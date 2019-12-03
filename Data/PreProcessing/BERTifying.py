@@ -40,6 +40,7 @@ def Text_in_BERT(text, tokenizer=tokenizer, max_length=512):
     From a string to a BERT input.
     """
     
+    input_dict = {}
     encoded_dict = tokenizer.encode_plus(text, max_length=max_length)
     
     # Get the actual lenght of the input
@@ -55,23 +56,19 @@ def Text_in_BERT(text, tokenizer=tokenizer, max_length=512):
     encoded_dict['special_tokens_mask'] = encoded_dict['special_tokens_mask'] + \
                                           masks_to_add                                    
                                       
-    # Turn into torch tensors
-    encoded_dict['input_ids'] = torch.tensor([encoded_dict['input_ids']]).long().to(DEVICE)
+    # Turn into torch tensors and add 'inputs_ids' to input_dict
+    input_dict['input_ids'] = torch.tensor([encoded_dict['input_ids']]).long().to(DEVICE)
     encoded_dict['special_tokens_mask'] = torch.tensor([encoded_dict['special_tokens_mask']])
     
     # Add 'attention mask' tokens (it's the reverse of 'special_tokens_mask')
-    encoded_dict['attention_mask'] = ((encoded_dict['special_tokens_mask'] -1) * -1).float().to(DEVICE)
+    input_dict['attention_mask'] = ((encoded_dict['special_tokens_mask'] -1) * -1).float().to(DEVICE)
     
-    # Remove 'special_tokens_mask' and 'overflowing_tokens' from dict so it's ready for BERT
-    encoded_dict.pop('special_tokens_mask')
-    if 'overflowing_tokens' in encoded_dict:
-        encoded_dict.pop('overflowing_tokens') 
     
     # Add token_type and position_ids 
-    encoded_dict['token_type_ids'] = torch.zeros(1, max_length).long().to(DEVICE)
-    encoded_dict['position_ids'] = torch.arange(max_length).unsqueeze(0).to(DEVICE)
+    input_dict['token_type_ids'] = torch.zeros(1, max_length).long().to(DEVICE)
+    input_dict['position_ids'] = torch.arange(max_length).unsqueeze(0).to(DEVICE)
     
-    return encoded_dict
+    return input_dict
     
 
 
