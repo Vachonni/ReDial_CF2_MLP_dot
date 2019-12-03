@@ -62,8 +62,9 @@ def Text_in_BERT(text, tokenizer=tokenizer, max_length=512):
     # Add 'attention mask' tokens (it's the reverse of 'special_tokens_mask')
     encoded_dict['attention_mask'] = ((encoded_dict['special_tokens_mask'] -1) * -1).float().to(DEVICE)
     
-    # Remove 'special_tokens_mask' from dict so it's ready for BERT
+    # Remove 'special_tokens_mask' and 'overflowing_tokens' from dict so it's ready for BERT
     encoded_dict.pop('special_tokens_mask')
+    encoded_dict.pop('overflowing_tokens')
     
     # Add token_type and position_ids 
     encoded_dict['token_type_ids'] = torch.zeros(1, max_length).long().to(DEVICE)
