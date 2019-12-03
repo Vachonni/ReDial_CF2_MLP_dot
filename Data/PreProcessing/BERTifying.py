@@ -102,7 +102,13 @@ def Text_to_BERT_avrg(text, model=model, tokenizer=tokenizer, max_length=512):
 
 # Example of usage: 
 
-[Text_to_BERT_avrg(text) for text in df_user['text'].head()]
+# [Text_to_BERT_avrg(text) for text in df_user['text'].head()]
+
+
+
+
+
+
 
 #%%
 
