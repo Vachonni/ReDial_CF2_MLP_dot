@@ -4,6 +4,8 @@
 /Data/MLRnGChronoTRAIN.json
 /Data/g_MLRnGChronoTRAIN.json
 /Data/.DS_Store
+Data/user_chrono_RT_BERT_avrg.csv
+Data/movie_genres_RT_BERT_avrg.csv
 SB*
 slurm*
 /home/vachonni/scratch/ReDial_CF2_MLP_dot/Data/PreProcessing/__pycache__/*
