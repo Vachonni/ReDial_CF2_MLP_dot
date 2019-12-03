@@ -29,7 +29,8 @@ else:
 #%%
 
 
-# BERT_avrg = [Text_to_BERT_avrg(text) for text in df_user['text']]
+# Treat users
+print('USERS')
 
 BERT_avrg = []
 with torch.no_grad():
@@ -39,8 +40,24 @@ with torch.no_grad():
         BERT_avrg.append(Text_to_BERT_avrg(text))
 
 
-#%%
-
-df_user['BERT_user'] = BERT_avrg
+df_user['BERT_avrg'] = BERT_avrg
 
 df_user.to_csv('user_chrono_RT_BERT_avrg.csv', index=False)
+
+
+#%%
+
+# Treat items
+print('ITEMS')
+
+BERT_avrg = []
+with torch.no_grad():
+    
+    for i, (title, genres) in enumerate(zip(df_item['title'], df_item['genres'])):
+        if i % 1000 == 0: print(i)
+        BERT_avrg.append(Text_to_BERT_avrg(title + '. Genres::'))
+        if i >= 4: break
+
+df_item['BERT_avrg'] = BERT_avrg
+
+df_user.to_csv('movie_genres_RT_BERT_avrg.csv', index=False)
