@@ -1,5 +1,5 @@
 /Results
-/__pycache__
+*/__pycache__
 /.DS_Store
 /Data/MLRnGChronoTRAIN.json
 /Data/g_MLRnGChronoTRAIN.json
