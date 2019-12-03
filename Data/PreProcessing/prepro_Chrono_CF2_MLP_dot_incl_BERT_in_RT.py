@@ -35,9 +35,9 @@ BERT_avrg = []
 with torch.no_grad():
     
     for i, text in enumerate(df_user['text']):
-        print(i)
+        if i % 1000 == 0: print(i)
         BERT_avrg.append(Text_to_BERT_avrg(text))
-        
+
 
 #%%
 
