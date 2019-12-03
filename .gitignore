@@ -1,5 +1,4 @@
 /Results
-*/__pycache__
 /.DS_Store
 /Data/MLRnGChronoTRAIN.json
 /Data/g_MLRnGChronoTRAIN.json
@@ -9,4 +8,4 @@ Data/movie_genres_RT_BERT_avrg.csv
 SB*
 slurm*
 /home/vachonni/scratch/ReDial_CF2_MLP_dot/Data/PreProcessing/__pycache__/*
-
+/Users/nicholas/ReDial_CF2_MLP_do/Data/PreProcessing/__pycache__/
