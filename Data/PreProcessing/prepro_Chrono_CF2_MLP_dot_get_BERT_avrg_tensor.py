@@ -29,20 +29,18 @@ else:
 #%%
 
 
-## Treat users
-#print('USERS')
-#
-#BERT_avrg = []
-#with torch.no_grad():
-#    
-#    for i, text in enumerate(df_user['text']):
-#        if i % 1000 == 0: print(i)
-#        BERT_avrg.append(Text_to_BERT_avrg(text))
-#
-#
-#df_user['BERT_avrg'] = BERT_avrg
-#
-#df_user.to_csv('user_chrono_RT_BERT_avrg.csv', index=False)
+# Treat users
+print('USERS')
+
+BERT_avrg = torch.zeros(48272, 768)
+with torch.no_grad():
+    
+    for i, text in enumerate(df_user['text']):
+        if i % 1000 == 0: print(i)
+        BERT_avrg[i] = Text_to_BERT_avrg(text)
+        
+
+torch.save(BERT_avrg, 'user_BERT_avrg.pt')
 
 
 #%%
@@ -50,7 +48,7 @@ else:
 # Treat items
 print('ITEMS')
 
-BERT_avrg = []
+BERT_avrg = torch.zeros(48272, 768)
 with torch.no_grad():
     
     for i, (title, genres) in enumerate(zip(df_item['title'], df_item['genres'])):
@@ -63,9 +61,7 @@ with torch.no_grad():
             genres=''
         else: 
             genres='Genres: ' + genres
-        BERT_avrg.append(Text_to_BERT_avrg(title + '. ' + genres))
+        BERT_avrg[i] = Text_to_BERT_avrg(title + '. ' + genres)
 
-    
-df_item['BERT_avrg'] = BERT_avrg
 
-df_item.to_csv('movie_genres_RT_BERT_avrg.csv', index=False)
+torch.save(BERT_avrg, 'item_BERT_avrg.pt')  
