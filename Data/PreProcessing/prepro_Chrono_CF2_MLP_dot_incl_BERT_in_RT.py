@@ -32,13 +32,15 @@ else:
 # BERT_avrg = [Text_to_BERT_avrg(text) for text in df_user['text']]
 
 BERT_avrg = []
-for i, text in enumerate(df_user['text']):
-    print(i)
-    BERT_avrg.append(Text_to_BERT_avrg(text))
+with torch.no_grad():
     
+    for i, text in enumerate(df_user['text']):
+        print(i)
+        BERT_avrg.append(Text_to_BERT_avrg(text))
+        
 
 #%%
 
 df_user['BERT_user'] = BERT_avrg
 
-print(df_user.head())
+df_user.to_csv('user_chrono_RT_BERT_avrg.csv', index=False)
