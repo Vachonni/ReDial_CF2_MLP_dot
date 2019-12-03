@@ -13,12 +13,9 @@ Adding the BERT averaged representation to the RT
 
 import pandas as pd
 import torch
-from transformers import BertConfig, BertModel, BertTokenizer
+
 from BERTifying import Text_to_BERT_avrg
 
-
-tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-model = BertModel.from_pretrained('bert-base-uncased')
 
 
 if torch.cuda.is_available():

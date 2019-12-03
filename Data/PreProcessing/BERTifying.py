@@ -13,9 +13,9 @@ Turning text into averaged BERT representations
 
 # Get BERT averaged representation of texts in RT
 
-import pandas as pd
+# import pandas as pd
 import torch
-from transformers import BertConfig, BertModel, BertTokenizer
+from transformers import BertModel, BertTokenizer
  
 
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -28,8 +28,8 @@ model = BertModel.from_pretrained('bert-base-uncased')
 model.to(DEVICE)
 
 
-#df_user = pd.read_csv('/Users/nicholas/ReDial_CF2_MLP_dot/Data/user_chrono_RT.csv')
-#df_item = pd.read_csv('/Users/nicholas/ReDial_CF2_MLP_dot/Data/movie_genres_RT.csv')
+# df_user = pd.read_csv('/Users/nicholas/ReDial_CF2_MLP_dot/Data/user_chrono_RT.csv')
+# df_item = pd.read_csv('/Users/nicholas/ReDial_CF2_MLP_dot/Data/movie_genres_RT.csv')
 
 
 #%%
