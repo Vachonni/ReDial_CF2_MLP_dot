@@ -55,7 +55,12 @@ with torch.no_grad():
     
     for i, (title, genres) in enumerate(zip(df_item['title'], df_item['genres'])):
         if i % 1000 == 0: print(i)
-        BERT_avrg.append(Text_to_BERT_avrg(title + '. Genres::'))
+        # If no genres were found for the movie, just leave a blank space
+        if isinstance(genres, float): 
+            genres=''
+        else: 
+            genres='Genres: ' + genres
+        BERT_avrg.append(Text_to_BERT_avrg(title + '. ' + genres))
 
 df_item['BERT_avrg'] = BERT_avrg
 
