@@ -6,3 +6,5 @@
 /Data/.DS_Store
 SB*
 slurm*
+/home/vachonni/scratch/ReDial_CF2_MLP_dot/Data/PreProcessing/__pycache__/*
+
