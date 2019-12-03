@@ -23,10 +23,10 @@ print('DEVICE = ', DEVICE )
 
 
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-
+print('tokenizer loaded')
 model = BertModel.from_pretrained('bert-base-uncased')
 model.to(DEVICE)
-
+print('model loaded')
 
 # df_user = pd.read_csv('/Users/nicholas/ReDial_CF2_MLP_dot/Data/user_chrono_RT.csv')
 # df_item = pd.read_csv('/Users/nicholas/ReDial_CF2_MLP_dot/Data/movie_genres_RT.csv')

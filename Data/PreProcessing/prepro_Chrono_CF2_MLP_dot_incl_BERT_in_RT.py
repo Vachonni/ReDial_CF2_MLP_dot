@@ -16,7 +16,7 @@ import torch
 
 from BERTifying import Text_to_BERT_avrg
 
-
+print('now Bertify is loaded')
 
 if torch.cuda.is_available():
     df_user = pd.read_csv('/home/vachonni/scratch/ReDial_CF2_MLP_dot/Data/user_chrono_RT.csv')
