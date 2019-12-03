@@ -68,4 +68,4 @@ with torch.no_grad():
     
 df_item['BERT_avrg'] = BERT_avrg
 
-df_user.to_csv('movie_genres_RT_BERT_avrg.csv', index=False)
+df_item.to_csv('movie_genres_RT_BERT_avrg.csv', index=False)
