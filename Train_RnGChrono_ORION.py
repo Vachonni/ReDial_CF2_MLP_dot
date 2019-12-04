@@ -159,7 +159,7 @@ def main(args):
     print('******* Creating dataloaders *******\n\n')    
     kwargs = {'num_workers': args.num_workers, 'pin_memory': False}
     if (args.DEVICE == "cuda"):
-        kwargs = {'num_workers': args.num_workers, 'pin_memory': False}
+        kwargs = {'num_workers': args.num_workers, 'pin_memory': True}
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=args.batch,\
                                                shuffle=True, drop_last=True, **kwargs)
     valid_loader = torch.utils.data.DataLoader(valid_dataset, batch_size=args.batch,\

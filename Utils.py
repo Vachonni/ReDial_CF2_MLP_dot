@@ -95,6 +95,7 @@ def TrainReconstruction(train_loader, model, criterion, optimizer, weights_facto
     
     model.train()
     train_loss = 0
+    train_loss_no_weight = 0
     nb_batch = len(train_loader) * completion / 100
     
     
@@ -120,13 +121,9 @@ def TrainReconstruction(train_loader, model, criterion, optimizer, weights_facto
         
         # Print update
         if batch_idx % 100 == 0: 
-            print('Batch {:4d} out of {:4.1f}.    Reconstruction Loss on targets: {:.4f}'\
-                  .format(batch_idx, nb_batch, train_loss/(batch_idx+1)))  
+            print('Batch {:4d} out of {:4.1f}.    Reconstruction Loss on targets: {:.4f}, no weights: {:.4f}' \
+                  .format(batch_idx, nb_batch, train_loss/(batch_idx+1), train_loss_no_weight/(batch_idx+1)))  
                 
-        # Add weights on targets rated 0 (w_0) because outnumbered by targets 1
-        w_0 = (targets - 1) * -1 * (weights_factor - 1)
-        w = torch.ones(len(targets)).to(DEVICE) + w_0
-        criterion.weight = w
         
         optimizer.zero_grad()   
 
@@ -138,9 +135,15 @@ def TrainReconstruction(train_loader, model, criterion, optimizer, weights_facto
 #        pred_mean_values.append((pred.detach()).mean())
 #        """ """
 
-
+        # Add weights on targets rated 0 (w_0) because outnumbered by targets 1
+        w_0 = (targets - 1) * -1 * (weights_factor - 1)
+        w = torch.ones(len(targets)).to(DEVICE) + w_0
+        criterion.weight = w
     
         loss = criterion(logits, targets)
+        
+        criterion.weight = None
+        loss_no_weight = criterion(logits, targets).detach()
 
         loss.backward()
         optimizer.step()
@@ -152,6 +155,7 @@ def TrainReconstruction(train_loader, model, criterion, optimizer, weights_facto
 #        train_loss += loss_no_weights.detach()
         
         train_loss += loss
+        train_loss_no_weight += loss_no_weight
         
     train_loss /= nb_batch
         
