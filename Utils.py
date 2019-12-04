@@ -133,6 +133,9 @@ def TrainReconstruction(train_loader, model, criterion, optimizer, weights_facto
 #        pred_mean_values.append((pred.detach()).mean())
 #        """ """
         
+        print(logits.is_cuda)
+        print(targets.to(DEVICE).is_cuda)
+
     
         loss = criterion(logits, targets.to(DEVICE))
 
