@@ -206,7 +206,8 @@ def main(args):
         
         train_loss = Utils.TrainReconstruction(train_loader, model, criterion, optimizer, \
                                                args.weights, args.completionTrain, args.DEVICE)
-        eval_loss = Utils.EvalReconstruction(valid_loader, model, criterion, 100, args.DEVICE)
+        eval_loss = Utils.EvalReconstruction(valid_loader, model, criterion, args.weights, \
+                                             100, args.DEVICE)
         
         
 
