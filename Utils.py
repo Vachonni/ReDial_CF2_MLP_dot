@@ -31,127 +31,52 @@ DATASET - Sub classes of Pytorch DATASET to prepare for Dataloader
 
 
 
-class RnGChronoDataset(data.Dataset):
+class Dataset_MLP_dot(data.Dataset):
     """    
     
     ****** Now inputs and targets are seperated in data ******
     
     
     INPUT: 
-        RnGlist format is:
-            ["ConvID", [(UiD, Rating) mentionned], ["genres"], [(UiD, Rating) to be mentionned]]
-        top_cut is the number of movies in genres vector
-        If data from a non-chrono dataset (eg: ML), all data in mentionned (to be mentionned empty).
-    
-    RETUNRS:
-        masks, (inputs, genres) and targets. 
-        Genres is vector with value for top_cut movies of intersection of genres mentionned 
-        by user, normalized (or deduced for ML).
+        data: A Numpy Array shape (39706, 6), where each column is:
+             [data_idx, ConvID, qt_movies_mentioned, user_chrono_id, movie_UiD, rating
+             Chrono data's from ReDial
+        user_RT: torch tensor (in cuda) of shape (39706, 768). Kind of a Retational Table.
+                 Each line is the BERT avrg representation of corresponding user_chrono_id     
+        item_RT: torch tensor (in cuda) of shape (48272, 768). Kind of a Retational Table.
+                 Each line is the BERT avrg representation of corresponding movie_UiD
 
+    
+    RETURNS (for one data point):
+        user's BERT avrg representation
+        item's BERT avrg representation
+        rating corresponding
     """
     
-    def __init__(self, RnGlist, dict_genresInter_idx_UiD, nb_movies, popularity, DEVICE, \
-                 exclude_genres=False, no_data_merge=False, noise=False, top_cut=100):
-        self.RnGlist = RnGlist
-        self.dict_genresInter_idx_UiD = dict_genresInter_idx_UiD
-        self.nb_movies = nb_movies
-        self.popularity = popularity
+    
+    def __init__(self, data, user_RT, item_RT, DEVICE):
+        self.data = data
+        self.user_RT = user_RT
+        self.item_RT = item_RT
         self.DEVICE = DEVICE
-        self.exclude_genres = exclude_genres
-        self.no_data_merge = no_data_merge
-        self.noise = noise
-        self.top_cut = top_cut
-        
+
+
         
     def __len__(self):
-        "Total number of samples. Here one sample corresponds to a new mention in Conversation"
-        return len(self.RnGlist)
+        "Total number of samples."
+        
+        return len(self.data)
+
 
 
     def __getitem__(self, index):
         "Generate one sample of data."
         
-        # Get list of movies and ratings for user number (=index) 
-        ConvID, l_inputs, l_genres, l_targets = self.RnGlist[index]
+        # Get items in 'index' position 
+        data_idx, ConvID, qt_movies_mentionnes, user_id, item_id, rating = self.data[index]        
         
-        # Init
-        # For inputs, we consider maximum 8 movies (after, too little data in ReDial)
-        # Add 48273 for the empty embedding at position 48273 (when not 8 inputs)
-        inputs = torch.zeros(9, dtype=torch.int64) + 48273
-        # Size 9 because fist token is the [RECO] token, at idx 48272
-        inputs[0] = 48272 
-        targets = torch.zeros(self.nb_movies)   
-        masks_inputs = torch.zeros(self.nb_movies)
-        masks_targets = torch.zeros(self.nb_movies)
-        genres = torch.zeros(self.nb_movies)
-
-        # If we merge data (mentionned and to be mentionned)
-        if not self.no_data_merge:
-            sum_i_t = l_inputs + l_targets
-            l_inputs = sum_i_t
-            l_targets = sum_i_t
+        return  self.user_RT[user_id], self.item_RT[item_id], rating.astype(float)
         
-        # Manage noise
-        if self.noise:
-            min_input = max(2, len(l_inputs))    # Insure p choice is at least 1
-            max_input = min(7, min_input)        # Insure not more than qt in l_inputs
-            p = torch.randint(1, max_input, (1,)).type(torch.uint8)  
-            ind_to_take = torch.randperm(len(l_inputs))[:p]
-            l_inputs = torch.IntTensor(l_inputs)
-            l_inputs = l_inputs[ind_to_take]
-            # Same for targets 
-            p = torch.randint(1, max_input, (1,)).type(torch.uint8)  
-            ind_to_take = torch.randperm(len(l_inputs))[:p]
-            l_targets = torch.IntTensor(l_targets)
-            l_targets = l_targets[ind_to_take]        
-        
-        # Inputs
-        input_idx = 1   # 0 is the [RECO] token
-        for uid, rating in l_inputs:
-            if rating == 1:
-                inputs[input_idx] = uid
-                input_idx += 1
-            masks_inputs[uid] = 1
-            if input_idx >= 8: break
-                
-        # Targets 
-        for uid, rating in l_targets:
-            targets[uid] = rating
-            masks_targets[uid] = 1
-        
-        # Genres
-        if not self.exclude_genres:
-            # Turn list of genres into string
-            str_genres = str(l_genres)
-            # Try - if no movies of that genres (key error)
-            try:
-                genres_idx, l_genres_uid = self.dict_genresInter_idx_UiD[str_genres] 
-            except:
-       #         print('No movie with genres:', str_genres)
-                genres_idx = 1
-            # If there is a genres...   (no else needed, since already at 0)
-            if genres_idx != 1:
-                for uid in l_genres_uid:
-                    genres[uid] = 1.0
-                    
-                """normalization and popularity"""
-                # If we want popularity (i.e. args.no_popularity == True)
-                if not torch.equal(self.popularity, torch.ones(1)):     
-                    # Include popularity in genres
-                    genres = genres * self.popularity
-                    # Take top 100 movies according to popularity
-                    genres_cut = torch.zeros(self.nb_movies)
-                    genres_cut[genres.topk(self.top_cut)[1]] = genres.topk(self.top_cut)[0]
-                    genres = genres_cut  
-                # Normalize vector
-                genres = torch.nn.functional.normalize(genres, dim=0)
-        
-        
-        return (masks_inputs.to(self.DEVICE), masks_targets.to(self.DEVICE)), \
-               (inputs.to(self.DEVICE), (genres_idx, genres.to(self.DEVICE))), \
-               targets.to(self.DEVICE)
-
-
 
 
 
@@ -166,21 +91,22 @@ TRAINING AND EVALUATION
 
 
 
-def TrainReconstruction(train_loader, model, criterion, optimizer, zero1, weights_factor, completion):
+def TrainReconstruction(train_loader, model, criterion, optimizer, weights_factor, completion):
+    
     model.train()
     train_loss = 0
     nb_batch = len(train_loader) * completion / 100
     
     
-    
-    """ """
-    pred_mean_values = []
-    
-    """ """
+#    """ """
+#    pred_mean_values = []
+#    
+#    """ """
    
-    print('TRAINING')
+    
+    print('\nTRAINING')
      
-    for batch_idx, (masks, inputs, targets) in enumerate(train_loader):
+    for batch_idx, (user, item, targets) in enumerate(train_loader):
         
         # Early stopping
         if batch_idx > nb_batch: 
@@ -192,75 +118,44 @@ def TrainReconstruction(train_loader, model, criterion, optimizer, zero1, weight
             print('Batch {:4d} out of {:4.1f}.    Reconstruction Loss on targets: {:.4f}'\
                   .format(batch_idx, nb_batch, train_loss/(batch_idx+1)))  
                 
-        # Add weights on targets rated 0 because outnumbered by targets 1
-        weights = (masks[1] == 1).float() * (targets == 0).float() \
-                                * weights_factor + torch.ones_like(targets)
-        criterion.weight = weights.float()
+        # Add weights on targets rated 0 (w_0) because outnumbered by targets 1
+        w_0 = (targets - 1) * -1 * (weights_factor - 1)
+        w = torch.ones(len(targets)) + w_0
+        criterion.weight = w
         
-
-        """ UNcomment TO TRAIN WITHOUT GENRES"""
-        # Genres removed from inputs 
-#        inputs[1][0] = torch.ones(inputs[0].size(0), dtype=torch.uint8)
-#        inputs[1][1] = torch.zeros(inputs[0].size(0), 48272)
-
-        # re-initialize the gradient computation
         optimizer.zero_grad()   
 
+        pred, logits = model(user, item)
 
-        # Making inputs 0 = not seen, -1 = not liked and 1 = liked
-        if zero1 == 1:
-            inputs[0] = 2*inputs[0] - masks[0]        
-        # Making inputs 0 = not seen, 1 = not liked and 2 = liked
-        if zero1 == 2:
-            inputs[0] = inputs[0] + masks[0]
-            
-            
-        pred = model(inputs)
+           
+#        
+#        """ To look into pred values evolution during training"""
+#        pred_mean_values.append((pred.detach()).mean())
+#        """ """
+        
+    
+        loss = criterion(logits, targets)
 
-            
-        
-        
-        """ To look into pred values evolution during training"""
-#        if model.model_pre.lla == 'none':
-#            pred_mean_values.append((torch.nn.Sigmoid()(pred.detach())).mean())
-#        else:
-#            pred_mean_values.append((pred.detach()).mean())
-        pred_mean_values.append((pred.detach()).mean())
-        """ """
-        
-        
-        
-     
-        """ Try reconstruction including genres """
-#        targets = targets + model.g * inputs[1][1]
-#        masks = masks * (inputs[1][1] != 0).float()
-     
-        
-
-        loss = (criterion(pred, targets) * masks[1]).sum()
-        assert loss >= 0, 'Getting a negative loss in training - IMPOSSIBLE'
-        # Using only predictions of movies that were rated in targets
-     #   pred = pred * masks
-        nb_ratings = masks[1].sum()
-        loss /= nb_ratings
         loss.backward()
         optimizer.step()
         
-        # Remove weights for other evaluations
-        criterion.weight = None
-        loss_no_weights = (criterion(pred, targets) * masks[1]).sum() 
-        loss_no_weights /= nb_ratings
-        train_loss += loss_no_weights.detach()
+#        # Remove weights for other evaluations
+#        criterion.weight = None
+#        loss_no_weights = (criterion(pred, targets) * masks[1]).sum() 
+#        loss_no_weights /= nb_ratings
+#        train_loss += loss_no_weights.detach()
+        
+        train_loss += loss
         
     train_loss /= nb_batch
         
-    return (pred_mean_values, train_loss) 
+    return train_loss
 
 
 
 
 
-def EvalReconstruction(valid_loader, model, criterion, zero1, completion):
+def EvalReconstruction(valid_loader, model, criterion, completion):
     model.eval()
     eval_loss = 0
     nb_batch = len(valid_loader) * completion / 100
@@ -268,7 +163,7 @@ def EvalReconstruction(valid_loader, model, criterion, zero1, completion):
     print('\nEVALUATION')
     
     with torch.no_grad():
-        for batch_idx, (masks, inputs, targets) in enumerate(valid_loader):
+        for batch_idx, (user, item, targets) in enumerate(valid_loader):
             
             # Early stopping 
             if batch_idx > nb_batch: 
@@ -279,28 +174,18 @@ def EvalReconstruction(valid_loader, model, criterion, zero1, completion):
             if batch_idx % 100 == 0: 
                 print('Batch {:4d} out of {:4.1f}.    Reconstruction Loss on targets: {:.4f}'\
                       .format(batch_idx, nb_batch, eval_loss/(batch_idx+1)))  
-                   
-            # Making inputs 0 = not seen, -1 = not liked and 1 = liked
-            if zero1 == 1:
-                inputs[0] = 2*inputs[0] - masks[0]        
-            # Making inputs 0 = not seen, 1 = not liked and 2 = liked
-            if zero1 == 2:
-                inputs[0] = inputs[0] + masks[0]
+                               
+            pred, logits = model(user, item)  
             
-            pred = model(inputs)  
-            
-            # Using only movies that were rated in targets
-        #   pred = pred * masks
-            nb_ratings = masks[1].sum()
-       #     del(masks)
-            loss = (criterion(pred, targets) * masks[1]).sum()
-            assert loss >= 0, 'Getting a negative loss in eval - IMPOSSIBLE'
-            loss = loss / nb_ratings
+            loss = criterion(logits, targets)
+
             eval_loss += loss
     
     eval_loss /= nb_batch 
     
     return eval_loss
+
+
 
 
 

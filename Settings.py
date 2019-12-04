@@ -38,8 +38,8 @@ ML_genres = ['animation', 'adventure', 'drama', 'thriller', 'action', 'fantasy',
 # List of all UiD of movies mentioned in ReDial
 
 # Get the dict of conversions
-ReDiD2UiD = np.load('./Data/ReDID2uID.npy').item()
+# ReDiD2UiD = np.load('./Data/ReDID2uID.npy').item()
 
-l_ReDUiD = []
-for value in ReDiD2UiD.values():
-    l_ReDUiD.append(value)
+#l_ReDUiD = []
+#for value in ReDiD2UiD.values():
+#    l_ReDUiD.append(value)

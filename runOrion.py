@@ -33,7 +33,7 @@ from orion.client import report_results
 
 # Making the --id the log folder (this is a strage name, should be changed to args.logPATH)
 # (need for Orion, from $SLURM_TMPDIR, adapted elsewhere)
-args.id = args.working_dir + '/Results/' + args.trial_id + '/' 
+args.logPATH = args.working_dir + '/Results/' + args.trial_id + '/' 
 
 # Making the --dataPATH 
 # (need for Orion, from $SLURM_TMPDIR, adapted elsewhere)
@@ -54,8 +54,8 @@ print(vars(args))
 
 
 # Save all arguments values
-if not os.path.isdir(args.id): os.makedirs(args.id, exist_ok=True)
-with open(args.id+'arguments.json', 'w') as fp:
+if not os.path.isdir(args.logPATH): os.makedirs(args.logPATH, exist_ok=True)
+with open(args.logPATH+'arguments.json', 'w') as fp:
     json.dump(vars(args), fp, sort_keys=True, indent=4)
     fp.write('\n\n'+str(sys.argv))
 
@@ -102,7 +102,7 @@ else:
     
     
     # Set args for training on ReDial after pre-training
-    args.preModel = args.id + 'ML_model.pth'
+    args.preModel = args.logPATH + 'ML_model.pth'
     args.dataTrain = 'ReDialRnGChronoTRAIN.json' 
     args.dataValid  = 'ReDialRnGChronoVALID.json' 
     args.noiseTrain = False
@@ -117,7 +117,7 @@ else:
     Train_RnGChrono_ORION.main(args) 
 
     # delete the ML_model (for space considerations)
-    os.remove(args.id + 'ML_model.pth')
+    os.remove(args.logPATH + 'ML_model.pth')
 
 
 
@@ -127,7 +127,7 @@ else:
 
 # Set args for prediction of one model, 
 args.seed = True
-args.M1_path = args.id + 'Re_model.pth'   
+args.M1_path = args.logPATH + 'Re_model.pth'   
 if args.DEBUG:
     args.completionPredChrono = 1
 else:

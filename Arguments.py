@@ -17,7 +17,7 @@ parser = argparse.ArgumentParser(description='Train an AutoEncoder Recommender a
 
 
                     # Strange name for id, should be changed
-parser.add_argument('--id', type=str, metavar='', \
+parser.add_argument('--logPATH', type=str, metavar='', \
                     help='Path to directory used when saving files.')
 
 # Data
@@ -27,13 +27,8 @@ parser.add_argument('--dataTrain', type=str, metavar='', default='', \
                     help='File name of Dataset to train on')
 parser.add_argument('--dataValid', type=str, metavar='', default='', \
                     help='File name of Dataset to for validation')
-parser.add_argument('--exclude_genres', default=False, action='store_true', \
-                    help='If arg added, genres not used in input (Dataset part empty for genres)')
-parser.add_argument('--no_data_merge', default=False, action='store_true', \
-                    help='If arg added, mentionned and to be mentionned data are NOT added. \
-                    Used in Dataset. ALWAYS True when for PredChrono.')
-parser.add_argument('--no_popularity', default=False, action='store_true', \
-                    help='If arg added, popularity is not added to the genres.')
+parser.add_argument('--num_workers', type=int, metavar='', default=0, help='Qt CPU when loading data')
+
 
 # Training
 parser.add_argument('--lr', type=float, metavar='', default=0.001, help='Learning rate')
@@ -135,7 +130,7 @@ parser.add_argument('--ORION_NOpreTrain', type=int, metavar='', default=-1, choi
                     help='Pretraining on ML or not, will be transformed in runOrion.py. ')
 parser.add_argument('--ORION_g_type', type=int, metavar='', default=-1, choices=[-1,0,1,2], \
                     help='g_type, will be transformed in runOrion.py (only 3 last types)')
-parser.add_argument('--trial_id', type=str, metavar='', \
+parser.add_argument('--trial_id', type=str, metavar='', default='.',\
                     help='ORION - Unique trial experience. USed to reconstruc args.id.')
 parser.add_argument('--working_dir', type=str, metavar='', default='.', \
                     help='ORION - Path to directory where experience is run.')
@@ -167,15 +162,6 @@ if args.loss_fct == 'BCE':
     assert args.last_layer_activation != 'none','Need last layer activation with BCE'
 if args.loss_fct == 'BCEWLL':
     assert args.last_layer_activation == 'none',"Last layer activation must be 'none' with BCEWLL"
-
-if args.no_data_merge:
-    assert args.completionPred == 0, "Can't ask for Pred Reconstruction when data not merged"
-    assert args.completionPredEpoch == 0, "Can't ask for Pred ReconstructionEpoch when data not merged"
-# If not for Prediction file and no data merge
-# (when pred file (no train data), don't raise error because case handle in code)  
-if not args.no_data_merge and args.dataTrain != '': 
-    assert args.completionPredChrono == 0, "Can't ask for PredChrono when data is merged"
-    
     
     
 

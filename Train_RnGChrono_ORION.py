@@ -19,11 +19,12 @@ import json
 import torch
 from torch import optim
 import numpy as np
+import pandas as pd
 from statistics import mean
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 
 # Personnal imports
-import TransformersNV
+import MLP_dot
 import Utils
 import Settings 
 import Arguments 
@@ -77,69 +78,32 @@ def main(args):
     #                      # 
     ########################
     
-    from transformers import BertTokenizer, BertModel
     
     # OPTIONAL: if you want to have more information on what's happening under the hood, activate the logger as follows
     import logging
     logging.basicConfig(level=logging.INFO)
-      
-    
-    ######## GET PRETRAINED TOKENIZER
- 
-    # Load pre-trained model tokenizer (vocabulary)
-# ============= >>>>>>>>>>  USE ENCODE WITH add_special_tokens=True
-    tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-    
-        
-    ######## GET PRETRAINED MODEL
-    
-   # Load pre-trained model (weights) for USERS
-    BERT_U = BertModel.from_pretrained('bert-base-uncased')
-
-   # Load pre-trained model (weights) for ITEMS
-    BERT_I = BertModel.from_pretrained('bert-base-uncased')
     
     
+    # Create basic model
+    model = MLP_dot.MLP_dot()
+    model = model.to(args.DEVICE)
+          
+    
+#    # LogitsLoss for stability. Weights for data imbalanced in rating = 0
+#    w = (labels.float() - 1) * -90
     
     
-
-    
-    
-    # Set the model in evaluation mode to deactivate the DropOut modules
-    # This is IMPORTANT to have reproducible results during evaluation!
-    model.eval()
-    
-    # If you have a GPU, put everything on cuda
-    tokens_tensor = tokens_tensor.to('cpu')
-    segments_tensors = segments_tensors.to('cpu')
-    model.to('cpu')
-    
-    # Predict hidden states features for each layer
-    with torch.no_grad():
-        # See the models docstrings for the detail of the inputs
-        outputs = model(tokens_tensor, token_type_ids=segments_tensors)
-        # Transformers models always output tuples.
-        # See the models docstrings for the detail of all the outputs
-        # In our case, the first element is the hidden state of the last layer of the Bert model
-        encoded_layers = outputs[0]
-    # We have encoded our input sequence in a FloatTensor of shape (batch size, sequence length, model hidden dimension)
-    assert tuple(encoded_layers.shape) == (1, len(indexed_tokens), model.config.hidden_size)
-    
-#%%
-    
-    
-    model = TransformersNV.BasicRecoTransformer(args.d_model, args.nhead, args.num_layers).to(args.DEVICE)
-    criterion = torch.nn.BCELoss(reduction='none')
+    criterion = torch.nn.BCEWithLogitsLoss()
     optimizer = optim.Adam(model.parameters(), lr = args.lr)
     
     
-    ######## LOAD MODEL
-    
-    if args.preModel != 'none': 
-        checkpoint = torch.load(args.preModel, map_location=args.DEVICE)    
-        model.load_state_dict(checkpoint['state_dict'])
-        optimizer.load_state_dict(checkpoint['optimizer'])
-    
+#    ######## LOAD MODEL
+#    
+#    if args.preModel != 'none': 
+#        checkpoint = torch.load(args.preModel, map_location=args.DEVICE)    
+#        model.load_state_dict(checkpoint['state_dict'])
+#        optimizer.load_state_dict(checkpoint['optimizer'])
+#    
     
     
     
@@ -155,51 +119,60 @@ def main(args):
     
     # R (ratings) - Format [ [UserID, [movies uID], [ratings 0-1]] ]   
     print('******* Loading SAMPLES from *******', args.dataPATH + args.dataTrain)
-    train_data = json.load(open(args.dataPATH + args.dataTrain))
-    valid_data = json.load(open(args.dataPATH + args.dataValid))
-    # Use only samples where there is a genres mention
-    valid_g_data = [[c,m,g,tbm] for c,m,g,tbm in valid_data if g != []]
+    df_train = pd.read_csv(args.dataPATH + args.dataTrain)
+    df_valid = pd.read_csv(args.dataPATH + args.dataValid)
+    # Turn DataFrame into an numpy array (easier iteration)
+    train_data = df_train.values
+    valid_data = df_valid.values
+    # Load Relational Tables (RT) of BERT_avrg for users and items. Type: torch.tensor.
+    user_RT = torch.load(args.dataPATH+'user_BERT_avrg.pt', map_location=args.DEVICE)
+    item_RT = torch.load(args.dataPATH+'item_BERT_avrg.pt', map_location=args.DEVICE)    
+#    # Use only samples where there is a genres mention
+#    valid_g_data = [[c,m,g,tbm] for c,m,g,tbm in valid_data if g != []]
     if args.DEBUG: 
         train_data = train_data[:128]
         valid_data = valid_data[:128]
     
-    # G (genres) - Format [ [UserID, [movies uID of genres mentionned]] ]    
-    print('******* Loading GENRES from *******', args.genresDict)
-    dict_genresInter_idx_UiD = json.load(open(args.dataPATH + args.genresDict))
-    
-    # Getting the popularity vector 
-    if not args.no_popularity:
-        print('** Including popularity')
-        popularity = np.load(args.dataPATH + 'popularity_vector.npy')
-        popularity = torch.from_numpy(popularity).float()
-    else: popularity = torch.ones(1)
+#    # G (genres) - Format [ [UserID, [movies uID of genres mentionned]] ]    
+#    print('******* Loading GENRES from *******', args.genresDict)
+#    dict_genresInter_idx_UiD = json.load(open(args.dataPATH + args.genresDict))
+#    
+#    # Getting the popularity vector 
+#    if not args.no_popularity:
+#        print('** Including popularity')
+#        popularity = np.load(args.dataPATH + 'popularity_vector.npy')
+#        popularity = torch.from_numpy(popularity).float()
+#    else: popularity = torch.ones(1)
         
     
     ######## CREATING DATASET 
     
     print('******* Creating torch datasets *******')
-    train_dataset = Utils.RnGChronoDataset(train_data, dict_genresInter_idx_UiD, \
-                                           nb_movies, popularity, args.DEVICE, args.exclude_genres, \
-                                           args.no_data_merge, args.noiseTrain, args.top_cut)
-    valid_dataset = Utils.RnGChronoDataset(valid_data, dict_genresInter_idx_UiD, \
-                                           nb_movies, popularity, args.DEVICE, args.exclude_genres, \
-                                           args.no_data_merge, args.noiseEval, args.top_cut)        
+    train_dataset = Utils.Dataset_MLP_dot(train_data, user_RT, item_RT, args.DEVICE)
+    valid_dataset = Utils.Dataset_MLP_dot(valid_data, user_RT, item_RT, args.DEVICE)       
     
     
     ######## CREATE DATALOADER
     
     print('******* Creating dataloaders *******\n\n')    
-    kwargs = {}
-    if(args.DEVICE == "cuda"):
-        kwargs = {'num_workers': 0, 'pin_memory': False}
+    kwargs = {'num_workers': args.num_workers, 'pin_memory': False}
+    if (args.DEVICE == "cuda"):
+        kwargs = {'num_workers': args.num_workers, 'pin_memory': True}
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=args.batch,\
                                                shuffle=True, drop_last=True, **kwargs)
     valid_loader = torch.utils.data.DataLoader(valid_dataset, batch_size=args.batch,\
                                                shuffle=True, drop_last=True, **kwargs)    
-    # For PredRaw - Loader of only 1 sample (user) 
-    valid_bs1_loader = torch.utils.data.DataLoader(valid_dataset, batch_size=1, shuffle=True, **kwargs)
-    ## For PredChrono
-    #valid_chrono_loader = torch.utils.data.DataLoader(valid_chrono_dataset, batch_size=args.batch, shuffle=True, **kwargs)    
+#    # For PredRaw - Loader of only 1 sample (user) 
+#    valid_bs1_loader = torch.utils.data.DataLoader(valid_dataset, batch_size=1, shuffle=True, **kwargs)
+#    ## For PredChrono
+#    #valid_chrono_loader = torch.utils.data.DataLoader(valid_chrono_dataset, batch_size=args.batch, shuffle=True, **kwargs)    
+#    
+    
+#%%    
+
+    
+    
+    import time
     
     
     
@@ -221,11 +194,28 @@ def main(args):
     
         print('\n\n\n\n     ==> Epoch:', epoch, '\n')
         
+        
+        
+        
+        start_time = time.time()
+        
+
+        
+        
         train_loss = Utils.TrainReconstruction(train_loader, model, criterion, optimizer, \
-                                               args.zero1, args.weights, args.completionTrain)
-        eval_loss = Utils.EvalReconstruction(valid_loader, model, criterion, \
-                                             args.zero1, 100)
+                                               args.weights, args.completionTrain)
+        eval_loss = Utils.EvalReconstruction(valid_loader, model, criterion, 100)
+        
+        
+
+        
+        
+        print('With {}, it took {} seconds'.format(args.num_workers, time.time() - start_time))   
+        
+        
+        
                 
+        
         train_losses.append(train_loss)
         valid_losses.append(eval_loss)
         losses = [train_losses, valid_losses]  
@@ -257,9 +247,9 @@ def main(args):
                     'optimizer': optimizer.state_dict(),
                     'losses': losses,
                     }
-            if not os.path.isdir(args.id): os.mkdir(args.id)
+            if not os.path.isdir(args.logPATH): os.mkdir(args.logPATH)
             # Save at directory + (ML or Re) + _model.pth
-            torch.save(state, args.id+args.dataTrain[0:2]+'_model.pth')
+            torch.save(state, args.logPATH+args.dataTrain[0:2]+'_model.pth')
             print('......saved.')
             
         
