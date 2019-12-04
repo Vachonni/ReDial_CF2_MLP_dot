@@ -93,8 +93,9 @@ def main(args):
 #    w = (labels.float() - 1) * -90
     
     
-    criterion = torch.nn.BCEWithLogitsLoss()
+    criterion = torch.nn.BCEWithLogitsLoss().to(args.DEVICE)        
     optimizer = optim.Adam(model.parameters(), lr = args.lr)
+          
     
     
 #    ######## LOAD MODEL
