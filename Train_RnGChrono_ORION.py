@@ -125,8 +125,9 @@ def main(args):
     train_data = df_train.values
     valid_data = df_valid.values
     # Load Relational Tables (RT) of BERT_avrg for users and items. Type: torch.tensor.
-    user_RT = torch.load(args.dataPATH+'user_BERT_avrg.pt', map_location=args.DEVICE)
-    item_RT = torch.load(args.dataPATH+'item_BERT_avrg.pt', map_location=args.DEVICE)    
+    # map_location is CPU because Dataset with num_workers > 0 should not return CUDA.
+    user_RT = torch.load(args.dataPATH+'user_BERT_avrg.pt', map_location='cpu')
+    item_RT = torch.load(args.dataPATH+'item_BERT_avrg.pt', map_location='cpu')    
 #    # Use only samples where there is a genres mention
 #    valid_g_data = [[c,m,g,tbm] for c,m,g,tbm in valid_data if g != []]
     if args.DEBUG: 
@@ -203,8 +204,8 @@ def main(args):
         
         
         train_loss = Utils.TrainReconstruction(train_loader, model, criterion, optimizer, \
-                                               args.weights, args.completionTrain)
-        eval_loss = Utils.EvalReconstruction(valid_loader, model, criterion, 100)
+                                               args.weights, args.completionTrain, args.DEVICE)
+        eval_loss = Utils.EvalReconstruction(valid_loader, model, criterion, 100, args.DEVICE)
         
         
 

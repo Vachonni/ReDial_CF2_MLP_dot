@@ -91,7 +91,7 @@ TRAINING AND EVALUATION
 
 
 
-def TrainReconstruction(train_loader, model, criterion, optimizer, weights_factor, completion):
+def TrainReconstruction(train_loader, model, criterion, optimizer, weights_factor, completion, DEVICE):
     
     model.train()
     train_loss = 0
@@ -125,7 +125,7 @@ def TrainReconstruction(train_loader, model, criterion, optimizer, weights_facto
         
         optimizer.zero_grad()   
 
-        pred, logits = model(user, item)
+        pred, logits = model(user.to(DEVICE), item.to(DEVICE))
 
            
 #        
@@ -155,7 +155,7 @@ def TrainReconstruction(train_loader, model, criterion, optimizer, weights_facto
 
 
 
-def EvalReconstruction(valid_loader, model, criterion, completion):
+def EvalReconstruction(valid_loader, model, criterion, completion, DEVICE):
     model.eval()
     eval_loss = 0
     nb_batch = len(valid_loader) * completion / 100
@@ -175,7 +175,7 @@ def EvalReconstruction(valid_loader, model, criterion, completion):
                 print('Batch {:4d} out of {:4.1f}.    Reconstruction Loss on targets: {:.4f}'\
                       .format(batch_idx, nb_batch, eval_loss/(batch_idx+1)))  
                                
-            pred, logits = model(user, item)  
+            pred, logits = model(user.to(DEVICE), item.to(DEVICE))  
             
             loss = criterion(logits, targets)
 
