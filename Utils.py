@@ -108,6 +108,11 @@ def TrainReconstruction(train_loader, model, criterion, optimizer, weights_facto
      
     for batch_idx, (user, item, targets) in enumerate(train_loader):
         
+        # Put on right DEVICE
+        user = user.to(DEVICE)
+        item = item.to(DEVICE)
+        targets = targets.to(DEVICE)
+        
         # Early stopping
         if batch_idx > nb_batch: 
             print(' *EARLY stopping')
@@ -125,19 +130,17 @@ def TrainReconstruction(train_loader, model, criterion, optimizer, weights_facto
         
         optimizer.zero_grad()   
 
-        pred, logits = model(user.to(DEVICE), item.to(DEVICE))
+        pred, logits = model(user, item)
 
            
 #        
 #        """ To look into pred values evolution during training"""
 #        pred_mean_values.append((pred.detach()).mean())
 #        """ """
-        
-        print(logits.is_cuda)
-        print(targets.to(DEVICE).is_cuda)
+
 
     
-        loss = criterion(logits, targets.to(DEVICE))
+        loss = criterion(logits, targets)
 
         loss.backward()
         optimizer.step()
@@ -168,6 +171,11 @@ def EvalReconstruction(valid_loader, model, criterion, completion, DEVICE):
     with torch.no_grad():
         for batch_idx, (user, item, targets) in enumerate(valid_loader):
             
+            # Put on right DEVICE
+            user = user.to(DEVICE)
+            item = item.to(DEVICE)
+            targets = targets.to(DEVICE)
+            
             # Early stopping 
             if batch_idx > nb_batch: 
                 print(' *EARLY stopping')
@@ -178,9 +186,9 @@ def EvalReconstruction(valid_loader, model, criterion, completion, DEVICE):
                 print('Batch {:4d} out of {:4.1f}.    Reconstruction Loss on targets: {:.4f}'\
                       .format(batch_idx, nb_batch, eval_loss/(batch_idx+1)))  
                                
-            pred, logits = model(user.to(DEVICE), item.to(DEVICE))  
+            pred, logits = model(user, item)  
             
-            loss = criterion(logits, targets.to(DEVICE))
+            loss = criterion(logits, targets)
 
             eval_loss += loss
     
