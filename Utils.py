@@ -125,7 +125,7 @@ def TrainReconstruction(train_loader, model, criterion, optimizer, weights_facto
                 
         # Add weights on targets rated 0 (w_0) because outnumbered by targets 1
         w_0 = (targets - 1) * -1 * (weights_factor - 1)
-        w = torch.ones(len(targets)) + w_0
+        w = torch.ones(len(targets)).to(DEVICE) + w_0
         criterion.weight = w
         
         optimizer.zero_grad()   
