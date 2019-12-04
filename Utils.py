@@ -134,7 +134,7 @@ def TrainReconstruction(train_loader, model, criterion, optimizer, weights_facto
 #        """ """
         
     
-        loss = criterion(logits, targets)
+        loss = criterion(logits, targets.to(DEVICE))
 
         loss.backward()
         optimizer.step()
@@ -177,7 +177,7 @@ def EvalReconstruction(valid_loader, model, criterion, completion, DEVICE):
                                
             pred, logits = model(user.to(DEVICE), item.to(DEVICE))  
             
-            loss = criterion(logits, targets)
+            loss = criterion(logits, targets.to(DEVICE))
 
             eval_loss += loss
     
