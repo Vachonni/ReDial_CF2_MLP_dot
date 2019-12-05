@@ -175,7 +175,7 @@ def EvalReconstruction(valid_loader, model, criterion, weights_factor, completio
     with torch.no_grad():
         for batch_idx, (user, item, targets) in enumerate(valid_loader):
             
-            # Put on right DEVICE
+            # Put on the right DEVICE
             user = user.to(DEVICE)
             item = item.to(DEVICE)
             targets = targets.to(DEVICE)
@@ -226,7 +226,7 @@ PREDICTION
 
 
 
-def Prediction(valid_data, model, user_BERT_RT, item_MLP_RT, completion, topx=100):
+def Prediction(valid_data, model, user_BERT_RT, item_MLP_RT, completion, DEVICE, topx=100):
     """
     Prediction on targets = to be mentionned movies...
     
@@ -257,6 +257,12 @@ def Prediction(valid_data, model, user_BERT_RT, item_MLP_RT, completion, topx=10
             # Print Update
             if batch_idx % 1000 == 0:
                 print('Batch {} out of {}'.format(batch_idx, nb_batch))
+                               
+            # Put on the right DEVICE (what will be used for prediction)
+            user_BERT_RT = user_BERT_RT.to(DEVICE)
+            item_MLP_RT = item_MLP_RT.to(DEVICE)
+            user_id = user_id.to(DEVICE)
+            item_id = item_id.to(DEVICE)
             
             
             ### Need to accumualte all movies for the same user (= same qt_movies_mentions)

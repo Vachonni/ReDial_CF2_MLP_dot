@@ -188,7 +188,7 @@ def main(args):
     # Make predictions (returns dictionaries)
     print("\n\nPrediction Chronological...")
     avrg_rank, MRR, RR, NDCG = Utils.Prediction(valid_data, model, user_BERT_RT, item_MLP_RT, \
-                                               args.completionPredChrono, args.topx)
+                                               args.completionPredChrono, args.DEVICE, args.topx)
 
     
     # Print results
