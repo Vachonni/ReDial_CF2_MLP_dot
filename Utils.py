@@ -259,8 +259,8 @@ def Prediction(valid_data, model, user_BERT_RT, item_MLP_RT, completion, DEVICE,
                 print('Batch {} out of {}'.format(batch_idx, nb_batch))
                                
             # Put on the right DEVICE (what will be used for prediction)
-            user_BERT_RT = user_BERT_RT.to(DEVICE)
-            item_MLP_RT = item_MLP_RT.to(DEVICE)
+    #        user_BERT_RT = user_BERT_RT.to(DEVICE)
+    #        item_MLP_RT = item_MLP_RT.to(DEVICE)
             user_id = user_id.to(DEVICE)
             item_id = item_id.to(DEVICE)
             
