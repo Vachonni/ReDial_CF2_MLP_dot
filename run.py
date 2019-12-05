@@ -61,9 +61,9 @@ args.completionPred = 0
 args.completionPredEpoch = 0 
 args.seed = True 
 
-## Execute training on ReDial
-#if not args.PredOnly:
-#    Train_RnGChrono_ORION.main(args) 
+# Execute training on ReDial
+if not args.PredOnly:
+    Train_RnGChrono_ORION.main(args) 
     
     
     
@@ -76,8 +76,6 @@ args.seed = True
 args.M1_path = args.logPATH + 'model.pth'   
 if args.DEBUG and args.completionPredChrono != 0:
     args.completionPredChrono = 1
-
-# args.completionPredChrono = 10
 
 # Execute prediction on the ReDial model 
 NDCGs_1model = Pred_RnGChrono.main(args)

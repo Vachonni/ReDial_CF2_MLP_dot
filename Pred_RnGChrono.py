@@ -219,7 +219,7 @@ def main(args):
     # Evaluate + graph
     for i in range(len(graphs_titles)):
         avrgs = Utils.ChronoPlot(graphs_data[i], graphs_titles[i], args.logPATH)
-        print(graphs_titles[i]+" on ReDial movies: {}={:.4f} and {}={:.4f}"\
+        print(graphs_titles[i]+" on ReDial movies: {}={:.4f} and {}={:.4f} \n"\
               .format('withOUT genres', avrgs[0], \
                       'with genres', avrgs[1]))
         if graphs_titles[i] == 'NDCG':

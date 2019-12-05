@@ -507,7 +507,7 @@ def ChronoPlot(l_d, title, PATH, l_label= ['withOUT genres', 'with genres']):
 #    plt.plot(d1x, d1y, label=label1)
 #    plt.plot(d0x, d0y, label=label2)  
         plt.errorbar(dx, dy, derr, elinewidth=0.5, label=l_label[i])
-        print(title, ' ',l_label[i],' CHRONO VALUES:', dy, '\n')
+        print(title, ' ',l_label[i],' CHRONO VALUES:', dy)
         dmean.append(mean(dall))
         
     # ADDING BERT
