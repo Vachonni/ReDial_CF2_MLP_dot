@@ -95,6 +95,9 @@ parser.add_argument('--preModel', type=str, metavar='', default='none', \
                     help='Path to a pre-trained model to start with. Should \
                     include a GenresWrapper of same type')
 # ...for Pred file
+parser.add_argument('--ranking_method', type=str, metavar='', default='min', \
+                    help='How even ranks are assigned. Use "ordinal" if get an assert error \
+                    of too many predictions equal. Can also be "average"')
 parser.add_argument('--PredOnly', default=False, action='store_true', \
                     help='If arg added,run.py will only do prediction, no training.')
 parser.add_argument('--M1_path', type=str, metavar='', default='none', \
@@ -105,6 +108,7 @@ parser.add_argument('--M2_path', type=str, metavar='', default='none', \
                     help='Path to a Model 2')
 parser.add_argument('--M2_label', type=str, metavar='', default='none', \
                     help='Label to a Model 2')
+
 
 
 # Genres 

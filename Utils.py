@@ -226,7 +226,8 @@ PREDICTION
 
 
 
-def Prediction(valid_data, model, user_BERT_RT, item_MLP_RT, completion, DEVICE, topx=100):
+def Prediction(valid_data, model, user_BERT_RT, item_MLP_RT, completion, \
+               ranking_method, DEVICE, topx=100):
     """
     Prediction on targets = to be mentionned movies...
     
@@ -293,9 +294,8 @@ def Prediction(valid_data, model, user_BERT_RT, item_MLP_RT, completion, DEVICE,
                     continue
 
                 # ... get Ranks for targets 
-                ranks, avrg_rk, mrr, rr, re_1, re_10, re_50, ndcg = Ranks(pred, pred[l_items_id], l_items_id, topx)
-                ranks_scipy = ss.rankdata(pred)[l_items_id]
-         #       if (ranks != ranks_scipy).all(): print(ranks, ranks_scipy)
+                ranks, avrg_rk, mrr, rr, re_1, re_10, re_50, ndcg = \
+                                            Ranks(pred, l_items_id, ranking_method, topx)
                 
                 # Add Ranks results to appropriate dict
                 if pred_on_qt_m_m in RR.keys():
@@ -435,21 +435,23 @@ def Recall_at_k_one_item(v, k=1):
 
 
 
-def Ranks(all_values, values_to_rank, indices_to_rank, topx = 0):
+def Ranks(all_values, indices_to_rank, ranking_method, topx = 0):
     """
-    Takes 2 numpy array and return, for all values in values_to_rank,
+    Takes 2 numpy array and return, for all values in indices_to_rank,
     the ranks, average ranks, MRR and nDCG for ranks smaller than topx
     """    
     # If topx not mentionned (no top), it's for all the values
     if topx == 0: topx = len(all_values)
     
-    qt_uniq = len(all_values.unique())
-    assert qt_uniq > 48272 * 0.95, \
-           '{} of predictions are equal, which is more than 0.05'.format((1 - (qt_uniq/48272)))
+    if ranking_method == 'min':
+        qt_uniq = len(all_values.unique())
+        assert qt_uniq > 48272 * 0.99, \
+               "{} of predictions are equal, which is more than 1%. \
+               USE --ranking_method 'ordinal'".format((1 - (qt_uniq/48272)))
     
-    ranks = ss.rankdata(all_values, method='ordinal')[indices_to_rank]
+    ranks = ss.rankdata(all_values, method=ranking_method)[indices_to_rank]
         
-    ndcg = nDCG(ranks, topx, len(values_to_rank))
+    ndcg = nDCG(ranks, topx, len(indices_to_rank))
     
     if ranks.sum() == 0: print('warning, should always be at least one rank')
     
