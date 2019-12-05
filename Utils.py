@@ -16,7 +16,7 @@ import torch
 #import nltk
 import matplotlib.pyplot as plt
 from statistics import mean, stdev
-
+import scipy.stats as ss
 
 #import Settings
 
@@ -241,6 +241,9 @@ def Prediction(valid_data, model, user_BERT_RT, item_MLP_RT, completion, DEVICE,
     MRR = {}
     RR = {}
     NDCG = {}
+    RE_1 = {}
+    RE_10 = {}
+    RE_50 = {}
                 
     pred_on_user = None
     l_items_id = []
@@ -290,7 +293,9 @@ def Prediction(valid_data, model, user_BERT_RT, item_MLP_RT, completion, DEVICE,
                     continue
 
                 # ... get Ranks for targets 
-                _, avrg_rk, mrr, rr, ndcg = Ranks(pred, pred[l_items_id], topx)
+                ranks, avrg_rk, mrr, rr, re_1, re_10, re_50, ndcg = Ranks(pred, pred[l_items_id], l_items_id, topx)
+                ranks_scipy = ss.rankdata(pred)[l_items_id]
+         #       if (ranks != ranks_scipy).all(): print(ranks, ranks_scipy)
                 
                 # Add Ranks results to appropriate dict
                 if pred_on_qt_m_m in RR.keys():
@@ -298,11 +303,17 @@ def Prediction(valid_data, model, user_BERT_RT, item_MLP_RT, completion, DEVICE,
                     MRR[pred_on_qt_m_m].append(mrr)
                     RR[pred_on_qt_m_m].append(rr)
                     NDCG[pred_on_qt_m_m].append(ndcg)
+                    RE_1[pred_on_qt_m_m].append(re_1)
+                    RE_10[pred_on_qt_m_m].append(re_10)
+                    RE_50[pred_on_qt_m_m].append(re_50)
                 else:
                     Avrg_Ranks[pred_on_qt_m_m] = [avrg_rk]
                     MRR[pred_on_qt_m_m] = [mrr]
                     RR[pred_on_qt_m_m] = [rr]
                     NDCG[pred_on_qt_m_m] = [ndcg]
+                    RE_1[pred_on_qt_m_m] = [re_1]
+                    RE_10[pred_on_qt_m_m] = [re_10]
+                    RE_50[pred_on_qt_m_m] = [re_50]
                 """ Done"""   
                
                 # Update pred_on with actual data
@@ -322,7 +333,7 @@ def Prediction(valid_data, model, user_BERT_RT, item_MLP_RT, completion, DEVICE,
             
             
 
-    return Avrg_Ranks, MRR, RR, NDCG
+    return Avrg_Ranks, MRR, RR, RE_1, RE_10, RE_50, NDCG
 
 
 
@@ -373,8 +384,7 @@ def nDCG(v, top, nb_values=0):
     
     return round(dcg/idcg, 2)
     
-
-    
+  
 # RR (Reciprocal Rank)
     
 # Gives a value in [0,1] for the first relevant item in list.
@@ -384,9 +394,48 @@ def nDCG(v, top, nb_values=0):
 def RR(v):
     return 1/np.min(v)
 
+
+
+# Recall@K for one item. 1 if the smallest rank in v is smaller than k, 0 if not.
+    
+def Recall_at_k_one_item(v, k=1):
+    return 1 if np.min(v) <= k else 0
+
+
+
+#def Ranks(all_values, values_to_rank, topx = 0):
+#    """
+#    Takes 2 numpy array and return, for all values in values_to_rank,
+#    the ranks, average ranks, MRR and nDCG for ranks smaller than topx
+#    """    
+#    # If topx not mentionned (no top), it's for all the values
+#    if topx == 0: topx = len(all_values)
+#    
+#    # Initiate ranks
+#    ranks = np.zeros(len(values_to_rank))
+#    
+#    for i,v in enumerate(values_to_rank):
+#        ranks[i] = len(all_values[all_values > v]) + 1
+#        
+#    ndcg = nDCG(ranks, topx, len(values_to_rank))
+#    
+#    if ranks.sum() == 0: print('warning, should always be at least one rank')
+#    
+#    return ranks, ranks.mean(), round(float((1/ranks).mean()),4), RR(ranks), \
+#           Recall_at_k_one_item(ranks, 1), Recall_at_k_one_item(ranks, 10), \
+#           Recall_at_k_one_item(ranks, 50), ndcg
     
 
-def Ranks(all_values, values_to_rank, topx = 0):
+
+
+
+
+
+
+
+
+
+def Ranks(all_values, values_to_rank, indices_to_rank, topx = 0):
     """
     Takes 2 numpy array and return, for all values in values_to_rank,
     the ranks, average ranks, MRR and nDCG for ranks smaller than topx
@@ -394,18 +443,25 @@ def Ranks(all_values, values_to_rank, topx = 0):
     # If topx not mentionned (no top), it's for all the values
     if topx == 0: topx = len(all_values)
     
-    # Initiate ranks
-    ranks = np.zeros(len(values_to_rank))
+    qt_uniq = len(all_values.unique())
+    assert qt_uniq > 48272 * 0.95, \
+           '{} of predictions are equal, which is more than 0.05'.format((1 - (qt_uniq/48272)))
     
-    for i,v in enumerate(values_to_rank):
-        ranks[i] = len(all_values[all_values > v]) + 1
+    ranks = ss.rankdata(all_values, method='ordinal')[indices_to_rank]
         
     ndcg = nDCG(ranks, topx, len(values_to_rank))
     
     if ranks.sum() == 0: print('warning, should always be at least one rank')
     
-    return ranks, ranks.mean(), round(float((1/ranks).mean()),4), RR(ranks), ndcg
-    
+    return ranks, ranks.mean(), round(float((1/ranks).mean()),4), RR(ranks), \
+           Recall_at_k_one_item(ranks, 1), Recall_at_k_one_item(ranks, 10), \
+           Recall_at_k_one_item(ranks, 50), ndcg
+
+
+
+
+
+
 
 
     
@@ -449,7 +505,7 @@ def ChronoPlot(l_d, title, PATH, l_label= ['withOUT genres', 'with genres']):
 #    plt.plot(d1x, d1y, label=label1)
 #    plt.plot(d0x, d0y, label=label2)  
         plt.errorbar(dx, dy, derr, elinewidth=0.5, label=l_label[i])
-        print(title, ' ',l_label[i],' CHRONO VALUES:', dy)
+        print(title, ' ',l_label[i],' CHRONO VALUES:', dy, '\n')
         dmean.append(mean(dall))
         
     # ADDING BERT

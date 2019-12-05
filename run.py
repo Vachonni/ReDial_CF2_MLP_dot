@@ -61,9 +61,9 @@ args.completionPred = 0
 args.completionPredEpoch = 0 
 args.seed = True 
 
-# Execute training on ReDial
-if not args.PredOnly:
-    Train_RnGChrono_ORION.main(args) 
+## Execute training on ReDial
+#if not args.PredOnly:
+#    Train_RnGChrono_ORION.main(args) 
     
     
     
