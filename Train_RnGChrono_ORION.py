@@ -77,12 +77,7 @@ def main(args):
     #        MODEL         #
     #                      # 
     ########################
-    
-    
-    # OPTIONAL: if you want to have more information on what's happening under the hood, activate the logger as follows
-    import logging
-    logging.basicConfig(level=logging.INFO)
-    
+     
     
     # Create basic model
     model = MLP_dot.MLP_dot()
@@ -118,7 +113,6 @@ def main(args):
     
     ######## LOAD DATA 
     
-    # R (ratings) - Format [ [UserID, [movies uID], [ratings 0-1]] ]   
     print('******* Loading SAMPLES from *******', args.dataPATH + args.dataTrain)
     df_train = pd.read_csv(args.dataPATH + args.dataTrain)
     df_valid = pd.read_csv(args.dataPATH + args.dataValid)
@@ -127,8 +121,8 @@ def main(args):
     valid_data = df_valid.values
     # Load Relational Tables (RT) of BERT_avrg for users and items. Type: torch.tensor.
     # map_location is CPU because Dataset with num_workers > 0 should not return CUDA.
-    user_RT = torch.load(args.dataPATH+'user_BERT_avrg.pt', map_location='cpu')
-    item_RT = torch.load(args.dataPATH+'item_BERT_avrg.pt', map_location='cpu')    
+    user_BERT_RT = torch.load(args.dataPATH+'user_BERT_avrg_RT.pt', map_location='cpu')
+    item_BERT_RT = torch.load(args.dataPATH+'item_BERT_avrg_RT.pt', map_location='cpu')    
 #    # Use only samples where there is a genres mention
 #    valid_g_data = [[c,m,g,tbm] for c,m,g,tbm in valid_data if g != []]
     if args.DEBUG: 
@@ -150,8 +144,8 @@ def main(args):
     ######## CREATING DATASET 
     
     print('******* Creating torch datasets *******')
-    train_dataset = Utils.Dataset_MLP_dot(train_data, user_RT, item_RT, args.DEVICE)
-    valid_dataset = Utils.Dataset_MLP_dot(valid_data, user_RT, item_RT, args.DEVICE)       
+    train_dataset = Utils.Dataset_MLP_dot(train_data, user_BERT_RT, item_BERT_RT)
+    valid_dataset = Utils.Dataset_MLP_dot(valid_data, user_BERT_RT, item_BERT_RT)       
     
     
     ######## CREATE DATALOADER
@@ -252,7 +246,7 @@ def main(args):
                     }
             if not os.path.isdir(args.logPATH): os.mkdir(args.logPATH)
             # Save at directory + (ML or Re) + _model.pth
-            torch.save(state, args.logPATH+args.dataTrain[0:2]+'_model.pth')
+            torch.save(state, args.logPATH+'model.pth')
             print('......saved.')
             
         

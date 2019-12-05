@@ -18,10 +18,11 @@ CF2 - Run Training and Prediction
 import os
 import json
 import sys
+
 # Get all arguemnts
 from Arguments import args 
 import Train_RnGChrono_ORION
-#import Pred_RnGChrono
+import Pred_RnGChrono
 
 
 
@@ -58,7 +59,6 @@ args.dataValid  = 'Val.csv'
 args.completionTrain = 100 
 args.completionPred = 0
 args.completionPredEpoch = 0 
-args.activations = 'relu'
 args.seed = True 
 
 # Execute training on ReDial
@@ -67,21 +67,21 @@ if not args.PredOnly:
     
     
     
-#    
-#    
-#########  PREDICTION  ########
-#
-## Set args for prediction of one model, 
-#args.seed = True
-#args.M1_path = args.logPATH + 'Re_model.pth'   
-#if args.DEBUG and args.completionPredChrono != 0:
-#    args.completionPredChrono = 1
-#
-#
-## Execute prediction on the ReDial model 
-## (No need for args.no_data_merge, it's treated in Pred_RnGChrono.main)
-#NDCGs_1model = Pred_RnGChrono.main(args)
-#
-#
+    
+    
+########  PREDICTION  ########
+
+# Set args for prediction of one model, 
+args.seed = True
+args.M1_path = args.logPATH + 'model.pth'   
+if args.DEBUG and args.completionPredChrono != 0:
+    args.completionPredChrono = 1
+
+# args.completionPredChrono = 10
+
+# Execute prediction on the ReDial model 
+NDCGs_1model = Pred_RnGChrono.main(args)
+
+
 
 
