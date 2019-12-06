@@ -449,7 +449,7 @@ def Ranks(all_values, indices_to_rank, ranking_method, topx = 0):
                "{} of predictions are equal, which is more than 1%. \
                USE --ranking_method 'ordinal'".format((1 - (qt_uniq/48272)))
     
-    ranks = ss.rankdata(all_values.cpu(), method=ranking_method)[indices_to_rank]
+    ranks = ss.rankdata((-1*all_values).cpu(), method=ranking_method)[indices_to_rank]
         
     ndcg = nDCG(ranks, topx, len(indices_to_rank))
     
