@@ -211,6 +211,38 @@ def main(args):
         
         
         
+        
+        
+        
+        
+        # Make predictions (returns dictionaries)
+        print("\n\nPrediction Chronological...")
+        item_MLP_RT = model.item_encoder(item_BERT_RT.to(args.DEVICE))
+        avrg_rank, MRR, RR, RE_1, RE_10, RE_50, NDCG = \
+                    Utils.Prediction(valid_data, model, user_BERT_RT, item_MLP_RT, \
+                                     args.completionPredChrono, args.ranking_method, \
+                                     args.DEVICE, args.topx)   
+        # Print results
+        print("\n  ====> RESULTS <==== \n")
+        print("\n  ==> BY Nb of mentions, on to be mentionned <== \n")
+                
+        # List of metrics to evaluate and graph
+        graphs_titles = ['RE_1', 'RE_10','RE_50','MRR', 'NDCG']  # 'Avrg Pred Error', 'MMRR', 'Avrg Rank', 'MRR'
+        graphs_data = [[RE_1, RE_1],[RE_10, RE_10],[RE_50, RE_50],[MRR, MRR],[NDCG, NDCG]]  # Put twice because legacy of with / without genres
+        # Evaluate + graph
+        for i in range(len(graphs_titles)):
+            avrgs = Utils.ChronoPlot(graphs_data[i], graphs_titles[i], args.logPATH)
+            print(graphs_titles[i]+" on ReDial movies: {}={:.4f} and {}={:.4f} \n"\
+                  .format('withOUT genres', avrgs[0], \
+                          'with genres', avrgs[1]))
+
+        
+
+    
+    
+    
+    
+    
                 
         
         train_losses.append(train_loss)
