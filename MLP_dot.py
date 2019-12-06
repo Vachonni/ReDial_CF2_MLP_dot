@@ -42,11 +42,6 @@ class MLP_dot(nn.Module):
     def __init__(self, input_size=768, hidden_size=512, output_size=128):
         super(MLP_dot, self).__init__()
         
-#        self.linear_user_1 = nn.Linear(input_size ,hidden_size)
-#        self.linear_user_2 = nn.Linear(hidden_size ,output_size)
-#        self.linear_item_1 = nn.Linear(input_size ,hidden_size)
-#        self.linear_item_2 = nn.Linear(hidden_size ,output_size)
-#        self.ReLU = nn.functional.relu
         
         self.user_encoder = nn.Sequential(
           nn.Linear(input_size ,hidden_size),
