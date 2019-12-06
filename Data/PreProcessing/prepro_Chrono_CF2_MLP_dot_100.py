@@ -280,7 +280,7 @@ for line in open(Conv_PATH, 'r'):
                     
                     
                 # Also add another 100 random movies at rating 0
-                new_movies_indices = np.random.choice(np.setdiff1d(range(48272), l_movies_rated), 100)
+                new_movies_indices = np.random.choice(np.setdiff1d(range(48272), l_movies_rated), len(l_movies_rated))
                 for m in new_movies_indices:
                     data.append([data_id, ConvID, count_original_mentions, u_id, m, 0])
                     data_id += 1
@@ -355,13 +355,13 @@ for line in open(Conv_PATH, 'r'):
 
 df = pd.DataFrame(valid_data)
 df.columns = ['data_idx', 'ConvID', 'qt_movies_mentioned', 'user_chrono_id', 'movie_UiD', 'rating']
-df.to_csv('Val100.csv', index=False)
+df.to_csv('Val_EQUAL.csv', index=False)
 
 # Creating a DataFrame and saving it
 
 df = pd.DataFrame(train_data)
 df.columns = ['data_idx', 'ConvID', 'qt_movies_mentioned', 'user_chrono_id', 'movie_UiD', 'rating']
-df.to_csv('Train100.csv', index=False)
+df.to_csv('Train_EQUAL.csv', index=False)
 
 
 #

@@ -227,8 +227,8 @@ def main(args):
         print("\n  ==> BY Nb of mentions, on to be mentionned <== \n")
                 
         # List of metrics to evaluate and graph
-        graphs_titles = ['RE_1', 'RE_10','RE_50','MRR', 'NDCG']  # 'Avrg Pred Error', 'MMRR', 'Avrg Rank', 'MRR'
-        graphs_data = [[RE_1, RE_1],[RE_10, RE_10],[RE_50, RE_50],[MRR, MRR],[NDCG, NDCG]]  # Put twice because legacy of with / without genres
+        graphs_titles = ['AVRG_RANK','RE_1', 'RE_10','RE_50','MRR', 'NDCG']  # 'Avrg Pred Error', 'MMRR', 'Avrg Rank', 'MRR'
+        graphs_data = [[avrg_rank,avrg_rank],[RE_1, RE_1],[RE_10, RE_10],[RE_50, RE_50],[MRR, MRR],[NDCG, NDCG]]  # Put twice because legacy of with / without genres
         # Evaluate + graph
         for i in range(len(graphs_titles)):
             avrgs = Utils.ChronoPlot(graphs_data[i], graphs_titles[i], args.logPATH)
