@@ -23,9 +23,9 @@ parser.add_argument('--logPATH', type=str, metavar='',\
 # Data
 parser.add_argument('--dataPATH', type=str, metavar='', default='./Data/', \
                     help='Path to datasets to train on')
-parser.add_argument('--dataTrain', type=str, metavar='', default='', \
+parser.add_argument('--dataTrain', type=str, metavar='', default='Train_EQUAL.csv', \
                     help='File name of Dataset to train on')
-parser.add_argument('--dataValid', type=str, metavar='', default='', \
+parser.add_argument('--dataValid', type=str, metavar='', default='Val_EQUAL.csv', \
                     help='File name of Dataset to for validation')
 parser.add_argument('--num_workers', type=int, metavar='', default=0, help='Qt CPU when loading data')
 

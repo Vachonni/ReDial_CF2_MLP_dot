@@ -54,8 +54,8 @@ with open(args.logPATH+'arguments.json', 'w') as fp:
 
 
 
-args.dataTrain = 'Train_EQUAL.csv' 
-args.dataValid  = 'Val_EQUAL.csv' 
+#args.dataTrain = 'Train_EQUAL.csv' 
+#args.dataValid  = 'Val_EQUAL.csv' 
 args.completionTrain = 100 
 args.completionPred = 0
 args.completionPredEpoch = 0 
