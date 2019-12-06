@@ -119,7 +119,7 @@ def TrainReconstruction(train_loader, model, criterion, optimizer, weights_facto
             break
         
         # Print update
-        if batch_idx % 10000 == 0: 
+        if batch_idx % 1000 == 0: 
             print('Batch {:4d} out of {:4.1f}.    Reconstruction Loss on targets: {:.4f}, no weights: {:.4f}' \
                   .format(batch_idx, nb_batch, train_loss/(batch_idx+1), train_loss_no_weight/(batch_idx+1)))  
                 
@@ -186,7 +186,7 @@ def EvalReconstruction(valid_loader, model, criterion, weights_factor, completio
                 break
             
             # Print update
-            if batch_idx % 10000 == 0: 
+            if batch_idx % 1000 == 0: 
                 print('Batch {:4d} out of {:4.1f}.    Reconstruction Loss on targets: {:.4f}, no weights: {:.4f}'\
                       .format(batch_idx, nb_batch, eval_loss/(batch_idx+1), eval_loss_no_weight/(batch_idx+1)))  
                                
@@ -259,7 +259,7 @@ def Prediction(valid_data, model, user_BERT_RT, item_MLP_RT, completion, \
                 break
             
             # Print Update
-            if batch_idx % 10000 == 0:
+            if batch_idx % 1000 == 0:
                 print('Batch {} out of {}'.format(batch_idx, nb_batch))
                                
             # Put on the right DEVICE (what will be used for prediction)
