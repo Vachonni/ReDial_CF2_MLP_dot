@@ -2,6 +2,7 @@
 /.DS_Store
 Data/item_BERT_avrg_RT.pt
 Data/user_BERT_avrg_RT.pt
+Data/Train100.csv
 /Data/.DS_Store
 Data/user_chrono_RT_BERT_avrg.csv
 Data/movie_genres_RT_BERT_avrg.csv

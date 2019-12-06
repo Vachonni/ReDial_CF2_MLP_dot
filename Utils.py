@@ -259,7 +259,7 @@ def Prediction(valid_data, model, user_BERT_RT, item_MLP_RT, completion, \
                 break
             
             # Print Update
-            if batch_idx % 1000 == 0:
+            if batch_idx % 10000 == 0:
                 print('Batch {} out of {}'.format(batch_idx, nb_batch))
                                
             # Put on the right DEVICE (what will be used for prediction)
