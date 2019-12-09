@@ -186,7 +186,7 @@ def EvalReconstruction(valid_loader, model, criterion, weights_factor, completio
                 break
             
             # Print update
-            if batch_idx % 1000 == 0: 
+            if batch_idx % 5000 == 0: 
                 print('Batch {:4d} out of {:4.1f}.    Reconstruction Loss on targets: {:.4f}, no weights: {:.4f}'\
                       .format(batch_idx, nb_batch, eval_loss/(batch_idx+1), eval_loss_no_weight/(batch_idx+1)))  
                                
@@ -258,14 +258,12 @@ def Prediction(valid_data, model, user_BERT_RT, item_BERT_RT, completion, \
                 break
             
             # Print Update
-            if batch_idx % 1000 == 0:
+            if batch_idx % 10000 == 0:
                 print('Batch {} out of {}'.format(batch_idx, nb_batch))
                                
             # Put on the right DEVICE (what will be used for prediction)
-            user_BERT_RT = user_BERT_RT.to(DEVICE)
+            user_id = torch.from_numpy(user_id).to(DEVICE)
             item_BERT_RT = item_BERT_RT.to(DEVICE)
-     #       user_id = user_id.to(DEVICE)
-     #       item_id = item_id.to(DEVICE)
             
             
             ### Need to accumualte all movies for the same user (= same qt_movies_mentions)
