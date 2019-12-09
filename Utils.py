@@ -262,7 +262,7 @@ def Prediction(valid_data, model, user_BERT_RT, item_BERT_RT, completion, \
                 print('Batch {} out of {}'.format(batch_idx, nb_batch))
                                
             # Put on the right DEVICE (what will be used for prediction)
-            user_id = torch.from_numpy(user_id).to(DEVICE)
+            user_BERT_RT = user_BERT_RT.to(DEVICE)
             item_BERT_RT = item_BERT_RT.to(DEVICE)
             
             
@@ -275,13 +275,12 @@ def Prediction(valid_data, model, user_BERT_RT, item_BERT_RT, completion, \
             if pred_on_user != user_id:
                 
                 """ Make the prediction on the pred_on user """
-#                # Get user's MLP_dot representation
-#                user_MLP_dot = model.user_encoder(user_BERT_RT[pred_on_user])
+                # Get user's avrg_BERT representation
+                user_BERT = user_BERT_RT[pred_on_user]
                 # Broadcast user's representation for each of of the 48272 movies
-                pred_on_user = pred_on_user.expand(48272, -1)
-                # Make predictions on all movies (1x128, 128x48272)
-#                logits = torch.mm(user_MLP_dot.unsqueeze(0), torch.transpose(item_MLP_RT, 0, 1))[0]
-                pred = model(pred_on_user, item_BERT_RT)
+                user_BERT = user_BERT.expand(48272, -1)
+                # Make predictions on all movies 
+                pred = model(user_BERT, item_BERT_RT)
                 
                 # Insure their is at least one target movie (case where new user starts with rating 0)
                 # (if not, go to next item and this sample not considered (continue))
