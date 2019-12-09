@@ -39,37 +39,29 @@ class MLP_dot(nn.Module):
     """
 
 
-    def __init__(self, input_size=768, hidden_size=512, output_size=128):
+    def __init__(self, input_size=2*768, hidden_size=512, output_size=1):
         super(MLP_dot, self).__init__()
         
         
-        self.user_encoder = nn.Sequential(
+        self.model = nn.Sequential(
           nn.Linear(input_size ,hidden_size),
           nn.ReLU(),
           nn.Linear(hidden_size ,output_size),
         )
         
-        self.item_encoder = nn.Sequential(
-          nn.Linear(input_size ,hidden_size),
-          nn.ReLU(),
-          nn.Linear(hidden_size ,output_size),
-        ) 
-        
-        nn.init.xavier_uniform_(self.user_encoder[0].weight)
-        nn.init.xavier_uniform_(self.user_encoder[2].weight)
-        nn.init.xavier_uniform_(self.item_encoder[0].weight)
-        nn.init.xavier_uniform_(self.item_encoder[2].weight)
+        nn.init.xavier_uniform_(self.model[0].weight)
+        nn.init.xavier_uniform_(self.model[2].weight)
+
         
 
         
     def forward(self, user, item):
         
-        # Pass through MLP to get user(item) representations
-        user_rep = self.user_encoder(user)
-        item_rep = self.item_encoder(item)
+        # Concatenate user and item
+        user_item = torch.cat((user, item), dim =1)
         
-        # Dot product 
-        logits = (user_rep * item_rep).sum(dim=1) 
+        # Make a prediction
+        logits = self.model(user_item).squeeze()
         pred = torch.sigmoid(logits)
 
         return pred, logits

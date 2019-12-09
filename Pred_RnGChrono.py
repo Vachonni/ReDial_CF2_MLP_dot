@@ -141,36 +141,27 @@ def main(args):
     
 #    ######## CREATING DATASET 
 #    
-#    print('******* Creating torch datasets *******')
+    print('******* Creating torch datasets *******')
 #    train_dataset = Utils.Dataset_MLP_dot(train_data, user_BERT_RT, item_BERT_RT, for_pred=True)
-#    valid_dataset = Utils.Dataset_MLP_dot(valid_data, user_BERT_RT, item_BERT_RT, for_pred=True)       
+    valid_dataset = Utils.Dataset_MLP_dot(valid_data, user_BERT_RT, item_BERT_RT)       
 #    
 #    
 #    ######## CREATE DATALOADER
 #    
-#    print('******* Creating dataloaders *******\n\n')    
-#    kwargs = {'num_workers': args.num_workers, 'pin_memory': False}
-#    if (args.DEVICE == "cuda"):
-#        kwargs = {'num_workers': args.num_workers, 'pin_memory': True}
+    print('******* Creating dataloaders *******\n\n')    
+    kwargs = {'num_workers': args.num_workers, 'pin_memory': False}
+    if (args.DEVICE == "cuda"):
+        kwargs = {'num_workers': args.num_workers, 'pin_memory': True}
 #    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=args.batch,\
 #                                               shuffle=True, drop_last=True, **kwargs)
-#    valid_loader = torch.utils.data.DataLoader(valid_dataset, batch_size=args.batch,\
-#                                               shuffle=True, drop_last=True, **kwargs)    
+    valid_loader = torch.utils.data.DataLoader(valid_dataset, batch_size=args.batch,\
+                                               shuffle=True, drop_last=True, **kwargs)    
 ##    # For PredRaw - Loader of only 1 sample (user) 
 ##    valid_bs1_loader = torch.utils.data.DataLoader(valid_dataset, batch_size=1, shuffle=True, **kwargs)
 ##    ## For PredChrono
 ##    #valid_chrono_loader = torch.utils.data.DataLoader(valid_chrono_dataset, batch_size=args.batch, shuffle=True, **kwargs)    
 ##    
     
-    
-    ######## Get item_MLP_RT
-    
-    # Tensor of MLP_dot values for all movies (faster prediction since only dot product remaining)
-    print('Creating item_MLP_RT...')
-    item_MLP_RT = model.item_encoder(item_BERT_RT.to(args.DEVICE))
-    print('...and saving it..')
-    torch.save(item_MLP_RT, args.logPATH+'item_MLP_RT.pt')
-    print('Done.')
     
     
     
@@ -188,7 +179,7 @@ def main(args):
     # Make predictions (returns dictionaries)
     print("\n\nPrediction Chronological...")
     avrg_rank, MRR, RR, RE_1, RE_10, RE_50, NDCG = \
-                Utils.Prediction(valid_data, model, user_BERT_RT, item_MLP_RT, \
+                Utils.Prediction(valid_loader, model, item_BERT_RT, \
                                  args.completionPredChrono, args.ranking_method, \
                                  args.DEVICE, args.topx)
 

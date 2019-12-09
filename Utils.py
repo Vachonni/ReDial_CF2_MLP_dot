@@ -74,7 +74,7 @@ class Dataset_MLP_dot(data.Dataset):
         # Get items in 'index' position 
         data_idx, ConvID, qt_movies_mentionned, user_id, item_id, rating = self.data[index]    
         
-        return  self.user_RT[user_id], self.item_RT[item_id], rating.astype(float)
+        return  self.user_RT[user_id], item_id, self.item_RT[item_id], rating.astype(float)
         
 
 
@@ -106,7 +106,7 @@ def TrainReconstruction(train_loader, model, criterion, optimizer, weights_facto
     
     print('\nTRAINING')
      
-    for batch_idx, (user, item, targets) in enumerate(train_loader):
+    for batch_idx, (user, _, item, targets) in enumerate(train_loader):
         
         # Put on right DEVICE
         user = user.to(DEVICE)
@@ -119,7 +119,7 @@ def TrainReconstruction(train_loader, model, criterion, optimizer, weights_facto
             break
         
         # Print update
-        if batch_idx % 1000 == 0: 
+        if batch_idx % 10000 == 0: 
             print('Batch {:4d} out of {:4.1f}.    Reconstruction Loss on targets: {:.4f}, no weights: {:.4f}' \
                   .format(batch_idx, nb_batch, train_loss/(batch_idx+1), train_loss_no_weight/(batch_idx+1)))  
                 
@@ -173,7 +173,7 @@ def EvalReconstruction(valid_loader, model, criterion, weights_factor, completio
     print('\nEVALUATION')
     
     with torch.no_grad():
-        for batch_idx, (user, item, targets) in enumerate(valid_loader):
+        for batch_idx, (user, _, item, targets) in enumerate(valid_loader):
             
             # Put on the right DEVICE
             user = user.to(DEVICE)
@@ -226,8 +226,7 @@ PREDICTION
 
 
 
-def Prediction(valid_data, model, user_BERT_RT, item_MLP_RT, completion, \
-               ranking_method, DEVICE, topx=100):
+def Prediction(valid_loader, model, item_BERT_RT, completion, ranking_method, DEVICE, topx=100):
     """
     Prediction on targets = to be mentionned movies...
     
@@ -236,7 +235,7 @@ def Prediction(valid_data, model, user_BERT_RT, item_MLP_RT, completion, \
     """
     
     model.eval()
-    nb_batch = len(valid_data) * completion / 100
+    nb_batch = len(valid_loader) * completion / 100
     
     Avrg_Ranks = {}
     MRR = {}
@@ -246,12 +245,10 @@ def Prediction(valid_data, model, user_BERT_RT, item_MLP_RT, completion, \
     RE_10 = {}
     RE_50 = {}
                 
-    pred_on_user = None
-    l_items_id = []
-        
+
     
     with torch.no_grad():
-        for batch_idx, (_, _, qt_movies_mentionned, user_id, item_id, rating) in enumerate(valid_data):
+        for batch_idx, (batch_users, items_id, _, targets) in enumerate(valid_loader):
             
             # Early stopping 
             if batch_idx > nb_batch or nb_batch == 0: 
@@ -259,43 +256,29 @@ def Prediction(valid_data, model, user_BERT_RT, item_MLP_RT, completion, \
                 break
             
             # Print Update
-            if batch_idx % 1000 == 0:
+            if batch_idx % 10000 == 0:
                 print('Batch {} out of {}'.format(batch_idx, nb_batch))
-                               
-            # Put on the right DEVICE (what will be used for prediction)
-            user_BERT_RT = user_BERT_RT.to(DEVICE)
-            item_MLP_RT = item_MLP_RT.to(DEVICE)
-     #       user_id = user_id.to(DEVICE)
-     #       item_id = item_id.to(DEVICE)
-            
-            
-            ### Need to accumualte all movies for the same user (= same qt_movies_mentions)
-            # If first time, set pred_on_user to the first one
-            if pred_on_user == None: 
-                pred_on_user = user_id
-                pred_on_qt_m_m = qt_movies_mentionned
-            # If we changed user 
-            if pred_on_user != user_id:
+
+            # Have to loop over each user in the batch
+            for user in batch_users:
                 
-                """ Make the prediction on the pred_on user """
-                # Get user's MLP_dot representation
-                user_MLP_dot = model.user_encoder(user_BERT_RT[pred_on_user])
-                # Make predictions on all movies (1x128, 128x48272)
-                logits = torch.mm(user_MLP_dot.unsqueeze(0), torch.transpose(item_MLP_RT, 0, 1))[0]
-                pred = torch.sigmoid(logits)
+                # Put on the right DEVICE
+                user = user.to(DEVICE)
+                item_BERT_RT = item_BERT_RT.to(DEVICE)
+                targets = targets.to(DEVICE)
                 
-                # Insure their is at least one target movie (case where new user starts with rating 0)
-                # (if not, go to next item and this sample not considered (continue))
-                if l_items_id == []: 
-                    if rating == 1:
-                        l_items_id = [item_id]    
-                    else:
-                        l_items_id = [] 
-                    continue
+                # Repeat the user's representation, num of items time
+                puffed_user = user.expand(48272, -1)
+                pred = model(puffed_user, item_BERT_RT)
+                
+                
+                ####### SHOULD USE THE LIST HERE of ITEMS HERE
+                
+                
 
                 # ... get Ranks for targets 
                 ranks, avrg_rk, mrr, rr, re_1, re_10, re_50, ndcg = \
-                                            Ranks(pred, l_items_id, ranking_method, topx)
+                                            Ranks(pred, items_id, ranking_method, topx)
                 
                 # Add Ranks results to appropriate dict
                 if pred_on_qt_m_m in RR.keys():
