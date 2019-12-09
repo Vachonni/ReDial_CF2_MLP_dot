@@ -281,8 +281,8 @@ def main(args):
             # Save at directory + _model.pth
             torch.save(state, args.logPATH+'model.pth')
             # Training curvs plot - Save
-            plt.plt(losses[0], label='Train')  
-            plt.plt(losses[1], label='Valid')  
+            plt.plot(losses[0], label='Train')  
+            plt.plot(losses[1], label='Valid')  
             plt.title('Training curvs', fontweight="bold")
             plt.xlabel('Epoch')
             plt.ylabel(str(criterion)[:3] + ' loss')
