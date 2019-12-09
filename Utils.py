@@ -280,7 +280,7 @@ def Prediction(valid_data, model, user_BERT_RT, item_BERT_RT, completion, \
                 # Broadcast user's representation for each of of the 48272 movies
                 user_BERT = user_BERT.expand(48272, -1)
                 # Make predictions on all movies 
-                pred = model(user_BERT, item_BERT_RT)
+                pred = model(user_BERT, item_BERT_RT)[0]   # model returns (pred, logits)
                 
                 # Insure their is at least one target movie (case where new user starts with rating 0)
                 # (if not, go to next item and this sample not considered (continue))

@@ -246,7 +246,7 @@ def main(args):
     
                 
         
-        train_losses.append(train_loss)
+        train_losses.append(train_loss.item())
         valid_losses.append(eval_loss)
         losses = [train_losses, valid_losses]  
         
