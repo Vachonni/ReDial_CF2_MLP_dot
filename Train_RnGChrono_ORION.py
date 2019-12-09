@@ -21,7 +21,7 @@ from torch import optim
 import numpy as np
 import pandas as pd
 from statistics import mean
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 # Personnal imports
 import MLP_dot
@@ -278,8 +278,18 @@ def main(args):
                     'losses': losses,
                     }
             if not os.path.isdir(args.logPATH): os.mkdir(args.logPATH)
-            # Save at directory + (ML or Re) + _model.pth
+            # Save at directory + _model.pth
             torch.save(state, args.logPATH+'model.pth')
+            # Training curvs plot - Save
+            plt.plt(losses[0], label='Train')  
+            plt.plt(losses[1], label='Valid')  
+            plt.title('Training curvs', fontweight="bold")
+            plt.xlabel('Epoch')
+            plt.ylabel(str(criterion)[:3] + ' loss')
+            plt.legend()
+          # plt.show()
+            plt.savefig(args.logPATH+'Training_Curvs.pdf')
+            plt.close()
             print('......saved.')
             
         

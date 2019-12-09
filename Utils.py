@@ -95,7 +95,11 @@ def TrainReconstruction(train_loader, model, criterion, optimizer, weights_facto
     model.train()
     train_loss = 0
     train_loss_no_weight = 0
+    
+    # For print pusposes 
     nb_batch = len(train_loader) * completion / 100
+    qt_of_print = 5
+    print_count = 0  
     
     
 #    """ """
@@ -119,10 +123,11 @@ def TrainReconstruction(train_loader, model, criterion, optimizer, weights_facto
             break
         
         # Print update
-        if batch_idx % 10000 == 0: 
+        if batch_idx > nb_batch / qt_of_print * print_count:
             print('Batch {:4d} out of {:4.1f}.    Reconstruction Loss on targets: {:.4f}, no weights: {:.4f}' \
                   .format(batch_idx, nb_batch, train_loss/(batch_idx+1), train_loss_no_weight/(batch_idx+1)))  
-                
+            print_count += 1    
+        
         
         optimizer.zero_grad()   
 
@@ -168,7 +173,11 @@ def EvalReconstruction(valid_loader, model, criterion, weights_factor, completio
     model.eval()
     eval_loss = 0
     eval_loss_no_weight = 0
+    
+    # For print pusposes 
     nb_batch = len(valid_loader) * completion / 100
+    qt_of_print = 5
+    print_count = 0
     
     print('\nEVALUATION')
     
@@ -186,10 +195,11 @@ def EvalReconstruction(valid_loader, model, criterion, weights_factor, completio
                 break
             
             # Print update
-            if batch_idx % 5000 == 0: 
+            if batch_idx > nb_batch / qt_of_print * print_count:
                 print('Batch {:4d} out of {:4.1f}.    Reconstruction Loss on targets: {:.4f}, no weights: {:.4f}'\
                       .format(batch_idx, nb_batch, eval_loss/(batch_idx+1), eval_loss_no_weight/(batch_idx+1)))  
-                               
+                print_count += 1
+                
             pred, logits = model(user, item)  
       
         
@@ -235,7 +245,11 @@ def Prediction(valid_data, model, user_BERT_RT, item_BERT_RT, completion, \
     """
     
     model.eval()
+    
+    # For print pusposes 
     nb_batch = len(valid_data) * completion / 100
+    qt_of_print = 5
+    print_count = 0
     
     Avrg_Ranks = {}
     MRR = {}
@@ -258,8 +272,9 @@ def Prediction(valid_data, model, user_BERT_RT, item_BERT_RT, completion, \
                 break
             
             # Print Update
-            if batch_idx % 10000 == 0:
+            if batch_idx > nb_batch / qt_of_print * print_count:
                 print('Batch {} out of {}'.format(batch_idx, nb_batch))
+                print_count += 1
                                
             # Put on the right DEVICE (what will be used for prediction)
             user_BERT_RT = user_BERT_RT.to(DEVICE)
