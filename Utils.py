@@ -225,8 +225,8 @@ PREDICTION
 
 
 
-
-def Prediction(valid_loader, model, item_BERT_RT, completion, ranking_method, DEVICE, topx=100):
+def Prediction(valid_data, model, user_BERT_RT, item_BERT_RT, completion, \
+               ranking_method, DEVICE, topx=100):
     """
     Prediction on targets = to be mentionned movies...
     
@@ -235,7 +235,7 @@ def Prediction(valid_loader, model, item_BERT_RT, completion, ranking_method, DE
     """
     
     model.eval()
-    nb_batch = len(valid_loader) * completion / 100
+    nb_batch = len(valid_data) * completion / 100
     
     Avrg_Ranks = {}
     MRR = {}
@@ -245,10 +245,12 @@ def Prediction(valid_loader, model, item_BERT_RT, completion, ranking_method, DE
     RE_10 = {}
     RE_50 = {}
                 
-
+    pred_on_user = None
+    l_items_id = []
+        
     
     with torch.no_grad():
-        for batch_idx, (batch_users, items_id, _, targets) in enumerate(valid_loader):
+        for batch_idx, (_, _, qt_movies_mentionned, user_id, item_id, rating) in enumerate(valid_data):
             
             # Early stopping 
             if batch_idx > nb_batch or nb_batch == 0: 
@@ -256,29 +258,45 @@ def Prediction(valid_loader, model, item_BERT_RT, completion, ranking_method, DE
                 break
             
             # Print Update
-            if batch_idx % 10000 == 0:
+            if batch_idx % 1000 == 0:
                 print('Batch {} out of {}'.format(batch_idx, nb_batch))
-
-            # Have to loop over each user in the batch
-            for user in batch_users:
+                               
+            # Put on the right DEVICE (what will be used for prediction)
+            user_BERT_RT = user_BERT_RT.to(DEVICE)
+            item_BERT_RT = item_BERT_RT.to(DEVICE)
+     #       user_id = user_id.to(DEVICE)
+     #       item_id = item_id.to(DEVICE)
+            
+            
+            ### Need to accumualte all movies for the same user (= same qt_movies_mentions)
+            # If first time, set pred_on_user to the first one
+            if pred_on_user == None: 
+                pred_on_user = user_id
+                pred_on_qt_m_m = qt_movies_mentionned
+            # If we changed user 
+            if pred_on_user != user_id:
                 
-                # Put on the right DEVICE
-                user = user.to(DEVICE)
-                item_BERT_RT = item_BERT_RT.to(DEVICE)
-                targets = targets.to(DEVICE)
+                """ Make the prediction on the pred_on user """
+#                # Get user's MLP_dot representation
+#                user_MLP_dot = model.user_encoder(user_BERT_RT[pred_on_user])
+                # Broadcast user's representation for each of of the 48272 movies
+                pred_on_user = pred_on_user.expand(48272, -1)
+                # Make predictions on all movies (1x128, 128x48272)
+#                logits = torch.mm(user_MLP_dot.unsqueeze(0), torch.transpose(item_MLP_RT, 0, 1))[0]
+                pred = model(pred_on_user, item_BERT_RT)
                 
-                # Repeat the user's representation, num of items time
-                puffed_user = user.expand(48272, -1)
-                pred = model(puffed_user, item_BERT_RT)
-                
-                
-                ####### SHOULD USE THE LIST HERE of ITEMS HERE
-                
-                
+                # Insure their is at least one target movie (case where new user starts with rating 0)
+                # (if not, go to next item and this sample not considered (continue))
+                if l_items_id == []: 
+                    if rating == 1:
+                        l_items_id = [item_id]    
+                    else:
+                        l_items_id = [] 
+                    continue
 
                 # ... get Ranks for targets 
                 ranks, avrg_rk, mrr, rr, re_1, re_10, re_50, ndcg = \
-                                            Ranks(pred, items_id, ranking_method, topx)
+                                            Ranks(pred, l_items_id, ranking_method, topx)
                 
                 # Add Ranks results to appropriate dict
                 if pred_on_qt_m_m in RR.keys():

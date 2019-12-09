@@ -215,11 +215,12 @@ def main(args):
         
         
         
+        
         # Make predictions (returns dictionaries)
         print("\n\nPrediction Chronological...")
-        item_MLP_RT = model.item_encoder(item_BERT_RT.to(args.DEVICE))
+  #      item_MLP_RT = model.item_encoder(item_BERT_RT.to(args.DEVICE))
         avrg_rank, MRR, RR, RE_1, RE_10, RE_50, NDCG = \
-                    Utils.Prediction(valid_data, model, user_BERT_RT, item_MLP_RT, \
+                    Utils.Prediction(valid_data, model, user_BERT_RT, item_BERT_RT, \
                                      args.completionPredChrono, args.ranking_method, \
                                      args.DEVICE, args.topx)   
         # Print results
