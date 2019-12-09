@@ -280,17 +280,18 @@ def main(args):
             if not os.path.isdir(args.logPATH): os.mkdir(args.logPATH)
             # Save at directory + _model.pth
             torch.save(state, args.logPATH+'model.pth')
-            # Training curvs plot - Save
-            plt.plot(losses[0], label='Train')  
-            plt.plot(losses[1], label='Valid')  
-            plt.title('Training curvs', fontweight="bold")
-            plt.xlabel('Epoch')
-            plt.ylabel(str(criterion)[:3] + ' loss')
-            plt.legend()
-          # plt.show()
-            plt.savefig(args.logPATH+'Training_Curvs.pdf')
-            plt.close()
-            print('......saved.')
+            
+        # Training Curvs plot - Save at each epoch
+        plt.plot(losses[0], label='Train')  
+        plt.plot(losses[1], label='Valid')  
+        plt.title('Training Curvs', fontweight="bold")
+        plt.xlabel('Epoch')
+        plt.ylabel(str(criterion)[:3] + ' loss')
+        plt.legend()
+     #   plt.show()
+        plt.savefig(args.logPATH+'Training_Curvs.pdf')
+        plt.close()
+        print('......saved.')
             
         
         
