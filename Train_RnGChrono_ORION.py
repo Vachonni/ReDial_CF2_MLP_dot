@@ -104,12 +104,16 @@ def main(args):
         args.dataTrain = 'Train100.csv'
         args.dataValid = 'Val100.csv'
     
-    print('\n******* Loading SAMPLES from *******', args.dataPATH + args.dataTrain)
+    print('\n******* Loading TRAIN samples from *******', args.dataPATH + args.dataTrain)
     df_train = pd.read_csv(args.dataPATH + args.dataTrain)
+    print('******* Loading VALID samples from *******', args.dataPATH + args.dataValid)
     df_valid = pd.read_csv(args.dataPATH + args.dataValid)
+    print('******* Loading PRED samples from *******', args.dataPATH + args.dataPred)
+    df_pred = pd.read_csv(args.dataPATH + args.dataPred)
     # Turn DataFrame into an numpy array (easier iteration)
     train_data = df_train.values
     valid_data = df_valid.values
+    pred_data = df_pred.values
     # Load Relational Tables (RT) of BERT_avrg for users and items. Type: torch.tensor.
     # map_location is CPU because Dataset with num_workers > 0 should not return CUDA.
     user_BERT_RT = torch.load(args.dataPATH + args.user_BERT_RT, map_location='cpu')
@@ -118,6 +122,7 @@ def main(args):
     if args.DEBUG: 
         train_data = train_data[:128]
         valid_data = valid_data[:128]
+        pred_data = pred_data[:128]
             
     
     ######## CREATING DATASET 
@@ -198,7 +203,7 @@ def main(args):
         print("\n\nPrediction Chronological...")
   #      item_MLP_RT = model.item_encoder(item_BERT_RT.to(args.DEVICE))
         avrg_rank, MRR, RR, RE_1, RE_10, RE_50, NDCG = \
-                    Utils.Prediction(valid_data, model, user_BERT_RT, item_BERT_RT, \
+                    Utils.Prediction(pred_data, model, user_BERT_RT, item_BERT_RT, \
                                      args.completionPredChrono, args.ranking_method, \
                                      args.DEVICE, args.topx)   
         # Print results

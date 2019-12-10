@@ -307,7 +307,7 @@ PREDICTION
 
 
 
-def Prediction(valid_data, model, user_BERT_RT, item_BERT_RT, completion, \
+def Prediction(pred_data, model, user_BERT_RT, item_BERT_RT, completion, \
                ranking_method, DEVICE, topx=100):
     """
     Prediction on targets = to be mentionned movies...
