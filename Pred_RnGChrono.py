@@ -20,10 +20,9 @@ import json
 import torch
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 
 # Personnal imports
-import MLP_dot
+import all_MLP
 import Utils
 import Settings 
 import Arguments 

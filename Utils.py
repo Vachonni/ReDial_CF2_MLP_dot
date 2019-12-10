@@ -98,12 +98,12 @@ class Dataset_all_MLP(data.Dataset):
                 full_ratings[item] = l_ratings[i]
                 full_masks[item] = 1
             
-            return  self.user_RT[user_id], None, None, full_ratings, full_masks
+            return  self.user_RT[user_id], -1, self.item_RT, full_ratings, full_masks
         
         
         else:   
             
-            return  self.user_RT[user_id], item_id, self.item_RT[item_id], rating.astype(float), None
+            return  self.user_RT[user_id], item_id, self.item_RT[item_id], rating.astype(float), -1
         
 
 
@@ -150,40 +150,44 @@ def TrainReconstruction(train_loader, model, model_output, criterion, optimizer,
             print('Batch {:4d} out of {:4.1f}.    Reconstruction Loss on targets: {:.4f}, no weights: {:.4f}' \
                   .format(batch_idx, nb_batch, train_loss/(batch_idx+1), train_loss_no_weight/(batch_idx+1)))  
             print_count += 1    
-        
-        
+    
         optimizer.zero_grad()   
         
+        # Make prediction
         if model_output == 'Softmax':
-            # Have to process 
-            pred,logits = model(user, )
+            # user is batch x BERT_avrg_size. item is qt_items x BERT_avrg_size.
+            # Put in batch dimension for model (who will concat along dim =1)
+            user = user.unsqueeze(1).expand(-1, 48272, -1)
+            item = item.expand(64, -1, -1)
+            print(user.shape, item.shape)
+            _, logits = model(user, item)
         elif model_output == 'sigmoid':
-            pred, logits = model(user, item)
-
-           
-#        
-#        """ To look into pred values evolution during training"""
-#        pred_mean_values.append((pred.detach()).mean())
-#        """ """
-
-        # Add weights on targets rated 0 (w_0) because outnumbered by targets 1
-        w_0 = (targets - 1) * -1 * (weights_factor - 1)
-        w = torch.ones(len(targets)).to(DEVICE) + w_0
-        criterion.weight = w
-    
-        loss = criterion(logits, targets)
+            # Proceed one at a time
+            _, logits = model(user, item)
         
-        criterion.weight = None
-        loss_no_weight = criterion(logits, targets).detach()
+        # Consider wieghts
+        if model_output == 'sigmoid':
+            # Add weights on targets rated 0 (w_0) because outnumbered by targets 1
+            w_0 = (targets - 1) * -1 * (weights_factor - 1)
+            w = torch.ones(len(targets)).to(DEVICE) + w_0
+            criterion.weight = w
+    
+        # Evaluate loss
+        if model_output == 'Softmax':
+            pred = torch.nn.Softmax(dim=0)(logits)
+            # Use only the predictions where there a rating was really available
+            pred = pred * masks
+            loss = criterion(pred, targets)
+        elif model_output == 'sigmoid':
+            loss = criterion(logits, targets)
+        
+        # Consider weights (evaluate without)
+        if model_output == 'sigmoid':
+            criterion.weight = None
+            loss_no_weight = criterion(logits, targets).detach()
 
         loss.backward()
         optimizer.step()
-        
-#        # Remove weights for other evaluations
-#        criterion.weight = None
-#        loss_no_weights = (criterion(pred, targets) * masks[1]).sum() 
-#        loss_no_weights /= nb_ratings
-#        train_loss += loss_no_weights.detach()
         
         train_loss += loss
         train_loss_no_weight += loss_no_weight
