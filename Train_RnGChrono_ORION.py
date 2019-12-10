@@ -281,19 +281,28 @@ def main(args):
             # Save at directory + _model.pth
             torch.save(state, args.logPATH+'model.pth')
             
-        # Training Curvs plot - Save at each epoch
+        # Training Curves plot - Save at each epoch
         plt.plot(losses[0], label='Train')  
         plt.plot(losses[1], label='Valid')  
-        plt.title('Training Curvs', fontweight="bold")
+        plt.title('Training Curves', fontweight="bold")
         plt.xlabel('Epoch')
         plt.ylabel(str(criterion)[:3] + ' loss')
         plt.legend()
      #   plt.show()
-        plt.savefig(args.logPATH+'Training_Curvs.pdf')
+        plt.savefig(args.logPATH+'Training_Curves.pdf')
         plt.close()
         print('......saved.')
             
-        
+        # Saving model corresponding to the last epoch (invariant of partience)
+        state = {
+                'epoch': epoch,
+                'eval_loss': eval_loss,
+                'state_dict': model.state_dict(),
+                'optimizer': optimizer.state_dict(),
+                'losses': losses,
+                }
+        # Save at directory + _model.pth
+        torch.save(state, args.logPATH+'model_last_epoch.pth')
         
         
         
