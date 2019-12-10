@@ -237,8 +237,8 @@ def main(args):
         valid_losses.append(eval_loss)
         losses = [train_losses, valid_losses]  
         
-        print('\nEND EPOCH {:3d} \nTrain Reconstruction Loss on targets: {:.4f}\
-              \nValid Reconstruction Loss on tragets: {:.4f}' \
+        print('\nEND EPOCH {:3d} \nTrain Reconstruction Loss on targets: {:.4E}\
+              \nValid Reconstruction Loss on tragets: {:.4E}' \
               .format(epoch, train_loss, eval_loss))
     
         ######## PATIENCE - Stop if the Model didn't improve in the last 'patience' epochs
