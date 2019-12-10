@@ -158,19 +158,19 @@ def TrainReconstruction(train_loader, item_RT, model, model_output, criterion, o
         
         # Make prediction
         if model_output == 'Softmax':
-            # # user is batch x BERT_avrg_size. item is qt_items x BERT_avrg_size.
-            # # Put in batch dimension for model (who will concat along dim =1)
-            # user = user.unsqueeze(1).expand(-1, 48272, -1)
-            # item = item.expand(user.shape[0], -1, -1)
-            # print(user.shape, item.shape)
-            # _, logits = model(user, item)
+            # user is batch x BERT_avrg_size. item is qt_items x BERT_avrg_size.
+            # Put in batch dimension for model (who will concat along dim =1)
+            user = user.unsqueeze(1).expand(-1, 48272, -1)
+            item = item.expand(user.shape[0], -1, -1)
+            print(user.shape, item.shape)
+            _, logits = model(user, item)
             
-            # Treat each user seperately, if not, it's too big. Maybe sparse???
-            logits = torch.empty(user.shape[0], 48272).to(DEVICE)
-            for i, one_user in enumerate(user):
-                # Expand to qt of items
-                one_user = one_user.expand(48272, -1)
-                _, logits[i] = model(one_user, item_RT)
+            # # Treat each user seperately, if not, it's too big. Maybe sparse???
+            # logits = torch.empty(user.shape[0], 48272).to(DEVICE)
+            # for i, one_user in enumerate(user):
+            #     # Expand to qt of items
+            #     one_user = one_user.expand(48272, -1)
+            #     _, logits[i] = model(one_user, item_RT)
         elif model_output == 'sigmoid':
             # Proceed one at a time
             _, logits = model(user, item)
@@ -249,19 +249,19 @@ def EvalReconstruction(valid_loader, item_RT, model, model_output, criterion, \
                 
             # Make prediction
             if model_output == 'Softmax':
-                # # user is batch x BERT_avrg_size. item is qt_items x BERT_avrg_size.
-                # # Put in batch dimension for model (who will concat along dim =1)
-                # user = user.unsqueeze(1).expand(-1, 48272, -1)
-                # item = item.expand(user.shape[0], -1, -1)
-                # print(user.shape, item.shape)
-                # _, logits = model(user, item)
+                # user is batch x BERT_avrg_size. item is qt_items x BERT_avrg_size.
+                # Put in batch dimension for model (who will concat along dim =1)
+                user = user.unsqueeze(1).expand(-1, 48272, -1)
+                item = item.expand(user.shape[0], -1, -1)
+                print(user.shape, item.shape)
+                _, logits = model(user, item)
                 
-                # Treat each user seperately, if not, it's too big. Maybe sparse???
-                logits = torch.empty(user.shape[0], 48272).to(DEVICE)
-                for i, one_user in enumerate(user):
-                    # Expand to qt of items
-                    one_user = one_user.expand(48272, -1)
-                    _, logits[i] = model(one_user, item_RT)
+                # # Treat each user seperately, if not, it's too big. Maybe sparse???
+                # logits = torch.empty(user.shape[0], 48272).to(DEVICE)
+                # for i, one_user in enumerate(user):
+                #     # Expand to qt of items
+                #     one_user = one_user.expand(48272, -1)
+                #     _, logits[i] = model(one_user, item_RT)
             elif model_output == 'sigmoid':
                 # Proceed one at a time
                 _, logits = model(user, item)
