@@ -529,8 +529,8 @@ def Ranks(all_values, indices_to_rank, ranking_method, topx = 0):
     
     if ranking_method == 'min':
         qt_uniq = len(all_values.unique())
-        assert qt_uniq > 48272 * 0.99, \
-               "{} of predictions are equal, which is more than 1%. \
+        assert qt_uniq > 48272 * 0.98, \
+               "{} of predictions are equal, which is more than 2%. \
                USE --ranking_method 'ordinal'".format((1 - (qt_uniq/48272)))
     
     ranks = ss.rankdata((-1*all_values).cpu(), method=ranking_method)[indices_to_rank]
