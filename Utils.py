@@ -162,7 +162,6 @@ def TrainReconstruction(train_loader, item_RT, model, model_output, criterion, o
             # Put in batch dimension for model (who will concat along dim =1)
             user = user.unsqueeze(1).expand(-1, 48272, -1)
             item = item_RT.expand(user.shape[0], -1, -1)
-            print(user.shape, item.shape)
             _, logits = model(user, item)
             
             # # Treat each user seperately, if not, it's too big. Maybe sparse???
@@ -253,7 +252,6 @@ def EvalReconstruction(valid_loader, item_RT, model, model_output, criterion, \
                 # Put in batch dimension for model (who will concat along dim =1)
                 user = user.unsqueeze(1).expand(-1, 48272, -1)
                 item = item_RT.expand(user.shape[0], -1, -1)
-                print(user.shape, item.shape)
                 _, logits = model(user, item)
                 
                 # # Treat each user seperately, if not, it's too big. Maybe sparse???
