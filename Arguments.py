@@ -13,47 +13,56 @@ List of argumnents usable with parser
 import argparse
 
 
-parser = argparse.ArgumentParser(description='Train an AutoEncoder Recommender and Pred')
+parser = argparse.ArgumentParser(description='Train an MLP for CF2')
 
 
-                    # Strange name for id, should be changed
+
+# Path where files will be logged (modifired in run.py and runORION.py)
+
 parser.add_argument('--logPATH', type=str, metavar='',\
                     help='Path to directory used when saving files.')
 
+    
 # Data
+    
 parser.add_argument('--dataPATH', type=str, metavar='', default='./Data/', \
                     help='Path to datasets to train on')
-parser.add_argument('--dataTrain', type=str, metavar='', default='Train_EQUAL.csv', \
+parser.add_argument('--dataTrain', type=str, metavar='', default='Train_LIST.csv', \
                     help='File name of Dataset to train on')
-parser.add_argument('--dataValid', type=str, metavar='', default='Val_EQUAL.csv', \
+parser.add_argument('--dataValid', type=str, metavar='', default='Val_LIST.csv', \
                     help='File name of Dataset to for validation')
-parser.add_argument('--num_workers', type=int, metavar='', default=0, help='Qt CPU when loading data')
+parser.add_argument('--dataPred', type=str, metavar='', default='Val_UNIQUE.csv', \
+                    help='File name of Dataset to for prediction')    
+parser.add_argument('--num_workers', type=int, metavar='', default=0, \
+                    help='Qt CPU when loading data')
+parser.add_argument('--user_BERT_RT', type=str, metavar='', default='user_BERT_avrg_RT.py', \
+                    help='File name of tensor where one line is one user avrg BERT representation')
+parser.add_argument('--item_BERT_RT', type=str, metavar='', default='item_BERT_avrg_RT.p', \
+                    help='File name of tensor where one line is one item avrg BERT representation')
 
+
+# Model
+
+parser.add_argument('--output', type=str, metavar='', default='Softmax', 
+                    choices=['Softmax', 'sigmoid'], \
+                    help='How loss will be evaluated. \
+                    With Softmax, masked BCE on all movies. \
+                    With sigmoid, error on each. Should be used with 100 ramdom samples.')
+parser.add_argument('--preModel', type=str, metavar='', default='none', \
+                    help='Path to a pre-trained model to start with.')
+    
+    
 
 # Training
+    
 parser.add_argument('--lr', type=float, metavar='', default=0.001, help='Learning rate')
 parser.add_argument('--batch', type=int, metavar='', default=64, help='Batch size')
-parser.add_argument('--epoch', type=int, metavar='', default=1000, help='Number of epoch')
-parser.add_argument('--loss_fct', type=str, metavar='', default='BCEWLL', \
-                    choices=['BCEWLL', 'BCE'], help='Loss function')
-parser.add_argument('--noiseTrain', default=False, action='store_true', \
-                    help='If arg added, mimics ReDial inputs by allowing only from 1 to 7 (random)\
-                    ratings as inputs.')
-parser.add_argument('--noiseEval', default=False, action='store_true', \
-                    help='If arg added, mimics ReDial inputs by allowing only from 1 to 7 (random)\
-                    ratings as inputs.')
-parser.add_argument('--zero1', type=int, metavar='', default=0, choices=[0,1,2], \
-                    help='Targets stay same.   If 0, ratings stay 0 1. \
-                    If 1, 2*ratings - masks, meaning we now have: \
-                    0 = not seen, -1 = not liked and 1 = liked. \
-                    If 2, ratings + masks, meaning we now have: \
-                    0 = not seen, 1 = not liked and 2 = liked.')
+parser.add_argument('--epoch', type=int, metavar='', default=1000, help='Number of epoch')   
 parser.add_argument('--weights', type=float, metavar='', default=1, \
                     help='Weights multiplying the errors on ratings of 0 (underrepresented) \
                     during training.  0 -> no weights, 5 -> 5 times the weight')
 parser.add_argument('--patience', type=int, metavar='', default=2, \
                     help='number of epoch to wait without improvement in valid_loss before ending training')
-
 parser.add_argument('--completionTrain', type=float, metavar='', default=100, \
                     help='% of data used during 1 training epoch ~ "early stopping"')
 parser.add_argument('--completionPred', type=float, metavar='', default=100, \
@@ -62,39 +71,12 @@ parser.add_argument('--completionPredEpoch', type=float, metavar='', default=100
                     help='% of data used for prediction during training (each epoch)')
 parser.add_argument('--EARLY', default=False, action='store_true', \
                     help="If arg added, Train at 10%, Pred at 1% and PredChrono at 1%")
-# ...for Pred file
-parser.add_argument('--completionPredChrono', type=float, metavar='', default=100, \
-                    help='% of data used for prediction')
-parser.add_argument('--pred_not_liked', default=False, action='store_true', \
-                    help='If arg added, PredChrono will be on not liked movies only')
 
 
-# BasicRecoTrans Model
-parser.add_argument('--d_model', type=int, metavar='', default=375, \
-                    help='Dimension if the hidden state of tokens. Has to be a multiple of nhead')
-parser.add_argument('--nhead', type=int, metavar='', default=5, \
-                    help='Number of attention heads')
-parser.add_argument('--num_layers', type=int, metavar='', default=5, \
-                    help='Number of self attention layers')
-# AE Model
-parser.add_argument('--g_type', type=str, metavar='', default='genres', \
-                    choices=['none', 'fixed', 'one', 'genres', 'unit'], \
-                    help="Parameter(s) learned for genres inputs. None: no genres, Fixed: no learning, \
-                    One: one global parameter, Genres: one parameter by genres, Unit:one parameter per movie,...")
-parser.add_argument('--layer1', type=int, metavar='', default=344, \
-                    help='Integers corresponding to the first hidden layer size')
-parser.add_argument('--layer2', type=int, metavar='', default=27, \
-                    help='Integers corresponding to the second hidden layer size. 0 if none.')
-parser.add_argument('--activations', type=str, metavar='', default='sigmoid', \
-                    choices=['relu', 'sigmoid'],\
-                    help='Activations in hidden layers of the model')
-parser.add_argument('--last_layer_activation', type=str, metavar='', default='none', \
-                    choices=['none', 'sigmoid', 'softmax'],\
-                    help='Last layer activation of the model')
-parser.add_argument('--preModel', type=str, metavar='', default='none', \
-                    help='Path to a pre-trained model to start with. Should \
-                    include a GenresWrapper of same type')
+    
+
 # ...for Pred file
+    
 parser.add_argument('--ranking_method', type=str, metavar='', default='min', \
                     help='How even ranks are assigned. Use "ordinal" if get an assert error \
                     of too many predictions equal. Can also be "average"')
@@ -104,32 +86,40 @@ parser.add_argument('--M1_path', type=str, metavar='', default='none', \
                     help='Path to a Model 1. Will pred with + without genres')
 parser.add_argument('--M1_label', type=str, metavar='', default='none', \
                     help='Label for Model 1')
-parser.add_argument('--M2_path', type=str, metavar='', default='none', \
-                    help='Path to a Model 2')
-parser.add_argument('--M2_label', type=str, metavar='', default='none', \
-                    help='Label to a Model 2')
+parser.add_argument('--completionPredChrono', type=float, metavar='', default=100, \
+                    help='% of data used for prediction')
+parser.add_argument('--pred_not_liked', default=False, action='store_true', \
+                    help='If arg added, PredChrono will be on not liked movies only')
+    
 
-
-
+    
 # Genres 
+    
 parser.add_argument('--genresDict', type=str, metavar='', default='dict_genresInter_idx_UiD.json', \
                     help='File name of Dict of genres')
 parser.add_argument('--top_cut', type=int, metavar='', default=100, \
                     help='number of movies in genres vector (for torch Dataset)')
 
-
+    
+    
 # Metrics
+    
 parser.add_argument('--topx', type=int, metavar='', default=100, \
                     help='for NDCG mesure, size of top ranks considered')
 
 
 
+    
 # Global (training(s) and prediction) with file runOrion.py
+    
 parser.add_argument('--NOpreTrain', default=False, action='store_true', \
                     help="If arg added, skips the pre-training on ML")
 
+    
+    
 
 # Args to cover for ORION's (lack of 'choice' option or $SLURM_TMPDIR)
+    
 parser.add_argument('--ORION_NOpreTrain', type=int, metavar='', default=-1, choices=[-1,0,1], \
                     help='Pretraining on ML or not, will be transformed in runOrion.py. ')
 parser.add_argument('--ORION_g_type', type=int, metavar='', default=-1, choices=[-1,0,1,2], \
@@ -139,8 +129,10 @@ parser.add_argument('--trial_id', type=str, metavar='', default='./test',\
 parser.add_argument('--working_dir', type=str, metavar='', default='.', \
                     help='ORION - Path to directory where experience is run.')
 
+    
 
 # Others
+    
 parser.add_argument('--seed', default=False, action='store_true', \
                     help="If arg added, random always give the same")
 
@@ -162,10 +154,10 @@ args = parser.parse_args()
 # ASSERTIONS
 
 
-if args.loss_fct == 'BCE':
-    assert args.last_layer_activation != 'none','Need last layer activation with BCE'
-if args.loss_fct == 'BCEWLL':
-    assert args.last_layer_activation == 'none',"Last layer activation must be 'none' with BCEWLL"
+# if args.loss_fct == 'BCE':
+#     assert args.last_layer_activation != 'none','Need last layer activation with BCE'
+# if args.loss_fct == 'BCEWLL':
+#     assert args.last_layer_activation == 'none',"Last layer activation must be 'none' with BCEWLL"
     
     
 

@@ -33,14 +33,14 @@ import torch.nn as nn
 
     
 
-class MLP_dot(nn.Module):
+class all_MLP(nn.Module):
     """
     See top of file for description.
     """
 
 
     def __init__(self, input_size=2*768, hidden_size=512, output_size=1):
-        super(MLP_dot, self).__init__()
+        super(all_MLP, self).__init__()
         
         
         self.model = nn.Sequential(
