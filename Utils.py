@@ -135,7 +135,7 @@ def TrainReconstruction(train_loader, item_RT, model, model_output, criterion, o
     
     print('\nTRAINING')
      
-    for batch_idx, (user, item_id, item, targets, masks) in enumerate(train_loader):
+    for batch_idx, (user, _, item, targets, masks) in enumerate(train_loader):
         
         # Put on right DEVICE
         user = user.to(DEVICE)
@@ -150,7 +150,7 @@ def TrainReconstruction(train_loader, item_RT, model, model_output, criterion, o
         
         # Print update
         if batch_idx > nb_batch / qt_of_print * print_count:
-            print('Batch {:4d} out of {:4.1f}.    Reconstruction Loss on targets: {:.4f}, no weights: {:.4f}' \
+            print('Batch {:4d} out of {:4.1f}.    Reconstruction Loss on targets: {:.7f}, no weights: {:.7f}' \
                   .format(batch_idx, nb_batch, train_loss/(batch_idx+1), train_loss_no_weight/(batch_idx+1)))  
             print_count += 1    
     
@@ -210,7 +210,8 @@ def TrainReconstruction(train_loader, item_RT, model, model_output, criterion, o
 
 
 
-def EvalReconstruction(valid_loader, model, criterion, weights_factor, completion, DEVICE):
+def EvalReconstruction(valid_loader, item_RT, model, model_output, criterion, \
+                       weights_factor, completion, DEVICE):
     model.eval()
     eval_loss = 0
     eval_loss_no_weight = 0
@@ -220,15 +221,20 @@ def EvalReconstruction(valid_loader, model, criterion, weights_factor, completio
     qt_of_print = 5
     print_count = 0
     
+    # Put on right DEVICE
+    item_RT = item_RT.to(DEVICE)
+    
+    
     print('\nEVALUATION')
     
     with torch.no_grad():
-        for batch_idx, (user, _, item, targets) in enumerate(valid_loader):
+        for batch_idx, (user, _, item, targets, masks) in enumerate(valid_loader):
             
-            # Put on the right DEVICE
+            # Put on right DEVICE
             user = user.to(DEVICE)
             item = item.to(DEVICE)
             targets = targets.to(DEVICE)
+            masks = masks.to(DEVICE)
             
             # Early stopping 
             if batch_idx > nb_batch: 
@@ -237,31 +243,58 @@ def EvalReconstruction(valid_loader, model, criterion, weights_factor, completio
             
             # Print update
             if batch_idx > nb_batch / qt_of_print * print_count:
-                print('Batch {:4d} out of {:4.1f}.    Reconstruction Loss on targets: {:.4f}, no weights: {:.4f}'\
+                print('Batch {:4d} out of {:4.1f}.    Reconstruction Loss on targets: {:.7f}, no weights: {:.7f}'\
                       .format(batch_idx, nb_batch, eval_loss/(batch_idx+1), eval_loss_no_weight/(batch_idx+1)))  
                 print_count += 1
                 
-            pred, logits = model(user, item)  
-      
-        
-            # Add weights on targets rated 0 (w_0) because outnumbered by targets 1
-            w_0 = (targets - 1) * -1 * (weights_factor - 1)
-            w = torch.ones(len(targets)).to(DEVICE) + w_0
-            criterion.weight = w
-        
-            loss = criterion(logits, targets)
+            # Make prediction
+            if model_output == 'Softmax':
+                # # user is batch x BERT_avrg_size. item is qt_items x BERT_avrg_size.
+                # # Put in batch dimension for model (who will concat along dim =1)
+                # user = user.unsqueeze(1).expand(-1, 48272, -1)
+                # item = item.expand(user.shape[0], -1, -1)
+                # print(user.shape, item.shape)
+                # _, logits = model(user, item)
+                
+                # Treat each user seperately, if not, it's too big. Maybe sparse???
+                logits = torch.empty(user.shape[0], 48272).to(DEVICE)
+                for i, one_user in enumerate(user):
+                    # Expand to qt of items
+                    one_user = one_user.expand(48272, -1)
+                    _, logits[i] = model(one_user, item_RT)
+            elif model_output == 'sigmoid':
+                # Proceed one at a time
+                _, logits = model(user, item)
             
-            criterion.weight = None
-            loss_no_weight = criterion(logits, targets).detach()
+            # Consider wieghts
+            if model_output == 'sigmoid':
+                # Add weights on targets rated 0 (w_0) because outnumbered by targets 1
+                w_0 = (targets - 1) * -1 * (weights_factor - 1)
+                w = torch.ones(len(targets)).to(DEVICE) + w_0
+                criterion.weight = w
         
-            eval_loss += loss
-            eval_loss_no_weight += loss_no_weight
+            # Evaluate loss
+            if model_output == 'Softmax':
+                pred = torch.nn.Softmax(dim=0)(logits)
+                # Use only the predictions where there a rating was really available
+                pred = pred * masks
+                loss = criterion(pred, targets)
+            elif model_output == 'sigmoid':
+                loss = criterion(logits, targets)
             
-    
-    eval_loss /= nb_batch 
-    
+            # Consider weights (evaluate without)
+            if model_output == 'sigmoid':
+                criterion.weight = None
+                loss_no_weight = criterion(logits, targets).detach()
+                eval_loss_no_weight += loss_no_weight.detach()
+                
+            eval_loss += loss.detach()
+            
+        eval_loss /= nb_batch    
+                
     return eval_loss
-
+                
+                
 
 
 

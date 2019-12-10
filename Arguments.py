@@ -88,8 +88,7 @@ parser.add_argument('--M1_label', type=str, metavar='', default='none', \
                     help='Label for Model 1')
 parser.add_argument('--completionPredChrono', type=float, metavar='', default=100, \
                     help='% of data used for prediction')
-parser.add_argument('--pred_not_liked', default=False, action='store_true', \
-                    help='If arg added, PredChrono will be on not liked movies only')
+
     
 
     

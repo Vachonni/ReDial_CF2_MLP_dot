@@ -75,8 +75,7 @@ def main(args):
     
     # Create basic model
     model = all_MLP.all_MLP()
-    model = model.to(args.DEVICE)
-          
+    model = model.to(args.DEVICE)       
     
     if args.model_output == 'Softmax':
         criterion = torch.nn.BCELoss() 
@@ -176,12 +175,11 @@ def main(args):
 
         
         
-        train_loss = Utils.TrainReconstruction(train_loader, item_BERT_RT, model, args.model_output, \
-                                               criterion, optimizer, \
+        train_loss = Utils.TrainReconstruction(train_loader, item_BERT_RT, model, \
+                                               args.model_output, criterion, optimizer, \
                                                args.weights, args.completionTrain, args.DEVICE)
-        eval_loss = Utils.EvalReconstruction(valid_loader, model, args.model_output,
-                                             criterion, args.weights, \
-                                             100, args.DEVICE)
+        eval_loss = Utils.EvalReconstruction(valid_loader, item_BERT_RT, model, args.model_output,
+                                             criterion, args.weights, 100, args.DEVICE)
         
         
 
