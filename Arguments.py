@@ -43,7 +43,7 @@ parser.add_argument('--item_BERT_RT', type=str, metavar='', default='item_BERT_a
 
 # Model
 
-parser.add_argument('--model_output', type=str, metavar='', default='Softmax', 
+parser.add_argument('--model_output', type=str, metavar='', default='sigmoid', 
                     choices=['Softmax', 'sigmoid'], \
                     help='How loss will be evaluated. \
                     With Softmax, masked BCE on all movies. \

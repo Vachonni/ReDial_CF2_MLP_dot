@@ -195,7 +195,7 @@ def TrainReconstruction(train_loader, item_RT, model, model_output, criterion, o
         if model_output == 'sigmoid':
             criterion.weight = None
             loss_no_weight = criterion(logits, targets).detach()
-            train_loss_no_weight += loss_no_weight.detach
+            train_loss_no_weight += loss_no_weight.detach()
 
         loss.backward()
         optimizer.step()
