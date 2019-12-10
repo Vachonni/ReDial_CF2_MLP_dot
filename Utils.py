@@ -306,7 +306,6 @@ PREDICTION
 """
 
 
-
 def Prediction(pred_data, model, user_BERT_RT, item_BERT_RT, completion, \
                ranking_method, DEVICE, topx=100):
     """
@@ -319,7 +318,7 @@ def Prediction(pred_data, model, user_BERT_RT, item_BERT_RT, completion, \
     model.eval()
     
     # For print pusposes 
-    nb_batch = len(valid_data) * completion / 100
+    nb_batch = len(pred_data) * completion / 100
     qt_of_print = 5
     print_count = 0
     
@@ -336,7 +335,7 @@ def Prediction(pred_data, model, user_BERT_RT, item_BERT_RT, completion, \
         
     
     with torch.no_grad():
-        for batch_idx, (_, _, qt_movies_mentionned, user_id, item_id, rating) in enumerate(valid_data):
+        for batch_idx, (_, _, qt_movies_mentionned, user_id, item_id, rating) in enumerate(pred_data):
             
             # Early stopping 
             if batch_idx > nb_batch or nb_batch == 0: 
