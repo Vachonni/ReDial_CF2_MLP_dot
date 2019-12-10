@@ -78,9 +78,9 @@ def main(args):
     model = model.to(args.DEVICE)
           
     
-    if args.output == 'Softmax':
+    if args.model_output == 'Softmax':
         criterion = torch.nn.BCELoss() 
-    elif args.output == 'sigmoid':
+    elif args.model_output == 'sigmoid':
         criterion = torch.nn.BCEWithLogitsLoss()     
         
     optimizer = optim.Adam(model.parameters(), lr = args.lr)
@@ -98,10 +98,10 @@ def main(args):
     
     ######## LOAD DATA 
     
-    if args.output == 'Softmax':
+    if args.model_output == 'Softmax':
         args.dataTrain = 'Train_LIST.csv'
         args.dataValid = 'Val_LIST.csv'
-    elif args.output == 'sigmoid':
+    elif args.model_output == 'sigmoid':
         args.dataTrain = 'Train100.csv'
         args.dataValid = 'Val100.csv'
     
@@ -124,8 +124,8 @@ def main(args):
     ######## CREATING DATASET 
     
     print('\n******* Creating torch datasets *******')
-    train_dataset = Utils.Dataset_MLP_dot(train_data, user_BERT_RT, item_BERT_RT)
-    valid_dataset = Utils.Dataset_MLP_dot(valid_data, user_BERT_RT, item_BERT_RT)       
+    train_dataset = Utils.Dataset_MLP_dot(train_data, user_BERT_RT, item_BERT_RT, args.model_output)
+    valid_dataset = Utils.Dataset_MLP_dot(valid_data, user_BERT_RT, item_BERT_RT, args.model_output)       
     
     
     ######## CREATE DATALOADER
@@ -138,11 +138,7 @@ def main(args):
                                                shuffle=True, drop_last=True, **kwargs)
     valid_loader = torch.utils.data.DataLoader(valid_dataset, batch_size=args.batch,\
                                                shuffle=True, drop_last=True, **kwargs)    
-#    # For PredRaw - Loader of only 1 sample (user) 
-#    valid_bs1_loader = torch.utils.data.DataLoader(valid_dataset, batch_size=1, shuffle=True, **kwargs)
-#    ## For PredChrono
-#    #valid_chrono_loader = torch.utils.data.DataLoader(valid_chrono_dataset, batch_size=args.batch, shuffle=True, **kwargs)    
-#    
+       
     
 #%%    
 
@@ -162,6 +158,8 @@ def main(args):
     
     train_losses = []
     valid_losses = []
+    NDCG_to_plot = []
+    RE10_to_plot = []
         
     if args.DEBUG: args.epoch = 1
     
@@ -178,9 +176,11 @@ def main(args):
 
         
         
-        train_loss = Utils.TrainReconstruction(train_loader, model, criterion, optimizer, \
+        train_loss = Utils.TrainReconstruction(train_loader, model, args.model_output, \
+                                               criterion, optimizer, \
                                                args.weights, args.completionTrain, args.DEVICE)
-        eval_loss = Utils.EvalReconstruction(valid_loader, model, criterion, args.weights, \
+        eval_loss = Utils.EvalReconstruction(valid_loader, model, args.model_output,
+                                             criterion, args.weights, \
                                              100, args.DEVICE)
         
         
@@ -210,12 +210,16 @@ def main(args):
         # List of metrics to evaluate and graph
         graphs_titles = ['AVRG_RANK','RE_1', 'RE_10','RE_50','MRR', 'NDCG']  # 'Avrg Pred Error', 'MMRR', 'Avrg Rank', 'MRR'
         graphs_data = [[avrg_rank,avrg_rank],[RE_1, RE_1],[RE_10, RE_10],[RE_50, RE_50],[MRR, MRR],[NDCG, NDCG]]  # Put twice because legacy of with / without genres
+     
         # Evaluate + graph
         for i in range(len(graphs_titles)):
             avrgs = Utils.ChronoPlot(graphs_data[i], graphs_titles[i], args.logPATH)
             print(graphs_titles[i]+" on ReDial movies: {}={:.4f} and {}={:.4f} \n"\
                   .format('withOUT genres', avrgs[0], \
                           'with genres', avrgs[1]))
+            if graphs_titles[i] == 'RE_10': RE10_to_plot.append(avrgs[0])
+            if graphs_titles[i] == 'NDCG': NDCG_to_plot.append(avrgs[0])
+            
 
         
 
@@ -264,6 +268,8 @@ def main(args):
         # Training Curves plot - Save at each epoch
         plt.plot(losses[0], label='Train')  
         plt.plot(losses[1], label='Valid')  
+        plt.plot(RE10_to_plot, label='Re@10')
+        plt.plot(NDCG_to_plot, label='NDCG')
         plt.title('Training Curves', fontweight="bold")
         plt.xlabel('Epoch')
         plt.ylabel(str(criterion)[:3] + ' loss')

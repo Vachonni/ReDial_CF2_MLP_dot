@@ -10,6 +10,7 @@ Classes and functions for ReDial project.
 @author: nicholas
 """
 
+import ast
 import numpy as np
 from torch.utils import data
 import torch
@@ -26,12 +27,13 @@ import scipy.stats as ss
 """
 DATASET - Sub classes of Pytorch DATASET to prepare for Dataloader
 
+
 """
 
 
 
 
-class Dataset_MLP_dot(data.Dataset):
+class Dataset_all_MLP(data.Dataset):
     """    
     
     ****** Now inputs and targets are seperated in data ******
@@ -45,19 +47,24 @@ class Dataset_MLP_dot(data.Dataset):
                  Each line is the BERT avrg representation of corresponding user_chrono_id     
         item_RT: torch tensor (in cuda) of shape (48272, 768). Kind of a Retational Table.
                  Each line is the BERT avrg representation of corresponding movie_UiD
+        model_output: Softmax or sigmoid
 
     
-    RETURNS (for one data point):
-        user's BERT avrg representation
-        item's BERT avrg representation
-        rating corresponding
+    RETURNS (for one data point): 
+        Always a 5-tuple (with some None, depending of model_output)
+            user's BERT avrg representation
+            item_id
+            item's BERT avrg representatio
+            rating (or list of ratings) corresponding
+            masks on ratings
     """
     
     
-    def __init__(self, data, user_RT, item_RT):
+    def __init__(self, data, user_RT, item_RT, model_output):
         self.data = data
         self.user_RT = user_RT
         self.item_RT = item_RT
+        self.model_output = model_output
 
 
         
@@ -71,13 +78,33 @@ class Dataset_MLP_dot(data.Dataset):
     def __getitem__(self, index):
         "Generate one sample of data."
         
+        
+        
         # Get items in 'index' position 
         data_idx, ConvID, qt_movies_mentionned, user_id, item_id, rating = self.data[index]    
         
-        return  self.user_RT[user_id], item_id, self.item_RT[item_id], rating.astype(float)
         
-
-
+        if self.model_output == 'Softmax':
+            
+            # Convert str to list
+            l_item_id = ast.literal_eval(item_id)
+            l_ratings = ast.literal_eval(rating)
+            
+            # Turn the list of item id's and l_ratings to full tensors (size len of items)
+            full_ratings = torch.zeros(48272)
+            # masks are 1 if a raing is available, 0 if not
+            full_masks = torch.zeros(48272)
+            for i, item in enumerate(l_item_id):
+                full_ratings[item] = l_ratings[i]
+                full_masks[item] = 1
+            
+            return  self.user_RT[user_id], None, None, full_ratings, full_masks
+        
+        
+        else:   
+            
+            return  self.user_RT[user_id], item_id, self.item_RT[item_id], rating.astype(float), None
+        
 
 
 
@@ -90,7 +117,8 @@ TRAINING AND EVALUATION
 
 
 
-def TrainReconstruction(train_loader, model, criterion, optimizer, weights_factor, completion, DEVICE):
+def TrainReconstruction(train_loader, model, model_output, criterion, optimizer, \
+                        weights_factor, completion, DEVICE):
     
     model.train()
     train_loss = 0
@@ -102,20 +130,15 @@ def TrainReconstruction(train_loader, model, criterion, optimizer, weights_facto
     print_count = 0  
     
     
-#    """ """
-#    pred_mean_values = []
-#    
-#    """ """
-   
-    
     print('\nTRAINING')
      
-    for batch_idx, (user, _, item, targets) in enumerate(train_loader):
+    for batch_idx, (user, item_id, item, targets, masks) in enumerate(train_loader):
         
         # Put on right DEVICE
         user = user.to(DEVICE)
         item = item.to(DEVICE)
         targets = targets.to(DEVICE)
+        masks = masks.to(DEVICE)
         
         # Early stopping
         if batch_idx > nb_batch: 
@@ -130,8 +153,12 @@ def TrainReconstruction(train_loader, model, criterion, optimizer, weights_facto
         
         
         optimizer.zero_grad()   
-
-        pred, logits = model(user, item)
+        
+        if model_output == 'Softmax':
+            # Have to process 
+            pred,logits = model(user, )
+        elif model_output == 'sigmoid':
+            pred, logits = model(user, item)
 
            
 #        
