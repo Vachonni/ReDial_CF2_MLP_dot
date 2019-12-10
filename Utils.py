@@ -252,7 +252,7 @@ def EvalReconstruction(valid_loader, item_RT, model, model_output, criterion, \
                 # user is batch x BERT_avrg_size. item is qt_items x BERT_avrg_size.
                 # Put in batch dimension for model (who will concat along dim =1)
                 user = user.unsqueeze(1).expand(-1, 48272, -1)
-                item = item.expand(user.shape[0], -1, -1)
+                item = item_RT.expand(user.shape[0], -1, -1)
                 print(user.shape, item.shape)
                 _, logits = model(user, item)
                 
