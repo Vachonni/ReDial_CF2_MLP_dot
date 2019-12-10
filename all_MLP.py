@@ -58,7 +58,7 @@ class all_MLP(nn.Module):
     def forward(self, user, item):
         
         # Concatenate user and item
-        user_item = torch.cat((user, item), dim =1)
+        user_item = torch.cat((user, item), dim = 1)
         
         # Make a prediction
         logits = self.model(user_item).squeeze()

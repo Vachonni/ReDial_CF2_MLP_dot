@@ -176,7 +176,7 @@ def main(args):
 
         
         
-        train_loss = Utils.TrainReconstruction(train_loader, model, args.model_output, \
+        train_loss = Utils.TrainReconstruction(train_loader, item_BERT_RT, model, args.model_output, \
                                                criterion, optimizer, \
                                                args.weights, args.completionTrain, args.DEVICE)
         eval_loss = Utils.EvalReconstruction(valid_loader, model, args.model_output,

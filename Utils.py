@@ -98,7 +98,7 @@ class Dataset_all_MLP(data.Dataset):
                 full_ratings[item] = l_ratings[i]
                 full_masks[item] = 1
             
-            return  self.user_RT[user_id], -1, self.item_RT, full_ratings, full_masks
+            return  self.user_RT[user_id], -1, -1, full_ratings, full_masks
         
         
         else:   
@@ -117,7 +117,7 @@ TRAINING AND EVALUATION
 
 
 
-def TrainReconstruction(train_loader, model, model_output, criterion, optimizer, \
+def TrainReconstruction(train_loader, item_RT, model, model_output, criterion, optimizer, \
                         weights_factor, completion, DEVICE):
     
     model.train()
@@ -128,6 +128,9 @@ def TrainReconstruction(train_loader, model, model_output, criterion, optimizer,
     nb_batch = len(train_loader) * completion / 100
     qt_of_print = 5
     print_count = 0  
+    
+    # Put on right DEVICE
+    item_RT = item_RT.to(DEVICE)
     
     
     print('\nTRAINING')
@@ -155,12 +158,19 @@ def TrainReconstruction(train_loader, model, model_output, criterion, optimizer,
         
         # Make prediction
         if model_output == 'Softmax':
-            # user is batch x BERT_avrg_size. item is qt_items x BERT_avrg_size.
-            # Put in batch dimension for model (who will concat along dim =1)
-            user = user.unsqueeze(1).expand(-1, 48272, -1)
-            item = item.expand(64, -1, -1)
-            print(user.shape, item.shape)
-            _, logits = model(user, item)
+            # # user is batch x BERT_avrg_size. item is qt_items x BERT_avrg_size.
+            # # Put in batch dimension for model (who will concat along dim =1)
+            # user = user.unsqueeze(1).expand(-1, 48272, -1)
+            # item = item.expand(user.shape[0], -1, -1)
+            # print(user.shape, item.shape)
+            # _, logits = model(user, item)
+            
+            # Treat each user seperately, if not, it's too big. Maybe sparse???
+            logits = torch.empty(user.shape[0], 48272).to(DEVICE)
+            for i, one_user in enumerate(user):
+                # Expand to qt of items
+                one_user = one_user.expand(48272, -1)
+                _, logits[i] = model(one_user, item_RT)
         elif model_output == 'sigmoid':
             # Proceed one at a time
             _, logits = model(user, item)
@@ -185,12 +195,12 @@ def TrainReconstruction(train_loader, model, model_output, criterion, optimizer,
         if model_output == 'sigmoid':
             criterion.weight = None
             loss_no_weight = criterion(logits, targets).detach()
+            train_loss_no_weight += loss_no_weight.detach
 
         loss.backward()
         optimizer.step()
         
-        train_loss += loss
-        train_loss_no_weight += loss_no_weight
+        train_loss += loss.detach()
         
     train_loss /= nb_batch
         
