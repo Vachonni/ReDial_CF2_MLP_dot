@@ -43,7 +43,6 @@ with torch.no_grad():
         if count % 1000 == 0: print(count, k)
         BERT_avrg[k] = Text_to_BERT_avrg(v['abstract'])
         count += 1
-        if count > 2: break
     
 
 #%%
