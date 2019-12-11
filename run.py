@@ -47,6 +47,15 @@ with open(args.logPATH+'arguments.json', 'w') as fp:
     fp.write('\n\n'+str(sys.argv))
 
 
+print('IN SLURM TEMPDIR') 
+files = os.listdir(args.working_dir)
+for name in files:
+    print(name)
+
+print('IN DATA:')
+files = os.listdir(args.dataPATH)
+for name in files:
+    print(name)
 
 
 
