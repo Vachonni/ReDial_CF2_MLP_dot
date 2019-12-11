@@ -35,7 +35,7 @@ import Pred_RnGChrono
 args.logPATH = args.working_dir + '/Results/' + args.trial_id + '/' 
 
 # Making the --dataPATH 
-args.dataPATH = args.working_dir + '/Data/'     
+args.dataPATH = args.working_dir + args.dataPATH 
 
 print(vars(args))
 

@@ -1,11 +1,10 @@
 /Results
 /.DS_Store
-Data/item_BERT_avrg_*
-Data/user_BERT_avrg_*
-Data/Train100.csv
+Data/DataReDialML/item_BERT_avrg_*
+Data/DataReDialML/user_BERT_avrg_*
+Data/DataReDialML/Train100.csv
+/Data/DataReDialML/.DS_Store
 /Data/.DS_Store
-Data/user_chrono_RT_BERT_avrg.csv
-Data/movie_genres_RT_BERT_avrg.csv
 Data/PreProcessing/__pycache__/
 __pycache__/
 SB*

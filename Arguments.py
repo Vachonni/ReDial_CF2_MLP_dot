@@ -25,7 +25,7 @@ parser.add_argument('--logPATH', type=str, metavar='',\
     
 # Data
     
-parser.add_argument('--dataPATH', type=str, metavar='', default='./Data/', \
+parser.add_argument('--dataPATH', type=str, metavar='', default='/Data/DataReDial/', \
                     help='Path to datasets to train on')
 parser.add_argument('--dataTrain', type=str, metavar='', default='Train_LIST.csv', \
                     help='File name of Dataset to train on')
