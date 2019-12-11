@@ -39,7 +39,7 @@ def main(args):
     ########################
     
     # Print agrs that will be used
-    print(sys.argv)
+    print('/n/n', sys.argv)
     
     # Cuda availability check
     if args.DEVICE == "cuda" and not torch.cuda.is_available():

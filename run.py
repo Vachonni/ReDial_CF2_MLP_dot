@@ -46,17 +46,17 @@ print(vars(args))
 
 
 
-print('IN $SLURM_TMPDIR:\n')
+print('\nIN $SLURM_TMPDIR:')
 files = os.listdir(args.working_dir)
 for name in files:
     print(name)
     
-print('IN $SLURM_TMPDIR/Data/:\n')
+print('\nIN $SLURM_TMPDIR/Data/:')
 files = os.listdir(args.working_dir+'/Data/')
 for name in files:
     print(name)
 
-print('IN {}:\n'.format(args.dataPATH))
+print('\nIN {}:'.format(args.dataPATH))
 files = os.listdir(args.dataPATH)
 for name in files:
     print(name)

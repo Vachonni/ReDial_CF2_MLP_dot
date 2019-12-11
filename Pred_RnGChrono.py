@@ -105,8 +105,8 @@ def main(args):
     
     # Load Relational Tables (RT) of BERT_avrg for users and items. Type: torch.tensor.
     # map_location is CPU because Dataset with num_workers > 0 should not return CUDA.
-    user_BERT_RT = torch.load(args.dataPATH+'user_BERT_avrg_RT.pt', map_location='cpu')
-    item_BERT_RT = torch.load(args.dataPATH+'item_BERT_avrg_RT.pt', map_location='cpu')    
+    user_BERT_RT = torch.load(args.dataPATH+args.user_BERT_RT, map_location='cpu')
+    item_BERT_RT = torch.load(args.dataPATH+args.item_BERT_RT, map_location='cpu')    
 
     if args.DEBUG: 
         pred_data = pred_data[:128]
