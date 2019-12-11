@@ -51,8 +51,8 @@ files = os.listdir(args.working_dir)
 for name in files:
     print(name)
     
-print('IN $SLURM_TMPDIR/Data:\n')
-files = os.listdir(args.working_dir+'/Data')
+print('IN $SLURM_TMPDIR/Data/:\n')
+files = os.listdir(args.working_dir+'/Data/')
 for name in files:
     print(name)
 
