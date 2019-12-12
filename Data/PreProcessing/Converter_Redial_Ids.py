@@ -23,4 +23,5 @@ for k,v in dict_movies_ReDOrId.items():
     
 #%%
     
-np.save()    
+np.save('/Users/nicholas/ReDial_Utils/ReDiD_2_ReDOrId.npy', ReDiD_2_ReDOrId)    
+np.save('/Users/nicholas/ReDial_Utils/ReDOrId_2_ReDiD.npy', ReDOrId_2_ReDiD)
