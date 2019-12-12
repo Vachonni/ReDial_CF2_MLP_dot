@@ -44,6 +44,7 @@ print(vars(args))
 
 # Print only when working with $SLURM_TMPDIR (i.e. with 'local' in working dir)
 if 'local' in args.working_dir:
+    print('\n\n')
     print('============================================')
     print('==== Mind only when using $SLURM_TMPDIR ====')
     
@@ -62,7 +63,7 @@ if 'local' in args.working_dir:
     for name in files:
         print(name)
 
-    print('============================================')
+    print('============================================\n\n')
 
 
 
