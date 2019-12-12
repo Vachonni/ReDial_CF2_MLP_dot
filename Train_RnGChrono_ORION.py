@@ -114,8 +114,8 @@ def main(args):
     pred_data = df_pred.values
     # Load Relational Tables (RT) of BERT_avrg for users and items. Type: torch.tensor.
     # map_location is CPU because Dataset with num_workers > 0 should not return CUDA.
-    user_BERT_RT = torch.load(args.dataPATH + args.user_BERT_RT, map_location='cpu')
-    item_BERT_RT = torch.load(args.dataPATH + args.item_BERT_RT, map_location='cpu')    
+    user_RT = torch.load(args.dataPATH + args.user_RT, map_location='cpu')
+    item_RT = torch.load(args.dataPATH + args.item_RT, map_location='cpu')    
 
     if args.DEBUG: 
         train_data = train_data[:128]
@@ -126,8 +126,8 @@ def main(args):
     ######## CREATING DATASET 
     
     print('\n******* Creating torch datasets *******')
-    train_dataset = Utils.Dataset_all_MLP(train_data, user_BERT_RT, item_BERT_RT, args.model_output)
-    valid_dataset = Utils.Dataset_all_MLP(valid_data, user_BERT_RT, item_BERT_RT, args.model_output)       
+    train_dataset = Utils.Dataset_all_MLP(train_data, user_RT, item_RT, args.model_output)
+    valid_dataset = Utils.Dataset_all_MLP(valid_data, user_RT, item_RT, args.model_output)       
     
     
     ######## CREATE DATALOADER
@@ -179,10 +179,10 @@ def main(args):
 
         
         
-        train_loss = Utils.TrainReconstruction(train_loader, item_BERT_RT, model, \
+        train_loss = Utils.TrainReconstruction(train_loader, item_RT, model, \
                                                args.model_output, criterion, optimizer, \
                                                args.weights, args.completionTrain, args.DEVICE)
-        eval_loss = Utils.EvalReconstruction(valid_loader, item_BERT_RT, model, args.model_output,
+        eval_loss = Utils.EvalReconstruction(valid_loader, item_RT, model, args.model_output,
                                              criterion, args.weights, 100, args.DEVICE)
         
         
@@ -200,19 +200,18 @@ def main(args):
         
         # Make predictions (returns dictionaries)
         print("\n\nPrediction Chronological...")
-  #      item_MLP_RT = model.item_encoder(item_BERT_RT.to(args.DEVICE))
         avrg_rank, MRR, RR, RE_1, RE_10, RE_50, NDCG = \
-                    Utils.Prediction(pred_data, model, user_BERT_RT, item_BERT_RT, \
+                    Utils.Prediction(pred_data, model, user_RT, item_RT, \
                                      args.completionPredEpoch, args.ranking_method, \
                                      args.DEVICE, args.topx)   
         # Print results
-        print("\n\n  ====> RESULTS <==== ")
-        print("\n  ==> By qt_of_movies_mentioned, on to be mentionned movies <== \n")
+        print("\n\n\n\n  ====> RESULTS <==== ")
+        print("\n  ==> By qt_of_movies_mentioned, on to be mentionned movies <== ")
                 
         # List of metrics to evaluate and graph
         #   Possible values: avrg_rank, MRR, RR, RE_1, RE_10, RE_50, NDCG 
         graphs_data = [avrg_rank, RE_1, RE_10, RE_50, MRR, NDCG]  
-        graphs_titles = ['AVRG_RANK','RE_1', 'RE_10','RE_50','MRR', 'NDCG'] 
+        graphs_titles = ['AVRG_RANK', 'RE_1', 'RE_10', 'RE_50', 'MRR', 'NDCG'] 
 
         # Evaluate + graph
         for i in range(len(graphs_titles)):
@@ -234,7 +233,7 @@ def main(args):
         valid_losses.append(eval_loss)
         losses = [train_losses, valid_losses]  
         
-        print('\nEND EPOCH {:3d} \nTrain Reconstruction Loss on targets: {:.4E}\
+        print('\n\nEND EPOCH {:3d} \nTrain Reconstruction Loss on targets: {:.4E}\
               \nValid Reconstruction Loss on tragets: {:.4E}' \
               .format(epoch, train_loss, eval_loss))
     

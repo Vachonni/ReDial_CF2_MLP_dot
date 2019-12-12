@@ -545,9 +545,7 @@ def ChronoPlot(metrics, title, PATH):
     
     RETURNS global mean for this metrics (all values, indepedant of qt_of_movies_mentioned)
     """
-    
- #   dmean = []    # global mean to return
-    
+        
     # Strat with empty values
     dx = []
     dy = []
@@ -576,11 +574,11 @@ def ChronoPlot(metrics, title, PATH):
     plt.close()
     
     # Printing by qt_of_movies_mentioned
-    print('\n', title, ': ', dy)
+    print('\n', title, ':', dy)
     
     # ...for all users, independently of qt_of_movies_mentioned
     mean_value = mean(dall)
-    print(title, ' mean for all:', mean_value)
+    print(title, 'mean:', mean_value)
     
     return mean_value
     

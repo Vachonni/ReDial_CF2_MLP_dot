@@ -35,10 +35,10 @@ parser.add_argument('--dataPred', type=str, metavar='', default='Val_UNIQUE.csv'
                     help='File name of Dataset to for prediction')    
 parser.add_argument('--num_workers', type=int, metavar='', default=0, \
                     help='Qt CPU when loading data')
-parser.add_argument('--user_BERT_RT', type=str, metavar='', default='user_BERT_avrg_Title_Genres.pt', \
-                    help='File name of tensor where one line is one user avrg BERT representation')
-parser.add_argument('--item_BERT_RT', type=str, metavar='', default='item_BERT_avrg_Title_Genres.pt', \
-                    help='File name of tensor where one line is one item avrg BERT representation')
+parser.add_argument('--user_RT', type=str, metavar='', default='embed_UserChrono_with_BERT_avrg.pt', \
+                    help='File name of tensor where one line is one user embedding')
+parser.add_argument('--item_RT', type=str, metavar='', default='embed_MovieTitlesGenres_with_BERT_avrg.pt', \
+                    help='File name of tensor where one line is one item embedding')
 
 
 # Model

@@ -105,8 +105,8 @@ def main(args):
     
     # Load Relational Tables (RT) of BERT_avrg for users and items. Type: torch.tensor.
     # map_location is CPU because Dataset with num_workers > 0 should not return CUDA.
-    user_BERT_RT = torch.load(args.dataPATH+args.user_BERT_RT, map_location='cpu')
-    item_BERT_RT = torch.load(args.dataPATH+args.item_BERT_RT, map_location='cpu')    
+    user_RT = torch.load(args.dataPATH+args.user_RT, map_location='cpu')
+    item_RT = torch.load(args.dataPATH+args.item_RT, map_location='cpu')    
 
     if args.DEBUG: 
         pred_data = pred_data[:128]
@@ -126,18 +126,18 @@ def main(args):
     # Make predictions (returns dictionaries)
     print("\n\nPrediction Chronological...")
     avrg_rank, MRR, RR, RE_1, RE_10, RE_50, NDCG = \
-            Utils.Prediction(pred_data, model, user_BERT_RT, item_BERT_RT, \
+            Utils.Prediction(pred_data, model, user_RT, item_RT, \
                              args.completionPredFinal, args.ranking_method, \
                              args.DEVICE, args.topx)   
     
     # Print results
-    print("\n\n  ====> RESULTS <==== ")
-    print("\n  ==> By qt_of_movies_mentioned, on to be mentionned movies <== \n")
+    print("\n\n\n\n  ====> RESULTS <==== ")
+    print("\n  ==> By qt_of_movies_mentioned, on to be mentionned movies <== ")
         
     # List of metrics to evaluate and graph
     #   Possible values: avrg_rank, MRR, RR, RE_1, RE_10, RE_50, NDCG 
     graphs_data = [avrg_rank, RE_1, RE_10, RE_50, MRR, NDCG]  
-    graphs_titles = ['AVRG_RANK','RE_1', 'RE_10','RE_50','MRR', 'NDCG'] 
+    graphs_titles = ['AVRG_RANK', 'RE_1', 'RE_10', 'RE_50', 'MRR', 'NDCG'] 
     
     # Evaluate + graph
     for i in range(len(graphs_titles)):

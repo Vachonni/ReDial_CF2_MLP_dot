@@ -1,7 +1,6 @@
 /Results
 /.DS_Store
-Data/DataReDialML/item_BERT_avrg_*
-Data/DataReDialML/user_BERT_avrg_*
+Data/DataReDialML/embed_*
 Data/DataReDialML/Train100.csv
 /Data/DataReDialML/.DS_Store
 /Data/.DS_Store
