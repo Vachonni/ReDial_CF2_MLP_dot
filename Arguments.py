@@ -65,8 +65,6 @@ parser.add_argument('--patience', type=int, metavar='', default=2, \
                     help='number of epoch to wait without improvement in valid_loss before ending training')
 parser.add_argument('--completionTrain', type=float, metavar='', default=100, \
                     help='% of data used during 1 training epoch ~ "early stopping"')
-parser.add_argument('--completionPred', type=float, metavar='', default=100, \
-                    help='% of data used for final prediction')
 parser.add_argument('--completionPredEpoch', type=float, metavar='', default=100, \
                     help='% of data used for prediction during training (each epoch)')
 parser.add_argument('--EARLY', default=False, action='store_true', \
@@ -86,8 +84,8 @@ parser.add_argument('--M1_path', type=str, metavar='', default='none', \
                     help='Path to a Model 1. Will pred with + without genres')
 parser.add_argument('--M1_label', type=str, metavar='', default='none', \
                     help='Label for Model 1')
-parser.add_argument('--completionPredChrono', type=float, metavar='', default=100, \
-                    help='% of data used for prediction')
+parser.add_argument('--completionPredFinal', type=float, metavar='', default=100, \
+                    help='% of data used for final prediction')
 
     
 
@@ -162,8 +160,8 @@ args = parser.parse_args()
 
 # Pourcentage
 assert 0 <= args.completionTrain <=100,'completionTrain should be in [0,100]'
-assert 0 <= args.completionPred <=100,'completionPred should be in [0,100]'
 assert 0 <= args.completionPredEpoch <=100,'completionPredEpoch should be in [0,100]'
+assert 0 <= args.completionPredFinal <=100,'completionPredEpoch should be in [0,100]'
 
 
 

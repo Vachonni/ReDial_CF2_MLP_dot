@@ -127,12 +127,12 @@ def main(args):
     print("\n\nPrediction Chronological...")
     avrg_rank, MRR, RR, RE_1, RE_10, RE_50, NDCG = \
             Utils.Prediction(pred_data, model, user_BERT_RT, item_BERT_RT, \
-                             args.completionPredChrono, args.ranking_method, \
+                             args.completionPredFinal, args.ranking_method, \
                              args.DEVICE, args.topx)   
     
     # Print results
-    print("\n  ====> RESULTS <==== \n")
-    print("\n  ==> BY Nb of mentions, on to be mentionned <== \n")
+    print("\n\n  ====> RESULTS <==== ")
+    print("\n  ==> By qt_of_movies_mentioned, on to be mentionned movies <== \n")
         
     # List of metrics to evaluate and graph
     #   Possible values: avrg_rank, MRR, RR, RE_1, RE_10, RE_50, NDCG 

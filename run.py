@@ -84,8 +84,7 @@ with open(args.logPATH+'arguments.json', 'w') as fp:
 #args.dataTrain = 'Train_EQUAL.csv' 
 #args.dataValid  = 'Val_EQUAL.csv' 
 args.completionTrain = 100 
-args.completionPred = 0
-args.completionPredEpoch = 0 
+# args.completionPredEpoch = 0 
 args.seed = True 
 
 # Execute training on ReDial
@@ -101,8 +100,8 @@ if not args.PredOnly:
 # Set args for prediction of one model, 
 args.seed = True
 args.M1_path = args.logPATH + 'model.pth'   
-if args.DEBUG and args.completionPredChrono != 0:
-    args.completionPredChrono = 1
+if args.DEBUG and args.completionPredFinal!= 0:
+    args.completionPredFinal = 5
 
 # Execute prediction on the ReDial model 
 NDCGs_1model = Pred_RnGChrono.main(args)
