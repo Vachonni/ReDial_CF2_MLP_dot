@@ -574,11 +574,12 @@ def ChronoPlot(metrics, title, PATH):
     plt.close()
     
     # Printing by qt_of_movies_mentioned
-    print('\n', title, ':', dy)
+    print('\n')
+    print(title, ' (all):', dy)
     
     # ...for all users, independently of qt_of_movies_mentioned
     mean_value = mean(dall)
-    print(title, 'mean:', mean_value)
+    print(title, '(mean):', mean_value)
     
     return mean_value
     
