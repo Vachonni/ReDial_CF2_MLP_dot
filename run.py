@@ -42,8 +42,8 @@ print(vars(args))
 
 
 
-# Print usefull when working with $SLURM_TMPDIR
-if args.DEVICE == 'cuda':
+# Print only when working with $SLURM_TMPDIR (i.e. with 'local' in working dir)
+if 'local' in args.working_dir:
     print('============================================')
     print('==== Mind only when using $SLURM_TMPDIR ====')
     
