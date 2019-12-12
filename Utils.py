@@ -24,11 +24,12 @@ import scipy.stats as ss
 
 
 
-"""
-DATASET - Sub classes of Pytorch DATASET to prepare for Dataloader
 
-
-"""
+########################
+#                      # 
+#       DATASET        #
+#                      # 
+########################  
 
 
 
@@ -40,32 +41,39 @@ class Dataset_all_MLP(data.Dataset):
     
     
     INPUT: 
-        data: A Numpy Array shape (39706, 6), where each column is:
-             [data_idx, ConvID, qt_movies_mentioned, user_chrono_id, movie_UiD, rating
+        data: A Numpy Array shape (qt_data, 6), where each column is:
+             [data_idx, ConvID, qt_movies_mentioned, user_id, item_id, rating]
              Chrono data's from ReDial
-        user_RT: torch tensor (in cuda) of shape (39706, 768). Kind of a Retational Table.
-                 Each line is the BERT avrg representation of corresponding user_chrono_id     
-        item_RT: torch tensor (in cuda) of shape (48272, 768). Kind of a Retational Table.
-                 Each line is the BERT avrg representation of corresponding movie_UiD
-        model_output: Softmax or sigmoid
+        user_RT: torch tensor (in cuda) of shape (qt_data, embedding_size). 
+                 Kind of a Retational Table.
+                 Each line is the embedding representation of corresponding user_id     
+        item_RT: torch tensor (in cuda) of shape (qt_item, embedding_size). 
+                 Kind of a Retational Table.
+                 Each line is the embedding representation of corresponding item_id
+        model_output: Softmax or sigmoid. How the loss will be evaluated.
 
     
     RETURNS (for one data point): 
-        Always a 5-tuple (with some None, depending of model_output)
-            user's BERT avrg representation
+        Always a 5-tuple (with some -1 when variable not necessary, depends of model_output)
+            user's embedding
             item_id
-            item's BERT avrg representatio
-            rating (or list of ratings) corresponding
-            masks on ratings
+            item's embedding
+            rating (or list of ratings) corresponding user and item
+            masks on ratings when list of ratings (for Softmax)
     """
     
     
     def __init__(self, data, user_RT, item_RT, model_output):
+  
         self.data = data
         self.user_RT = user_RT
         self.item_RT = item_RT
         self.model_output = model_output
-
+        # Quantity of users 
+        # (Not always unique users. In chrono, users repeat for varying qt of movies mentionned)
+        self.qt_user = len(data)
+        self.qt_item = len(item_RT)
+        
 
         
     def __len__(self):
@@ -76,13 +84,10 @@ class Dataset_all_MLP(data.Dataset):
 
 
     def __getitem__(self, index):
-        "Generate one sample of data."
-        
-        
+        "Generate one sample of data."    
         
         # Get items in 'index' position 
-        data_idx, ConvID, qt_movies_mentionned, user_id, item_id, rating = self.data[index]    
-        
+        data_idx, ConvID, qt_movies_mentionned, user_id, item_id, rating = self.data[index]        
         
         if self.model_output == 'Softmax':
             
@@ -90,10 +95,10 @@ class Dataset_all_MLP(data.Dataset):
             l_item_id = ast.literal_eval(item_id)
             l_ratings = ast.literal_eval(rating)
             
-            # Turn the list of item id's and l_ratings to full tensors (size len of items)
-            full_ratings = torch.zeros(48272)
+            # Turn the list of item id's and list of ratings to full tensors (size len of items)
+            full_ratings = torch.zeros(self.qt_item)
             # masks are 1 if a raing is available, 0 if not
-            full_masks = torch.zeros(48272)
+            full_masks = torch.zeros(self.qt_item)
             for i, item in enumerate(l_item_id):
                 full_ratings[item] = l_ratings[i]
                 full_masks[item] = 1
@@ -109,11 +114,13 @@ class Dataset_all_MLP(data.Dataset):
 
 
 
-"""
 
-TRAINING AND EVALUATION 
 
-"""
+########################
+#                      # 
+#       TRAINING       #
+#                      # 
+########################  
 
 
 
@@ -158,18 +165,12 @@ def TrainReconstruction(train_loader, item_RT, model, model_output, criterion, o
         
         # Make prediction
         if model_output == 'Softmax':
-            # user is batch x BERT_avrg_size. item is qt_items x BERT_avrg_size.
-            # Put in batch dimension for model (who will concat along dim =1)
-            user = user.unsqueeze(1).expand(-1, 48272, -1)
+            # user is batch x embedding_size. item is qt_items x embedding_size.
+            # Put in batch dimension for model (who will concat along embed (dim = -1))
+            user = user.unsqueeze(1).expand(-1, len(item_RT), -1)
             item = item_RT.expand(user.shape[0], -1, -1)
             _, logits = model(user, item)
-            
-            # # Treat each user seperately, if not, it's too big. Maybe sparse???
-            # logits = torch.empty(user.shape[0], 48272).to(DEVICE)
-            # for i, one_user in enumerate(user):
-            #     # Expand to qt of items
-            #     one_user = one_user.expand(48272, -1)
-            #     _, logits[i] = model(one_user, item_RT)
+
         elif model_output == 'sigmoid':
             # Proceed one at a time
             _, logits = model(user, item)
@@ -207,6 +208,15 @@ def TrainReconstruction(train_loader, item_RT, model, model_output, criterion, o
 
 
 
+
+
+
+########################
+#                      # 
+#      EVALUATION      #
+#                      # 
+########################  
+    
 
 
 def EvalReconstruction(valid_loader, item_RT, model, model_output, criterion, \
@@ -248,18 +258,12 @@ def EvalReconstruction(valid_loader, item_RT, model, model_output, criterion, \
                 
             # Make prediction
             if model_output == 'Softmax':
-                # user is batch x BERT_avrg_size. item is qt_items x BERT_avrg_size.
+                # user is batch x embedding_size. item is qt_items x embedding_size.
                 # Put in batch dimension for model (who will concat along dim =1)
-                user = user.unsqueeze(1).expand(-1, 48272, -1)
+                user = user.unsqueeze(1).expand(-1, len(item_RT), -1)
                 item = item_RT.expand(user.shape[0], -1, -1)
                 _, logits = model(user, item)
                 
-                # # Treat each user seperately, if not, it's too big. Maybe sparse???
-                # logits = torch.empty(user.shape[0], 48272).to(DEVICE)
-                # for i, one_user in enumerate(user):
-                #     # Expand to qt of items
-                #     one_user = one_user.expand(48272, -1)
-                #     _, logits[i] = model(one_user, item_RT)
             elif model_output == 'sigmoid':
                 # Proceed one at a time
                 _, logits = model(user, item)
@@ -299,19 +303,17 @@ def EvalReconstruction(valid_loader, item_RT, model, model_output, criterion, \
 
 
 
-"""
+########################
+#                      # 
+#      PREDICTION      #
+#                      # 
+########################  
 
-PREDICTION
 
-"""
-
-
-def Prediction(pred_data, model, user_BERT_RT, item_BERT_RT, completion, \
+def Prediction(pred_data, model, user_RT, item_RT, completion, \
                ranking_method, DEVICE, topx=100):
     """
     Prediction on targets = to be mentionned movies...
-    
-    ** Only works with RnGChronoDataset **
     
     """
     
@@ -348,8 +350,8 @@ def Prediction(pred_data, model, user_BERT_RT, item_BERT_RT, completion, \
                 print_count += 1
                                
             # Put on the right DEVICE (what will be used for prediction)
-            user_BERT_RT = user_BERT_RT.to(DEVICE)
-            item_BERT_RT = item_BERT_RT.to(DEVICE)
+            user_RT = user_RT.to(DEVICE)
+            item_RT = item_RT.to(DEVICE)
             
             
             ### Need to accumualte all movies for the same user (= same qt_movies_mentions)
@@ -361,12 +363,12 @@ def Prediction(pred_data, model, user_BERT_RT, item_BERT_RT, completion, \
             if pred_on_user != user_id:
                 
                 """ Make the prediction on the pred_on user """
-                # Get user's avrg_BERT representation
-                user_BERT = user_BERT_RT[pred_on_user]
-                # Broadcast user's representation for each of of the 48272 movies
-                user_BERT = user_BERT.expand(48272, -1)
+                # Get user's embedding
+                user_embed = user_RT[pred_on_user]
+                # Adapt shape for model: embedding_size -> qt_items x embedding_size 
+                user_embed_broad = user_embed.expand(len(item_RT), -1)
                 # Make predictions on all movies 
-                pred = model(user_BERT, item_BERT_RT)[0]   # model returns (pred, logits)
+                pred = model(user_embed_broad, item_RT)[0]   # model returns (pred, logits)
                 
                 # Insure their is at least one target movie (case where new user starts with rating 0)
                 # (if not, go to next item and this sample not considered (continue))
@@ -400,7 +402,7 @@ def Prediction(pred_data, model, user_BERT_RT, item_BERT_RT, completion, \
                     RE_50[pred_on_qt_m_m] = [re_50]
                 """ Done"""   
                
-                # Update pred_on with actual data
+                # Update pred_on with the one in the for loop, were done with pred_on
                 pred_on_user = user_id
                 pred_on_qt_m_m = qt_movies_mentionned
                 if rating == 1:
@@ -425,22 +427,19 @@ def Prediction(pred_data, model, user_BERT_RT, item_BERT_RT, completion, \
 
 
 
+########################
+#                      # 
+#       METRICS        #
+#                      # 
+########################  
 
-"""
-
-OTHERS
-
-"""
-
-
-
-# DCG (Discounted Cumulative Gain)   
- 
-# Needed to compare rankings when the numbre of item compared are not the same
-# and/or when relevance is not binary
 
 def DCG(v, top):
     """
+    (Discounted Cumulative Gain)   
+    Needed to compare rankings when the number of item compared are not the same
+    and/or when relevance is not binary
+    
     V is vector of ranks, lowest is better
     top is the max rank considered 
     Relevance is 1 if items in rank vector, 0 else
@@ -453,6 +452,8 @@ def DCG(v, top):
             discounted_gain += 1/np.log2(i+1)
 
     return round(discounted_gain, 2)
+
+
 
 
 def nDCG(v, top, nb_values=0):
@@ -469,52 +470,26 @@ def nDCG(v, top, nb_values=0):
     return round(dcg/idcg, 2)
     
   
-# RR (Reciprocal Rank)
-    
-# Gives a value in [0,1] for the first relevant item in list.
-# 1st = 1 and than lower until cloe to 0.
-# Only consern with FIRST relevant item in the list.
+
     
 def RR(v):
+    """
+    Gives a value in [0,1] for the first relevant item in list.
+    1st = 1 and than lower until cloe to 0.
+    Only consern with FIRST relevant item in the list.
+    """
     return 1/np.min(v)
 
 
 
-# Recall@K for one item. 1 if the smallest rank in v is smaller than k, 0 if not.
+
     
 def Recall_at_k_one_item(v, k=1):
-    return 1 if np.min(v) <= k else 0
-
-
-
-#def Ranks(all_values, values_to_rank, topx = 0):
-#    """
-#    Takes 2 numpy array and return, for all values in values_to_rank,
-#    the ranks, average ranks, MRR and nDCG for ranks smaller than topx
-#    """    
-#    # If topx not mentionned (no top), it's for all the values
-#    if topx == 0: topx = len(all_values)
-#    
-#    # Initiate ranks
-#    ranks = np.zeros(len(values_to_rank))
-#    
-#    for i,v in enumerate(values_to_rank):
-#        ranks[i] = len(all_values[all_values > v]) + 1
-#        
-#    ndcg = nDCG(ranks, topx, len(values_to_rank))
-#    
-#    if ranks.sum() == 0: print('warning, should always be at least one rank')
-#    
-#    return ranks, ranks.mean(), round(float((1/ranks).mean()),4), RR(ranks), \
-#           Recall_at_k_one_item(ranks, 1), Recall_at_k_one_item(ranks, 10), \
-#           Recall_at_k_one_item(ranks, 50), ndcg
+    """
+    Recall@K for one item. 1 if the smallest rank in v is smaller than k, 0 if not.
+    """
     
-
-
-
-
-
-
+    return 1 if np.min(v) <= k else 0
 
 
 
@@ -529,9 +504,9 @@ def Ranks(all_values, indices_to_rank, ranking_method, topx = 0):
     
     if ranking_method == 'min':
         qt_uniq = len(all_values.unique())
-        assert qt_uniq > 48272 * 0.98, \
+        assert qt_uniq > len(all_values) * 0.98, \
                "{} of predictions are equal, which is more than 2%. \
-               USE --ranking_method 'ordinal'".format((1 - (qt_uniq/48272)))
+               USE --ranking_method 'ordinal'".format(1 - (qt_uniq/len(all_values)))
     
     ranks = ss.rankdata((-1*all_values).cpu(), method=ranking_method)[indices_to_rank]
         
@@ -548,12 +523,16 @@ def Ranks(all_values, indices_to_rank, ranking_method, topx = 0):
 
 
 
-
+########################
+#                      # 
+#        PLOTS         #
+#                      # 
+########################  
 
     
 def ChronoPlot(l_d, title, PATH, l_label= ['withOUT genres', 'with genres']):
     """
-    Plot graph of list ofdicts, doing mean of values for each key
+    Plot graph of list of dicts, doing mean of values for each key
     """
     dmean = []    # global mean to return
     
@@ -607,27 +586,6 @@ def ChronoPlot(l_d, title, PATH, l_label= ['withOUT genres', 'with genres']):
     return dmean
     
     
-    
-    
-    
-def EpochPlot(tup, title=''):
-    """
-    Plot graph of 4-tuples, doing mean of values
-    """
-        
-    ygl = [wgl for (wgl, wnl, wgn, wnn) in tup]
-    ynl = [wnl for (wgl, wnl, wgn, wnn) in tup]
-    ygn = [wgn for (wgl, wnl, wgn, wnn) in tup]
-    ynn = [wnn for (wgl, wnl, wgn, wnn) in tup]
-    
-    plt.plot(ygl, 'C0', label='Genres + Liked')
-    plt.plot(ynl, 'C0--', label='No Genres + Liked')
-    plt.plot(ygn, 'C1', label='Genres + Not Liked')
-    plt.plot(ynn, 'C1--', label='No Genres & Not Liked')    
-    plt.title(title, fontweight="bold")
-    plt.xlabel('epoch')
-    plt.legend()
-    plt.show()
 
     
     

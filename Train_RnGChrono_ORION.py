@@ -162,8 +162,9 @@ def main(args):
     
     train_losses = []
     valid_losses = []
-    NDCG_to_plot = []
-    RE10_to_plot = []
+    RE10_training_plot = []
+    NDCG_training_plot = []
+
         
     if args.DEBUG: args.epoch = 1
     
@@ -211,17 +212,17 @@ def main(args):
         print("\n  ==> BY Nb of mentions, on to be mentionned <== \n")
                 
         # List of metrics to evaluate and graph
-        graphs_titles = ['AVRG_RANK','RE_1', 'RE_10','RE_50','MRR', 'NDCG']  # 'Avrg Pred Error', 'MMRR', 'Avrg Rank', 'MRR'
         graphs_data = [[avrg_rank,avrg_rank],[RE_1, RE_1],[RE_10, RE_10],[RE_50, RE_50],[MRR, MRR],[NDCG, NDCG]]  # Put twice because legacy of with / without genres
-     
+        graphs_titles = ['AVRG_RANK','RE_1', 'RE_10','RE_50','MRR', 'NDCG']  # 'Avrg Pred Error', 'MMRR', 'Avrg Rank', 'MRR'
+
         # Evaluate + graph
         for i in range(len(graphs_titles)):
             avrgs = Utils.ChronoPlot(graphs_data[i], graphs_titles[i], args.logPATH)
             print(graphs_titles[i]+" on ReDial movies: {}={:.4f} and {}={:.4f} \n"\
                   .format('withOUT genres', avrgs[0], \
                           'with genres', avrgs[1]))
-            if graphs_titles[i] == 'RE_10': RE10_to_plot.append(avrgs[0])
-            if graphs_titles[i] == 'NDCG': NDCG_to_plot.append(avrgs[0])
+            if graphs_titles[i] == 'RE_10': RE10_training_plot.append(avrgs[0])
+            if graphs_titles[i] == 'NDCG': NDCG_training_plot.append(avrgs[0])
             
 
         
@@ -271,8 +272,8 @@ def main(args):
         # Training Curves plot - Save at each epoch
         plt.plot(losses[0], label='Train')  
         plt.plot(losses[1], label='Valid')  
-        plt.plot(RE10_to_plot, label='Re@10')
-        plt.plot(NDCG_to_plot, label='NDCG')
+        plt.plot(RE10_training_plot, label='Re@10')
+        plt.plot(NDCG_training_plot, label='NDCG')
         plt.title('Training Curves', fontweight="bold")
         plt.xlabel('Epoch')
         plt.ylabel(str(criterion)[:3] + ' loss')

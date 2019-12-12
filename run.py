@@ -42,26 +42,27 @@ print(vars(args))
 
 
 
-
-
-
-
-print('\nIN $SLURM_TMPDIR:')
-files = os.listdir(args.working_dir)
-for name in files:
-    print(name)
+# Print usefull when working with $SLURM_TMPDIR
+if args.DEVICE == 'cuda':
+    print('============================================')
+    print('==== Mind only when using $SLURM_TMPDIR ====')
     
-print('\nIN $SLURM_TMPDIR/Data/:')
-files = os.listdir(args.working_dir+'/Data/')
-for name in files:
-    print(name)
+    print('\nIN $SLURM_TMPDIR:')
+    files = os.listdir(args.working_dir)
+    for name in files:
+        print(name)
+        
+    print('\nIN $SLURM_TMPDIR/Data/:')
+    files = os.listdir(args.working_dir+'/Data/')
+    for name in files:
+        print(name)
+    
+    print('\nIN {}:'.format(args.dataPATH))
+    files = os.listdir(args.dataPATH)
+    for name in files:
+        print(name)
 
-print('\nIN {}:'.format(args.dataPATH))
-files = os.listdir(args.dataPATH)
-for name in files:
-    print(name)
-
-
+    print('============================================')
 
 
 
