@@ -27,9 +27,9 @@ parser.add_argument('--logPATH', type=str, metavar='',\
     
 parser.add_argument('--dataPATH', type=str, metavar='', default='/Data/DataReDial/', \
                     help='Path to datasets to train on')
-parser.add_argument('--dataTrain', type=str, metavar='', default='Train_LIST.csv', \
+parser.add_argument('--dataTrain', type=str, metavar='', default='Train100.csv', \
                     help='File name of Dataset to train on')
-parser.add_argument('--dataValid', type=str, metavar='', default='Val_LIST.csv', \
+parser.add_argument('--dataValid', type=str, metavar='', default='Val100.csv', \
                     help='File name of Dataset to for validation')
 parser.add_argument('--dataPred', type=str, metavar='', default='Val_UNIQUE.csv', \
                     help='File name of Dataset to for prediction')    

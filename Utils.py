@@ -530,58 +530,57 @@ def Ranks(all_values, indices_to_rank, ranking_method, topx = 0):
 ########################  
 
     
-def ChronoPlot(l_d, title, PATH, l_label= ['withOUT genres', 'with genres']):
+def ChronoPlot(metrics, title, PATH):
     """
-    Plot graph of list of dicts, doing mean of values for each key
+    Plot graph of metrics 
+    
+    metrics is a dict where each key is the qt_of_movies_mentioned and values are 
+    list of metric values for difference data predictions.
+    
+    We do the mean of values for each key and then plot accrodingly.   
+        ** Needs minimum of 5 vallues to be considered
+    A print of mean metric values by qt_of_movies_mentioned is done, 
+    and one if done for the global mean (indep on qt_of_moveis_mentioned)
+    
+    
+    RETURNS global mean for this metrics (all values, indepedant of qt_of_movies_mentioned)
     """
+    
     dmean = []    # global mean to return
     
-#    d0x = []
-#    d0y = []
-#    d0err = []
-#    d0mean = []    # global mean to return
-    
-    # For each dictionary
-    for i in range(len(l_d)):
-        dx = []
-        dy = []
-        derr = []
-        dall = []
+    # Strat with empty values
+    dx = []
+    dy = []
+    derr = []
+    dall = []
         
-        # For each key
-        for k, v in sorted(l_d[i].items()):
-            if len(v) < 5:
-                continue
-            else:
-                dx.append(k)
-                dy.append(mean(v))
-                derr.append(stdev(v))
-                dall += v
+    # For each key
+    for k, v in sorted(metrics.items()):
+        if len(v) < 5:
+            continue
+        else:
+            dx.append(k)
+            dy.append(mean(v))
+            derr.append(stdev(v))
+            dall += v
 
-#    for k, v in sorted(d0.items()):
-#        if len(v) < 5:
-#            continue
-#        else:
-#            d0x.append(k)
-#            d0y.append(mean(v))
-#            d0err.append(stdev(v))
-#            d0mean += v
-    
-#    plt.plot(d1x, d1y, label=label1)
-#    plt.plot(d0x, d0y, label=label2)  
-        plt.errorbar(dx, dy, derr, elinewidth=0.5, label=l_label[i])
-        print(title, ' ',l_label[i],' CHRONO VALUES:', dy)
-        dmean.append(mean(dall))
-        
-    # ADDING BERT
-    plt.errorbar([0,1,2,3,4,5,6,7,8], [0.18954871794871794, 0.20591032608695653, 0.18370689655172415, 0.13998529411764707, 0.13518518518518519, 0.12472826086956522, 0.11848101265822784, 0.13777777777777778, 0.11130434782608696], label='BERT')    
-    
+    # MAKING GRAPH
+    plt.errorbar(dx, dy, derr, elinewidth=0.5)
+    # Adding BERT for recommendation on Redial and ML
+    plt.errorbar([0,1,2,3,4,5,6,7,8], [0.18954871794871794, 0.20591032608695653, 0.18370689655172415, 0.13998529411764707, 0.13518518518518519, 0.12472826086956522, 0.11848101265822784, 0.13777777777777778, 0.11130434782608696], label='BERT ReDialML')    
     plt.title(title, fontweight="bold")
     plt.xlabel('Nb of mentionned movies before prediction')
     plt.legend()
   # plt.show()
     plt.savefig(PATH+title+'.pdf')
     plt.close()
+    
+    # Printing by qt_of_movies_mentioned
+    print(title, ' values by qt_of_movies_mentionned: ', dy)
+    
+    # ...for all users, independently of qt_of_movies_mentioned
+    dmean.append(mean(dall))
+    print(title, ' value for all (independently of movies_mentioned)', dmean)
     
     return dmean
     

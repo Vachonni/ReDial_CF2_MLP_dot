@@ -151,11 +151,7 @@ assert NDCGs_1model != -1, "Orion's objective not evaluated"
 report_results([dict(
     name='NDCG with genres',
     type='objective',
-    value=-NDCGs_1model[1]),
-    dict(
-    name='NDCG without genres',
-    type='constraint',
-    value=-NDCGs_1model[0]),
+    value=-NDCGs_1model),
 #    dict(
 #    name='valid_pred_error',
 #    type='constraint',

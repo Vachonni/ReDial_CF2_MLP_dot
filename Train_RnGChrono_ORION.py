@@ -98,11 +98,9 @@ def main(args):
     ######## LOAD DATA 
     
     if args.model_output == 'Softmax':
+        print('\n\n===---> WARNING: Moving to LIST DATA. Mandatory for Softmax evaluation <---===')
         args.dataTrain = 'Train_LIST.csv'
         args.dataValid = 'Val_LIST.csv'
-    elif args.model_output == 'sigmoid':
-        args.dataTrain = 'Train100.csv'
-        args.dataValid = 'Val100.csv'
     
     print('\n******* Loading TRAIN samples from *******', args.dataPATH + args.dataTrain)
     df_train = pd.read_csv(args.dataPATH + args.dataTrain)
@@ -212,17 +210,15 @@ def main(args):
         print("\n  ==> BY Nb of mentions, on to be mentionned <== \n")
                 
         # List of metrics to evaluate and graph
-        graphs_data = [[avrg_rank,avrg_rank],[RE_1, RE_1],[RE_10, RE_10],[RE_50, RE_50],[MRR, MRR],[NDCG, NDCG]]  # Put twice because legacy of with / without genres
-        graphs_titles = ['AVRG_RANK','RE_1', 'RE_10','RE_50','MRR', 'NDCG']  # 'Avrg Pred Error', 'MMRR', 'Avrg Rank', 'MRR'
+        #   Possible values: avrg_rank, MRR, RR, RE_1, RE_10, RE_50, NDCG 
+        graphs_data = [avrg_rank, RE_1, RE_10, RE_50, MRR, NDCG]  
+        graphs_titles = ['AVRG_RANK','RE_1', 'RE_10','RE_50','MRR', 'NDCG'] 
 
         # Evaluate + graph
         for i in range(len(graphs_titles)):
             avrgs = Utils.ChronoPlot(graphs_data[i], graphs_titles[i], args.logPATH)
-            print(graphs_titles[i]+" on ReDial movies: {}={:.4f} and {}={:.4f} \n"\
-                  .format('withOUT genres', avrgs[0], \
-                          'with genres', avrgs[1]))
-            if graphs_titles[i] == 'RE_10': RE10_training_plot.append(avrgs[0])
-            if graphs_titles[i] == 'NDCG': NDCG_training_plot.append(avrgs[0])
+            if graphs_titles[i] == 'RE_10': RE10_training_plot.append(avrgs)
+            if graphs_titles[i] == 'NDCG': NDCG_training_plot.append(avrgs)
             
 
         
