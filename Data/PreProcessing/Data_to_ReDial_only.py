@@ -11,7 +11,7 @@ From ReDialML data to ReDial only
 """
 
 
-
+import ast
 import numpy as np
 import pandas as pd
 
@@ -66,8 +66,9 @@ for file in files:
         if isinstance(data_np[i,4], int):
             data_np[i,4] = UiD_2_ReDOrId[data_np[i,4]]
         # If it's the LIST case:
-        if isinstance(data_np[i,4], list):
-            data_np[i,4] = [UiD_2_ReDOrId[item_id] for item_id in data_np[i,4]]
+        if isinstance(data_np[i,4], str):
+            l_items = ast.literal_eval(data_np[i,4])
+            data_np[i,4] = [UiD_2_ReDOrId[item_id] for item_id in l_items]
             
     # Save the new file
     new_df = pd.DataFrame(data=data_np,    # values
