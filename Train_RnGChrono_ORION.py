@@ -216,9 +216,9 @@ def main(args):
     
             # Evaluate + graph
             for i in range(len(graphs_titles)):
-                title_epoch = graphs_titles[i]+'_last_epoch_'+str(args.completionPredEpoch)+'%_data' 
-                avrgs = Utils.ChronoPlot(graphs_data[i], title_epoch, \
-                                         args.logPATH, args.trial_id)
+                subtitle = args.trial_id+' - last_epoch_'+str(args.completionPredEpoch)+'%_data' 
+                avrgs = Utils.ChronoPlot(graphs_data[i], graphs_titles[i], \
+                                         args.logPATH, subtitle)
                 if graphs_titles[i] == 'RE_10': RE10_training_plot.append(avrgs)
                 if graphs_titles[i] == 'NDCG': NDCG_training_plot.append(avrgs)
             
@@ -273,7 +273,7 @@ def main(args):
         if args.completionPredEpoch != 0:
             plt.plot(RE10_training_plot, label='Re@10')
             plt.plot(NDCG_training_plot, label='NDCG')
-        plt.title('Training Curves', fontweight="bold")
+        plt.title('Training Curves' + args.trial_id, fontweight="bold")
         plt.xlabel('Epoch')
         plt.ylabel(str(criterion)[:3] + ' loss')
         plt.legend()
