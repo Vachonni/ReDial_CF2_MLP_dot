@@ -141,7 +141,7 @@ def main(args):
     
     # Evaluate + graph
     for i in range(len(graphs_titles)):
-        avrgs = Utils.ChronoPlot(graphs_data[i], graphs_titles[i], args.logPATH, args.trial_id)
+        avrgs = Utils.ChronoPlot(graphs_data[i], graphs_titles[i], args.logPATH, '_'+args.trial_id)
         if graphs_titles[i] == 'NDCG':
             NDCGs_1model = avrgs
     
