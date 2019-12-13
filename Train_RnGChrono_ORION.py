@@ -198,26 +198,29 @@ def main(args):
         
         
         
-        # Make predictions (returns dictionaries)
-        print("\n\nPrediction Chronological...")
-        avrg_rank, MRR, RR, RE_1, RE_10, RE_50, NDCG = \
-                    Utils.Prediction(pred_data, model, user_RT, item_RT, \
-                                     args.completionPredEpoch, args.ranking_method, \
-                                     args.DEVICE, args.topx)   
-        # Print results
-        print("\n\n\n\n  ====> RESULTS <==== ")
-        print("\n  ==> By qt_of_movies_mentioned, on to be mentionned movies <== ")
-                
-        # List of metrics to evaluate and graph
-        #   Possible values: avrg_rank, MRR, RR, RE_1, RE_10, RE_50, NDCG 
-        graphs_data = [avrg_rank, RE_1, RE_10, RE_50, MRR, NDCG]  
-        graphs_titles = ['AVRG_RANK', 'RE_1', 'RE_10', 'RE_50', 'MRR', 'NDCG'] 
-
-        # Evaluate + graph
-        for i in range(len(graphs_titles)):
-            avrgs = Utils.ChronoPlot(graphs_data[i], graphs_titles[i], args.logPATH)
-            if graphs_titles[i] == 'RE_10': RE10_training_plot.append(avrgs)
-            if graphs_titles[i] == 'NDCG': NDCG_training_plot.append(avrgs)
+        # Make predictions (returns dictionaries) 
+        if args.completionPredEpoch != 0:
+            print("\n\nPrediction Chronological...")
+            avrg_rank, MRR, RR, RE_1, RE_10, RE_50, NDCG = \
+                        Utils.Prediction(pred_data, model, user_RT, item_RT, \
+                                         args.completionPredEpoch, args.ranking_method, \
+                                         args.DEVICE, args.topx)   
+            # Print results
+            print("\n\n\n\n  ====> RESULTS <==== ")
+            print("\n  ==> By qt_of_movies_mentioned, on to be mentionned movies <== ")
+                    
+            # List of metrics to evaluate and graph
+            #   Possible values: avrg_rank, MRR, RR, RE_1, RE_10, RE_50, NDCG 
+            graphs_data = [avrg_rank, RE_1, RE_10, RE_50, MRR, NDCG]  
+            graphs_titles = ['AVRG_RANK', 'RE_1', 'RE_10', 'RE_50', 'MRR', 'NDCG'] 
+    
+            # Evaluate + graph
+            for i in range(len(graphs_titles)):
+                title_this_epoch = graphs_titles[i]+'_last_epoch_'+args.completionPredEpoch+'%_data' 
+                avrgs = Utils.ChronoPlot(graphs_data[i], title_this_epoch, \
+                                         args.logPATH, args.trial_id)
+                if graphs_titles[i] == 'RE_10': RE10_training_plot.append(avrgs)
+                if graphs_titles[i] == 'NDCG': NDCG_training_plot.append(avrgs)
             
 
         
@@ -267,8 +270,9 @@ def main(args):
         # Training Curves plot - Save at each epoch
         plt.plot(losses[0], label='Train')  
         plt.plot(losses[1], label='Valid')  
-        plt.plot(RE10_training_plot, label='Re@10')
-        plt.plot(NDCG_training_plot, label='NDCG')
+        if args.completionPredEpoch != 0:
+            plt.plot(RE10_training_plot, label='Re@10')
+            plt.plot(NDCG_training_plot, label='NDCG')
         plt.title('Training Curves', fontweight="bold")
         plt.xlabel('Epoch')
         plt.ylabel(str(criterion)[:3] + ' loss')

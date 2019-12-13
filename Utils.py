@@ -530,7 +530,7 @@ def Ranks(all_values, indices_to_rank, ranking_method, topx = 0):
 ########################  
 
     
-def ChronoPlot(metrics, title, PATH):
+def ChronoPlot(metrics, title, PATH, subtitle = ''):
     """
     Plot graph of metrics 
     
@@ -566,7 +566,7 @@ def ChronoPlot(metrics, title, PATH):
     plt.errorbar(dx, dy, derr, elinewidth=0.5)
     # Adding BERT for recommendation on Redial and ML
     plt.errorbar([0,1,2,3,4,5,6,7,8], [0.18954871794871794, 0.20591032608695653, 0.18370689655172415, 0.13998529411764707, 0.13518518518518519, 0.12472826086956522, 0.11848101265822784, 0.13777777777777778, 0.11130434782608696], label='BERT ReDialML')    
-    plt.title(title, fontweight="bold")
+    plt.title(title + ' - ' + subtitle, fontweight="bold")
     plt.xlabel('Nb of mentionned movies before prediction')
     plt.legend()
   # plt.show()
@@ -574,12 +574,11 @@ def ChronoPlot(metrics, title, PATH):
     plt.close()
     
     # Printing by qt_of_movies_mentioned
-    print('\n')
-    print(title, ' (all):', dy)
+    print(title, ' (all):  ', dy)
     
     # ...for all users, independently of qt_of_movies_mentioned
     mean_value = mean(dall)
-    print(title, '(mean):', mean_value)
+    print(title, '(mean):  ', mean_value)
     
     return mean_value
     

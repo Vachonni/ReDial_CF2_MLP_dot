@@ -161,7 +161,7 @@ args = parser.parse_args()
 # Pourcentage
 assert 0 <= args.completionTrain <=100,'completionTrain should be in [0,100]'
 assert 0 <= args.completionPredEpoch <=100,'completionPredEpoch should be in [0,100]'
-assert 0 <= args.completionPredFinal <=100,'completionPredEpoch should be in [0,100]'
+assert 0 <= args.completionPredFinal <=100,'completionPredFinal should be in [0,100]'
 
 
 
@@ -172,7 +172,7 @@ assert 0 <= args.completionPredFinal <=100,'completionPredEpoch should be in [0,
 
 if args.EARLY:
     args.completionTrain = 10 
-    args.completionPred = 1
-    args.completionPredEpoch = 1
+    args.completionPredEpoch = 10
+    args.completionPredFinal = 10
     
     
