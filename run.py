@@ -80,8 +80,10 @@ with open(args.logPATH+'arguments.json', 'w') as fp:
 
 ########  TRAINING  ########
 
-
-
+print('\n\n\n\n')
+print('**********************')
+print('*      TRAINING      *')
+print('**********************\n')
 #args.dataTrain = 'Train_EQUAL.csv' 
 #args.dataValid  = 'Val_EQUAL.csv' 
 args.completionTrain = 100 
@@ -98,7 +100,10 @@ if not args.PredOnly:
     
 ########  PREDICTION  ########
 
-print('\n\n\n\n     ==> FINAL PREDICTION')
+print('\n\n\n\n')
+print('**********************')
+print('*  FINAL PREDICTION  *')
+print('**********************\n')
 # Set args for prediction of one model, 
 args.seed = True
 args.M1_path = args.logPATH + 'model.pth'   
