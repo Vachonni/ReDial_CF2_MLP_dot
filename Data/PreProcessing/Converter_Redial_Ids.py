@@ -8,7 +8,7 @@ Created on Wed Dec 11 17:22:45 2019
 
 import numpy as np
 
-dict_movies_ReDOrId = np.load('/Users/nicholas/ReDial_CF2_MLP_dot/Data/PreProcessing/dict_movie_full_by_ReDOrId.npy', allow_pickle=True).item()
+dict_movies_ReDOrId = np.load('/Users/nicholas/ReDial_CF2_MLP_dot/Data/PreProcessing/dict_movie_REDIAL_by_ReDOrId.npy', allow_pickle=True).item()
 
 
 #%%
@@ -24,8 +24,8 @@ for k,v in dict_movies_ReDOrId.items():
     
 #%%
     
-#np.save('/Users/nicholas/ReDial_Utils/ReDiD_2_ReDOrId.npy', ReDiD_2_ReDOrId)    
-#np.save('/Users/nicholas/ReDial_Utils/ReDOrId_2_ReDiD.npy', ReDOrId_2_ReDiD)
+np.save('/Users/nicholas/ReDial_Utils/ReDiD_2_ReDOrId.npy', ReDiD_2_ReDOrId)    
+np.save('/Users/nicholas/ReDial_Utils/ReDOrId_2_ReDiD.npy', ReDOrId_2_ReDiD)
 
 
 #%%
@@ -46,7 +46,7 @@ for k,v in dict_movies_ReDOrId.items():
 #%%
     
     
-#np.save('/Users/nicholas/ReDial_CF2_MLP_dot/Data/PreProcessing/dict_movies_full_by_ReDiD.npy', dict_movies_full_by_ReDiD)    
+np.save('/Users/nicholas/ReDial_CF2_MLP_dot/Data/PreProcessing/dict_movies_full_by_ReDiD.npy', dict_movies_full_by_ReDiD)    
     
 #%%
     

@@ -2,6 +2,8 @@
 /.DS_Store
 Data/DataReDialML/embed_*
 Data/DataReDialML/Train100.csv
+Data/DataReDial/embed_UserChrono_with_BERT_avrg.pt
+Data/DataReDial/Train100.csv
 /Data/DataReDialML/.DS_Store
 /Data/.DS_Store
 Data/PreProcessing/__pycache__/

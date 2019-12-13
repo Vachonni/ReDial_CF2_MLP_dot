@@ -280,7 +280,7 @@ for line in open(Conv_PATH, 'r'):
                     
                     
                 # Also add another 100 random movies at rating 0
-                new_movies_indices = np.random.choice(np.setdiff1d(range(48272), l_movies_rated), len(l_movies_rated))
+                new_movies_indices = np.random.choice(range(48272), 100, replace=False)
                 for m in new_movies_indices:
                     data.append([data_id, ConvID, count_original_mentions, u_id, m, 0])
                     data_id += 1

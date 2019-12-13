@@ -19,11 +19,11 @@ from BERTifying import Text_to_BERT_avrg
 print('now Bertify is loaded')
 
 if torch.cuda.is_available():
-    PATH = '/home/vachonni/scratch/ReDial_CF2_MLP_dot/Data/'
+    PATH = '/home/vachonni/scratch/ReDial_CF2_MLP_dot/Data/DataReDialML/'
 else:    
-    PATH = '/Users/nicholas/ReDial_CF2_MLP_dot/Data/'
+    PATH = '/Users/nicholas/ReDial_CF2_MLP_dot/Data/DataReDialML/'
     
-dict_movies = np.load(PATH + 'PreProcessing/dict_movie_full_by_UiD.npy', \
+dict_movies = np.load(PATH + 'PreProcessing/dict_movie_REDIAL_by_UiD.npy', \
                       allow_pickle=True).item()
 
 
@@ -47,4 +47,4 @@ with torch.no_grad():
 
 #%%
         
-torch.save(BERT_avrg, PATH + 'item_BERT_avrg_Abstract.pt')  
+torch.save(BERT_avrg, PATH + 'embed_MovieAbstract_with_BERT_avrg.pt')  
