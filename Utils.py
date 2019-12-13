@@ -566,7 +566,7 @@ def ChronoPlot(metrics, title, PATH, subtitle = ''):
     plt.errorbar(dx, dy, derr, elinewidth=0.5, label=title)
     # Adding BERT for recommendation on Redial and ML
     plt.errorbar([0,1,2,3,4,5,6,7,8], [0.18954871794871794, 0.20591032608695653, 0.18370689655172415, 0.13998529411764707, 0.13518518518518519, 0.12472826086956522, 0.11848101265822784, 0.13777777777777778, 0.11130434782608696], label='BERT ReDialML')    
-    plt.title(title + ' -' + subtitle, fontweight="bold")
+    plt.title(title + '  ' + subtitle, fontweight="bold")
     plt.xlabel('Nb of mentionned movies before prediction')
     plt.legend()
   # plt.show()
