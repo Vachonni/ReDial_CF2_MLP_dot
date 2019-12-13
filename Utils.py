@@ -107,7 +107,7 @@ class Dataset_all_MLP(data.Dataset):
         
         
         else:   
-            
+            item_id = int(item_id)
             return  self.user_RT[user_id], item_id, self.item_RT[item_id], rating.astype(float), -1
         
 
