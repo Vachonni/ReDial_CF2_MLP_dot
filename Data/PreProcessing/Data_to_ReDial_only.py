@@ -90,7 +90,7 @@ for file in files:
 
 import torch
 
-RT = torch.load('/Users/nicholas/ReDial_CF2_MLP_dot/Data/DataReDialML/embed_MovieTitlesGenres_with_BERT_avrg.pt')
+RT = torch.load('/Users/nicholas/ReDial_CF2_MLP_dot/Data/DataReDialML/embed_MovieAbstract_with_BERT_avrg.pt')
 
 
 #%%
@@ -102,7 +102,7 @@ for k, v in UiD_2_ReDOrId.items():
 
 #%%
     
-torch.save(new_RT, '/Users/nicholas/ReDial_CF2_MLP_dot/Data/DataReDial/embed_MovieTitlesGenres_with_BERT_avrg.pt')
+torch.save(new_RT, '/Users/nicholas/ReDial_CF2_MLP_dot/Data/DataReDial/embed_MovieAbstract_with_BERT_avrg.pt')
 
 
 
