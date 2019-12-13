@@ -266,6 +266,7 @@ def main(args):
             if not os.path.isdir(args.logPATH): os.mkdir(args.logPATH)
             # Save at directory + _model.pth
             torch.save(state, args.logPATH+'model.pth')
+            print('......saved.')
             
         # Training Curves plot - Save at each epoch
         plt.plot(losses[0], label='Train')  
@@ -280,7 +281,6 @@ def main(args):
      #   plt.show()
         plt.savefig(args.logPATH+'Training_Curves.pdf')
         plt.close()
-        print('......saved.')
             
         # Saving model corresponding to the last epoch (invariant of partience)
         state = {
