@@ -63,9 +63,9 @@ parser.add_argument('--weights', type=float, metavar='', default=1, \
                     during training.  0 -> no weights, 5 -> 5 times the weight')
 parser.add_argument('--patience', type=int, metavar='', default=2, \
                     help='number of epoch to wait without improvement in valid_loss before ending training')
-parser.add_argument('--completionTrain', type=float, metavar='', default=100, \
+parser.add_argument('--completionTrain', type=int, metavar='', default=100, \
                     help='% of data used during 1 training epoch ~ "early stopping"')
-parser.add_argument('--completionPredEpoch', type=float, metavar='', default=100, \
+parser.add_argument('--completionPredEpoch', type=int, metavar='', default=100, \
                     help='% of data used for prediction during training (each epoch)')
 parser.add_argument('--EARLY', default=False, action='store_true', \
                     help="If arg added, Train at 10%, Pred at 1% and PredChrono at 1%")
@@ -84,7 +84,7 @@ parser.add_argument('--M1_path', type=str, metavar='', default='none', \
                     help='Path to a Model 1. Will pred with + without genres')
 parser.add_argument('--M1_label', type=str, metavar='', default='none', \
                     help='Label for Model 1')
-parser.add_argument('--completionPredFinal', type=float, metavar='', default=100, \
+parser.add_argument('--completionPredFinal', type=int, metavar='', default=100, \
                     help='% of data used for final prediction')
 
     
