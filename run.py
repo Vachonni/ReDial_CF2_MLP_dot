@@ -98,6 +98,7 @@ if not args.PredOnly:
     
 ########  PREDICTION  ########
 
+print('\n\n\n\n     ==> FINAL PREDICTION')
 # Set args for prediction of one model, 
 args.seed = True
 args.M1_path = args.logPATH + 'model.pth'   

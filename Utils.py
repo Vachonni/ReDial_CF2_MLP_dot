@@ -570,7 +570,7 @@ def ChronoPlot(metrics, title, PATH, subtitle = ''):
     plt.xlabel('Nb of mentionned movies before prediction')
     plt.legend()
   # plt.show()
-    plt.savefig(PATH+title+'.pdf')
+    plt.savefig(PATH+title+subtitle+'.pdf')
     plt.close()
     
     # Printing by qt_of_movies_mentioned

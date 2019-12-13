@@ -207,7 +207,7 @@ def main(args):
                                          args.DEVICE, args.topx)   
             # Print results
             print("\n\n\n\n  ====> RESULTS <==== ")
-            print("\n  ==> By qt_of_movies_mentioned, on to be mentionned movies <== ")
+            print("\n  ==> By qt_of_movies_mentioned, on to be mentionned movies <==\n")
                     
             # List of metrics to evaluate and graph
             #   Possible values: avrg_rank, MRR, RR, RE_1, RE_10, RE_50, NDCG 
@@ -273,7 +273,7 @@ def main(args):
         if args.completionPredEpoch != 0:
             plt.plot(RE10_training_plot, label='Re@10')
             plt.plot(NDCG_training_plot, label='NDCG')
-        plt.title('Training Curves' + args.trial_id, fontweight="bold")
+        plt.title('Training Curves -' + args.trial_id, fontweight="bold")
         plt.xlabel('Epoch')
         plt.ylabel(str(criterion)[:3] + ' loss')
         plt.legend()
