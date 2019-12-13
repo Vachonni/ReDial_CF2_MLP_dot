@@ -216,8 +216,8 @@ def main(args):
     
             # Evaluate + graph
             for i in range(len(graphs_titles)):
-                title_this_epoch = graphs_titles[i]+'_last_epoch_'+args.completionPredEpoch+'%_data' 
-                avrgs = Utils.ChronoPlot(graphs_data[i], title_this_epoch, \
+                title_epoch = graphs_titles[i]+'_last_epoch_'+int(args.completionPredEpoch)+'%_data' 
+                avrgs = Utils.ChronoPlot(graphs_data[i], title_epoch, \
                                          args.logPATH, args.trial_id)
                 if graphs_titles[i] == 'RE_10': RE10_training_plot.append(avrgs)
                 if graphs_titles[i] == 'NDCG': NDCG_training_plot.append(avrgs)
