@@ -263,7 +263,7 @@ def main(args):
                     'optimizer': optimizer.state_dict(),
                     'losses': losses,
                     }
-            if not os.path.isdir(args.logModelsPATH): os.mkdir(args.logModelsPATH)
+            if not os.path.isdir(args.logModelsPATH): os.makedirs(args.logModelsPATH, exist_ok=True)
             # Save at Models directory + model.pth
             torch.save(state, args.logModelsPATH+'model.pth')
             print('......saved.')
