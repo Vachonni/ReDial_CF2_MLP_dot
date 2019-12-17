@@ -218,7 +218,7 @@ def main(args):
             for i in range(len(graphs_titles)):
                 subtitle = '_'+args.trial_id+'__last_epoch_'+str(args.completionPredEpoch)+'%_data' 
                 avrgs = Utils.ChronoPlot(graphs_data[i], graphs_titles[i], \
-                                         args.logPATH, subtitle)
+                                         args.logInfosPATH, subtitle)
                 if graphs_titles[i] == 'RE_10': RE10_training_plot.append(avrgs)
                 if graphs_titles[i] == 'NDCG': NDCG_training_plot.append(avrgs)
             
@@ -263,9 +263,9 @@ def main(args):
                     'optimizer': optimizer.state_dict(),
                     'losses': losses,
                     }
-            if not os.path.isdir(args.logPATH): os.mkdir(args.logPATH)
-            # Save at directory + _model.pth
-            torch.save(state, args.logPATH+'model.pth')
+            if not os.path.isdir(args.logModelsPATH): os.mkdir(args.logModelsPATH)
+            # Save at Models directory + model.pth
+            torch.save(state, args.logModelsPATH+'model.pth')
             print('......saved.')
             
         # Training Curves plot - Save at each epoch
@@ -279,10 +279,10 @@ def main(args):
         plt.ylabel(str(criterion)[:3] + ' loss')
         plt.legend()
      #   plt.show()
-        plt.savefig(args.logPATH+'Training_Curves.pdf')
+        plt.savefig(args.logInfosPATH+'Training_Curves.pdf')
         plt.close()
             
-        # Saving model corresponding to the last epoch (invariant of partience)
+        # Saving model corresponding to the last epoch (invariant of patience)
         state = {
                 'epoch': epoch,
                 'eval_loss': eval_loss,
@@ -290,8 +290,8 @@ def main(args):
                 'optimizer': optimizer.state_dict(),
                 'losses': losses,
                 }
-        # Save at directory + _model.pth
-        torch.save(state, args.logPATH+'model_last_epoch.pth')
+        # Save at Models directory + model_last_epoch.pth
+        torch.save(state, args.logModelsPATH + 'model_last_epoch.pth')
         
         
         

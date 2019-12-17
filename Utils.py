@@ -504,6 +504,8 @@ def Ranks(all_values, indices_to_rank, ranking_method, topx = 0):
     
     if ranking_method == 'min':
         qt_uniq = len(all_values.unique())
+        plt.hist(all_values, 1000, [0.0,1.0])
+        plt.show
         assert qt_uniq > len(all_values) * 0.98, \
                "{} of predictions are equal, which is more than 2%. \
                USE --ranking_method 'ordinal'".format(1 - (qt_uniq/len(all_values)))

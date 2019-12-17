@@ -32,7 +32,8 @@ import Pred_RnGChrono
 
 
 # (need for Orion, from $SLURM_TMPDIR, adapted elsewhere)
-args.logPATH = args.working_dir + '/Results/' + args.trial_id + '/' 
+args.logModelsPATH = args.working_dir + '/Results/Models/' + args.trial_id + '/'
+args.logInfosPATH = args.working_dir + '/Results/Infos/' + args.trial_id + '/'
 
 # Making the --dataPATH 
 args.dataPATH = args.working_dir + args.dataPATH 
@@ -69,8 +70,8 @@ if 'local' in args.working_dir:
 
 
 # Save all arguments values
-if not os.path.isdir(args.logPATH): os.makedirs(args.logPATH, exist_ok=True)
-with open(args.logPATH+'arguments.json', 'w') as fp:
+if not os.path.isdir(args.logInfosPATH): os.makedirs(args.logInfosPATH, exist_ok=True)
+with open(args.logInfosPATH + 'arguments.json', 'w') as fp:
     json.dump(vars(args), fp, sort_keys=True, indent=4)
     fp.write('\n\n'+str(sys.argv))
 
@@ -106,7 +107,8 @@ print('*  FINAL PREDICTION  *')
 print('**********************\n')
 # Set args for prediction of one model, 
 args.seed = True
-args.M1_path = args.logPATH + 'model.pth'   
+if args.model_path == 'none':
+    args.model_path = args.logModelsPATH + 'model.pth'   
 if args.DEBUG and args.completionPredFinal!= 0:
     args.completionPredFinal = 5
 

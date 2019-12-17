@@ -29,7 +29,7 @@ parser.add_argument('--dataPATH', type=str, metavar='', default='/Data/DataReDia
                     help='Path to datasets to train on')
 parser.add_argument('--dataTrain', type=str, metavar='', default='Train100.csv', \
                     help='File name of Dataset to train on')
-parser.add_argument('--dataValid', type=str, metavar='', default='Val100.csv', \
+parser.add_argument('--dataValid', type=str, metavar='', default='Val_UNIQUE.csv', \
                     help='File name of Dataset to for validation')
 parser.add_argument('--dataPred', type=str, metavar='', default='Val_UNIQUE.csv', \
                     help='File name of Dataset to for prediction')    
@@ -80,10 +80,8 @@ parser.add_argument('--ranking_method', type=str, metavar='', default='min', \
                     of too many predictions equal. Can also be "average"')
 parser.add_argument('--PredOnly', default=False, action='store_true', \
                     help='If arg added,run.py will only do prediction, no training.')
-parser.add_argument('--M1_path', type=str, metavar='', default='none', \
-                    help='Path to a Model 1. Will pred with + without genres')
-parser.add_argument('--M1_label', type=str, metavar='', default='none', \
-                    help='Label for Model 1')
+parser.add_argument('--model_path', type=str, metavar='', default='none', \
+                    help='Path to model used for prediction. If none, determined in run.py')
 parser.add_argument('--completionPredFinal', type=int, metavar='', default=100, \
                     help='% of data used for final prediction')
 
