@@ -41,6 +41,7 @@ parser.add_argument('--item_RT', type=str, metavar='', default='embed_MovieTitle
                     help='File name of tensor where one line is one item embedding')
 
 
+
 # Model
 
 parser.add_argument('--model_output', type=str, metavar='', default='sigmoid', 
@@ -85,15 +86,6 @@ parser.add_argument('--model_path', type=str, metavar='', default='none', \
 parser.add_argument('--completionPredFinal', type=int, metavar='', default=100, \
                     help='% of data used for final prediction')
 
-    
-
-    
-# Genres 
-    
-parser.add_argument('--genresDict', type=str, metavar='', default='dict_genresInter_idx_UiD.json', \
-                    help='File name of Dict of genres')
-parser.add_argument('--top_cut', type=int, metavar='', default=100, \
-                    help='number of movies in genres vector (for torch Dataset)')
 
     
     
@@ -105,20 +97,10 @@ parser.add_argument('--topx', type=int, metavar='', default=100, \
 
 
     
-# Global (training(s) and prediction) with file runOrion.py
-    
-parser.add_argument('--NOpreTrain', default=False, action='store_true', \
-                    help="If arg added, skips the pre-training on ML")
-
-    
     
 
 # Args to cover for ORION's (lack of 'choice' option or $SLURM_TMPDIR)
     
-parser.add_argument('--ORION_NOpreTrain', type=int, metavar='', default=-1, choices=[-1,0,1], \
-                    help='Pretraining on ML or not, will be transformed in runOrion.py. ')
-parser.add_argument('--ORION_g_type', type=int, metavar='', default=-1, choices=[-1,0,1,2], \
-                    help='g_type, will be transformed in runOrion.py (only 3 last types)')
 parser.add_argument('--trial_id', type=str, metavar='', default='Test',\
                     help='ORION - Unique trial experience. Used to reconstruc args.id.')
 parser.add_argument('--working_dir', type=str, metavar='', default='.', \
