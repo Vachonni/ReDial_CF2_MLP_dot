@@ -126,8 +126,12 @@ def main(args):
     if args.model == 'TrainBERT':
         user_RT = np.load(args.dataPATH + args.user_RT, allow_pickle=True).item()
         item_RT = np.load(args.dataPATH + args.item_RT, allow_pickle=True).item()
-        user_RT = {v.to(args.DEVICE) for user in user_RT.values() for v in user.values()}
-        item_RT = {v.to(args.DEVICE) for item in item_RT.values() for v in item.values()}
+        for ku, vu in user_RT.items():
+            for k, v in vu.items():
+                v = v.to(args.DEVICE)
+        for ki, vi in item_RT.items():
+            for k, v in vi.items():
+                v = v.to(args.DEVICE)
     else:
         # Load Relational Tables (RT) of BERT_avrg for users and items. Type: torch.tensor.
         # map_location is CPU because Dataset with num_workers > 0 should not return CUDA.
