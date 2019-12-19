@@ -105,84 +105,112 @@ def Text_to_BERT_avrg(text, model=model, tokenizer=tokenizer, max_length=512):
 
 
 
+#%%
+    
+
+import numpy as np
+
+# We now convert all the str of ML - titles & genres
+
+movie_str_ML = np.load('/Users/nicholas/ReDial_CF2_MLP_dot/Data/DataReDialML/str_MovieTitlesGenres_RT.npy',\
+                       allow_pickle=True)
+
+BERT_input_MovieTitlesGenres_dict = {}
+    
+for k, text in enumerate(movie_str_ML):
+    BERT_input_MovieTitlesGenres_dict[k] = Text_in_BERT(text[0])
 
 
+np.save('/Users/nicholas/ReDial_CF2_MLP_dot/Data/DataReDialML/BERT_input_MovieTitlesGenres_dict.npy', \
+        BERT_input_MovieTitlesGenres_dict)
+    
+    
+    
+    
+#%%
+    
+    
+# We now convert all the str of ReDial - titles & genres
+
+movie_str = np.load('/Users/nicholas/ReDial_CF2_MLP_dot/Data/DataReDial/str_MovieTitlesGenres_RT.npy',\
+                       allow_pickle=True)
+
+BERT_input_MovieTitlesGenres_dict = {}
+    
+for k, text in enumerate(movie_str):
+    BERT_input_MovieTitlesGenres_dict[k] = Text_in_BERT(text[0])
 
 
+np.save('/Users/nicholas/ReDial_CF2_MLP_dot/Data/DataReDial/BERT_input_MovieTitlesGenres_dict.npy', \
+        BERT_input_MovieTitlesGenres_dict)
+    
 #%%
 
+    
+# We now convert all the str of ReDial - Abstract
 
-# Trying stuff
+movie_str = np.load('/Users/nicholas/ReDial_CF2_MLP_dot/Data/DataReDial/str_MovieAbstract_RT.npy',\
+                       allow_pickle=True)
 
-
-
-#
-#
-#
-#
-#
-#for text in df_user['text'].head():
-#    print(tokenizer.tokenize(text))
-#
-#
-#
-##%%
-#
-#
-#
-#tokenizer.encode_plus(['Have a nice day'], add_special_tokens=True, max_length=5)
-#
-##%%
-#
-#tokenizer.convert_ids_to_tokens(102)
-#
-##%%
-#
-#tokenizer.convert_tokens_to_ids(['PAD'])
-#
-#
-#
-##%%
-#
-#inp = text_to_BERT('Have a nivce day')
-#
-#model(**inp)
-##%%
-#model(torch.tensor([ 101,  2031,  1037,  9152, 25465,  2063,  2154,   100,   100,   100]).unsqueeze(0))[0]
-#
-##%%
-#
-#tokenizer.encode_plus('Have a nivce day', max_length=512)
-#
-##%%
-#
-#trr = text_to_BERT('Have a nivce day')
-#
-#for k,v in trr.items():
-#    print(v.shape)
-#
-#print(trr)
-#
+BERT_input_MovieAbstract_dict = {}
+    
+for k, text in enumerate(movie_str):
+    BERT_input_MovieAbstract_dict[k] = Text_in_BERT(text[0])
 
 
+np.save('/Users/nicholas/ReDial_CF2_MLP_dot/Data/DataReDial/BERT_input_MovieAbstract_dict.npy', \
+        BERT_input_MovieAbstract_dict)
+
+    
+    
+#%%
+    
+    
+# We now convert all the str of users_chrono
+
+user_str = np.load('/Users/nicholas/ReDial_CF2_MLP_dot/Data/DataReDialML/str_UserChrono_RT.npy',\
+                       allow_pickle=True)
+
+BERT_input_UserChrono_dict = {}
+    
+for k, text in enumerate(user_str):
+    BERT_input_UserChrono_dict[k] = Text_in_BERT(text[0])
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+np.save('/Users/nicholas/ReDial_CF2_MLP_dot/Data/DataReDialML/BERT_input_UserChrono_dict.npy', \
+        BERT_input_UserChrono_dict)
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
