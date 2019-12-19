@@ -35,15 +35,18 @@ parser.add_argument('--dataPred', type=str, metavar='', default='Val_UNIQUE.csv'
                     help='File name of Dataset to for prediction')    
 parser.add_argument('--num_workers', type=int, metavar='', default=0, \
                     help='Qt CPU when loading data')
-parser.add_argument('--user_RT', type=str, metavar='', default='embed_UserChrono_with_BERT_avrg.pt', \
-                    help='File name of tensor where one line is one user embedding')
-parser.add_argument('--item_RT', type=str, metavar='', default='embed_MovieTitlesGenres_with_BERT_avrg.pt', \
-                    help='File name of tensor where one line is one item embedding')
+parser.add_argument('--user_RT', type=str, metavar='', default='BERT_input_UserChrono_dict.npy', \
+                    help='File name where one index is one user input')
+parser.add_argument('--item_RT', type=str, metavar='', default='BERT_input_MovieTitlesGenres_dict.npy', \
+                    help='File name where one index is one item input')
 
 
 
 # Model
 
+parser.add_argument('--model', type=str, metavar='', default='TrainBERT', 
+                    choices=['TrainBERT', 'all_MLP'], \
+                    help='Which model to use')    
 parser.add_argument('--model_output', type=str, metavar='', default='sigmoid', 
                     choices=['Softmax', 'sigmoid'], \
                     help='How loss will be evaluated. \

@@ -18,7 +18,6 @@ import torch
 import matplotlib.pyplot as plt
 from statistics import mean, stdev
 import scipy.stats as ss
-import BERTifying
 #import Settings
 
 
@@ -88,9 +87,6 @@ class Dataset_all_MLP(data.Dataset):
         # Get items in 'index' position 
         data_idx, ConvID, qt_movies_mentionned, user_id, item_id, rating = self.data[index]        
         
-        # Get the user input ready
-        
-        
         if self.model_output == 'Softmax':
             
             # Convert str to list
@@ -118,27 +114,29 @@ class Dataset_all_MLP(data.Dataset):
 
 class Dataset_TrainBERT(data.Dataset):
     """    
-    Dataset to use when *_RT are Numpy Arrays of str and returns BERT ready inputs.
+    Dataset to use when *_RT are dict of BERT_input.
         
     
     INPUT: 
         data: A Numpy Array shape (qt_data, 6), where each column is:
              [data_idx, ConvID, qt_movies_mentioned, user_id, item_id, rating]
              Chrono data's from ReDial
-        user_RT: A Numpy Array of shape (qt_user, 1). 
+        user_RT: A dict of BERT_input (len = qt_user). 
                  Kind of a Retational Table.
-                 Each line is the str of corresponding user_id     
+                 Each item is a dict containing 4 tensors (inputs, masks, positional, token_types) 
+                 corresponding to user's key    
         item_RT: A Numpy Array of shape (qt_item, 1). 
                  Kind of a Retational Table.
-                 Each line is the str of corresponding item_id
+                 Each item is a dict containing 4 tensors (inputs, masks, positional, token_types) 
+                 corresponding to item's key
         model_output: Softmax or sigmoid. How the loss will be evaluated.
 
     
     RETURNS (for one data point): 
         Always a 5-tuple (with some -1 when variable not necessary, depends of model_output)
-            user's str in BERT input format
+            user's BERT_input format
             item_id
-            item's str in BERT input format
+            item's BERT_input format
             rating (or list of ratings) corresponding user and item
             masks on ratings when list of ratings (for Softmax)
     """
@@ -216,19 +214,20 @@ def TrainReconstruction(train_loader, item_RT, model, model_output, criterion, o
     qt_of_print = 5
     print_count = 0  
     
-    # Put on right DEVICE
-    item_RT = item_RT.to(DEVICE)
+    # # Put on right DEVICE
+    # if args.model != 'TrainBERT':
+    #     item_RT = item_RT.to(DEVICE)
     
     
     print('\nTRAINING')
      
     for batch_idx, (user, _, item, targets, masks) in enumerate(train_loader):
         
-        # Put on right DEVICE
-        user = user.to(DEVICE)
-        item = item.to(DEVICE)
-        targets = targets.to(DEVICE)
-        masks = masks.to(DEVICE)
+        # # Put on right DEVICE
+        # user = user.to(DEVICE)
+        # item = item.to(DEVICE)
+        # targets = targets.to(DEVICE)
+        # masks = masks.to(DEVICE)
         
         # Early stopping
         if batch_idx > nb_batch: 
@@ -236,7 +235,7 @@ def TrainReconstruction(train_loader, item_RT, model, model_output, criterion, o
             break
         
         # Print update
-        if batch_idx > nb_batch / qt_of_print * print_count:
+        if True:  #batch_idx > nb_batch / qt_of_print * print_count:
             print('Batch {:4d} out of {:4.1f}.    Reconstruction Loss on targets: {:.4E}, no weights: {:.4E}' \
                   .format(batch_idx, nb_batch, train_loss/(batch_idx+1), train_loss_no_weight/(batch_idx+1)))  
             print_count += 1    

@@ -73,14 +73,22 @@ def main(args):
     ########################
      
     
-    # Create basic model
-    model = all_MLP.all_MLP()
-    model = model.to(args.DEVICE)       
-    
-    if args.model_output == 'Softmax':
-        criterion = torch.nn.BCELoss() 
-    elif args.model_output == 'sigmoid':
-        criterion = torch.nn.BCEWithLogitsLoss()     
+    # Create model
+            
+    if args.model == 'TrainBERT':
+        model = all_MLP.TrainBERT()
+        model = model.to(args.DEVICE) 
+        criterion = torch.nn.BCEWithLogitsLoss() 
+        
+    else:
+        model = all_MLP.all_MLP()
+        model = model.to(args.DEVICE)       
+        
+        if args.model_output == 'Softmax':
+            criterion = torch.nn.BCELoss() 
+        elif args.model_output == 'sigmoid':
+            criterion = torch.nn.BCEWithLogitsLoss()     
+            
         
     optimizer = optim.Adam(model.parameters(), lr = args.lr)
     
@@ -112,10 +120,17 @@ def main(args):
     train_data = df_train.values
     valid_data = df_valid.values
     pred_data = df_pred.values
-    # Load Relational Tables (RT) of BERT_avrg for users and items. Type: torch.tensor.
-    # map_location is CPU because Dataset with num_workers > 0 should not return CUDA.
-    user_RT = torch.load(args.dataPATH + args.user_RT, map_location='cpu')
-    item_RT = torch.load(args.dataPATH + args.item_RT, map_location='cpu')    
+    
+    print('\n******* Loading RT *******', args.dataPATH + args.item_RT)
+    # LOAD RT - According to the model
+    if args.model == 'TrainBERT':
+        user_RT = np.load(args.dataPATH + args.user_RT, allow_pickle=True).item()
+        item_RT = np.load(args.dataPATH + args.item_RT, allow_pickle=True).item()
+    else:
+        # Load Relational Tables (RT) of BERT_avrg for users and items. Type: torch.tensor.
+        # map_location is CPU because Dataset with num_workers > 0 should not return CUDA.
+        user_RT = torch.load(args.dataPATH + args.user_RT, map_location='cpu')
+        item_RT = torch.load(args.dataPATH + args.item_RT, map_location='cpu')    
 
     if args.DEBUG: 
         train_data = train_data[:128]

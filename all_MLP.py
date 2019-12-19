@@ -15,12 +15,6 @@ Output:
     A tensor of shape (batch, 1) representing the predicted ratings of each user-item pair (+ the logits)
     
     
-Model is composed of 2 sub models: user_encoder and item_encoder. 
-
-Dot producted is performed on these 2 encoders to obtain the prediction.
-
-
-
 
 @author: nicholas
 """
@@ -30,8 +24,9 @@ Dot producted is performed on these 2 encoders to obtain the prediction.
 
 import torch
 import torch.nn as nn
-
+from transformers import BertModel
     
+
 
 class all_MLP(nn.Module):
     """
@@ -42,7 +37,6 @@ class all_MLP(nn.Module):
     def __init__(self, input_size=2*768, hidden_size=512, output_size=1):
         super(all_MLP, self).__init__()
         
-        
         self.model = nn.Sequential(
           nn.Linear(input_size ,hidden_size),
           nn.ReLU(),
@@ -51,9 +45,7 @@ class all_MLP(nn.Module):
         
         nn.init.xavier_uniform_(self.model[0].weight)
         nn.init.xavier_uniform_(self.model[2].weight)
-
-        
-
+       
         
     def forward(self, user, item):
         
@@ -69,6 +61,38 @@ class all_MLP(nn.Module):
 
 
 
+
+class TrainBERT(nn.Module):
+    """ 
+    A Model that takes in 2 BERT_input: user and item.
+    
+    Passed each through the SAME BERT_Model. 
+    
+    Averages the last_hidden_layer.
+    
+    Passed it through all_MLP model to get a prediction (and logits)
+    """
+    
+    
+    def __init__(self, input_size=2*768, hidden_size=512, output_size=1):
+        super(TrainBERT, self).__init__()
+        
+        self.MLP = all_MLP(input_size, hidden_size, output_size)
+        self.BERT = BertModel.from_pretrained('bert-base-uncased')
+        
+        
+    def forward(self, user, item):
+        
+        # Get user's BERT_avrg value
+        user_last_hidden_layer = self.BERT(**user)[0]
+        user_avrg_last_hidden_layer = user_last_hidden_layer.mean(dim=1)
+
+        # Get item's BERT_avrg value
+        item_last_hidden_layer = self.BERT(**item)[0]
+        item_avrg_last_hidden_layer = item_last_hidden_layer.mean(dim=1)    
+        
+        # Pass the both through the MLP
+        return self.MLP(user_avrg_last_hidden_layer, item_avrg_last_hidden_layer)
 
 
 
