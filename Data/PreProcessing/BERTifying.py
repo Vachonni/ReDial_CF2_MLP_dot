@@ -38,6 +38,10 @@ print('model loaded')
 def Text_in_BERT(text, tokenizer=tokenizer, max_length=512):
     """
     From a string to a BERT input.
+    The outpur is in a batch 1 format. (one line matrix format)
+    
+    NOTE: WHEN ONLY ONE SPEAKER:
+        'position_ids' and 'token_type_ids' can be removed 
     """
     
     input_dict = {}
@@ -118,12 +122,19 @@ movie_str_ML = np.load('/Users/nicholas/ReDial_CF2_MLP_dot/Data/DataReDialML/str
 BERT_input_MovieTitlesGenres_dict = {}
     
 for k, text in enumerate(movie_str_ML):
-    BERT_input_MovieTitlesGenres_dict[k] = Text_in_BERT(text[0])
+    if k == 0: print(text)
+    # text is a list, so take first argument
+    input_dict = Text_in_BERT(text[0])
+    # Flatten the tensors in input dict
+    input_dict = {k:v[0] for k,v in input_dict.items()}
+    input_dict.pop('token_type_ids')
+    input_dict.pop('position_ids')
+    BERT_input_MovieTitlesGenres_dict[k] = input_dict
+ #   if k == 0:break
 
 
 np.save('/Users/nicholas/ReDial_CF2_MLP_dot/Data/DataReDialML/BERT_input_MovieTitlesGenres_dict.npy', \
         BERT_input_MovieTitlesGenres_dict)
-    
     
     
     
@@ -138,7 +149,15 @@ movie_str = np.load('/Users/nicholas/ReDial_CF2_MLP_dot/Data/DataReDial/str_Movi
 BERT_input_MovieTitlesGenres_dict = {}
     
 for k, text in enumerate(movie_str):
-    BERT_input_MovieTitlesGenres_dict[k] = Text_in_BERT(text[0])
+    if k == 0: print(text)
+    # text is a list, so take first argument
+    input_dict = Text_in_BERT(text[0])
+    # Flatten the tensors in input dict
+    input_dict = {k:v[0] for k,v in input_dict.items()}
+    input_dict.pop('token_type_ids')
+    input_dict.pop('position_ids')
+    BERT_input_MovieTitlesGenres_dict[k] = input_dict
+ #   if k == 0:break
 
 
 np.save('/Users/nicholas/ReDial_CF2_MLP_dot/Data/DataReDial/BERT_input_MovieTitlesGenres_dict.npy', \
@@ -155,7 +174,15 @@ movie_str = np.load('/Users/nicholas/ReDial_CF2_MLP_dot/Data/DataReDial/str_Movi
 BERT_input_MovieAbstract_dict = {}
     
 for k, text in enumerate(movie_str):
-    BERT_input_MovieAbstract_dict[k] = Text_in_BERT(text[0])
+    if k == 0: print(text)
+    # text is a list, so take first argument
+    input_dict = Text_in_BERT(text[0])
+    # Flatten the tensors in input dict
+    input_dict = {k:v[0] for k,v in input_dict.items()}
+    input_dict.pop('token_type_ids')
+    input_dict.pop('position_ids')
+    BERT_input_MovieAbstract_dict[k] = input_dict
+  #  if k == 0:break
 
 
 np.save('/Users/nicholas/ReDial_CF2_MLP_dot/Data/DataReDial/BERT_input_MovieAbstract_dict.npy', \
@@ -174,10 +201,19 @@ user_str = np.load('/Users/nicholas/ReDial_CF2_MLP_dot/Data/DataReDialML/str_Use
 BERT_input_UserChrono_dict = {}
     
 for k, text in enumerate(user_str):
-    BERT_input_UserChrono_dict[k] = Text_in_BERT(text[0])
+    if k == 0: print(text)
+    # text in not a list
+    input_dict = Text_in_BERT(text)
+    # Flatten the tensors in input dict
+    input_dict = {k:v[0] for k,v in input_dict.items()}
+    input_dict.pop('token_type_ids')
+    input_dict.pop('position_ids')
+    BERT_input_UserChrono_dict[k] = input_dict
+  #  if k == 0:break
 
 
-np.save('/Users/nicholas/ReDial_CF2_MLP_dot/Data/DataReDialML/BERT_input_UserChrono_dict.npy', \
+#%%
+np.save('/Users/nicholas/ReDial_CF2_MLP_dot/Data/DataReDial/BERT_input_UserChrono_dict.npy', \
         BERT_input_UserChrono_dict)
     
     

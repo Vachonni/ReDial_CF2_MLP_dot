@@ -214,20 +214,28 @@ def TrainReconstruction(train_loader, item_RT, model, model_output, criterion, o
     qt_of_print = 5
     print_count = 0  
     
-    # # Put on right DEVICE
-    # if args.model != 'TrainBERT':
-    #     item_RT = item_RT.to(DEVICE)
+    # Put on right DEVICE
+    if hasattr(model, 'BERT'):
+        for k_item, v_item in item_RT.items():
+            for k, v in v_item.items():
+                v_item[k] = v.to(DEVICE)
+    else:
+        item_RT = item_RT.to(DEVICE)
     
     
     print('\nTRAINING')
      
     for batch_idx, (user, _, item, targets, masks) in enumerate(train_loader):
         
-        # # Put on right DEVICE
-        # user = user.to(DEVICE)
-        # item = item.to(DEVICE)
-        # targets = targets.to(DEVICE)
-        # masks = masks.to(DEVICE)
+        # Put on right DEVICE
+        if hasattr(model, 'BERT'):
+            user = {k:v.to(DEVICE) for k, v in user.items()}
+            item = {k:v.to(DEVICE) for k, v in item.items()}
+        else:
+            user = user.to(DEVICE)
+            item = item.to(DEVICE)
+        targets = targets.to(DEVICE)
+        masks = masks.to(DEVICE)
         
         # Early stopping
         if batch_idx > nb_batch: 
@@ -310,7 +318,12 @@ def EvalReconstruction(valid_loader, item_RT, model, model_output, criterion, \
     print_count = 0
     
     # Put on right DEVICE
-    item_RT = item_RT.to(DEVICE)
+    if hasattr(model, 'BERT'):
+        for k_item, v_item in item_RT.items():
+            for k, v in v_item.items():
+                v_item[k] = v.to(DEVICE)
+    else:
+        item_RT = item_RT.to(DEVICE)
     
     
     print('\nEVALUATION')
@@ -319,8 +332,12 @@ def EvalReconstruction(valid_loader, item_RT, model, model_output, criterion, \
         for batch_idx, (user, _, item, targets, masks) in enumerate(valid_loader):
             
             # Put on right DEVICE
-            user = user.to(DEVICE)
-            item = item.to(DEVICE)
+            if hasattr(model, 'BERT'):
+                user = {k:v.to(DEVICE) for k, v in user.items()}
+                item = {k:v.to(DEVICE) for k, v in item.items()}
+            else:
+                user = user.to(DEVICE)
+                item = item.to(DEVICE)
             targets = targets.to(DEVICE)
             masks = masks.to(DEVICE)
             
@@ -428,7 +445,7 @@ def Prediction(pred_data, model, user_RT, item_RT, completion, \
                 print('Batch {} out of {}'.format(batch_idx, nb_batch))
                 print_count += 1
                                
-            # Put on the right DEVICE (what will be used for prediction)
+            # Put on right DEVICE (what will be used for prediction)
             user_RT = user_RT.to(DEVICE)
             item_RT = item_RT.to(DEVICE)
             
