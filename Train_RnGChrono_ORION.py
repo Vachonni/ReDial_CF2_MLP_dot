@@ -128,10 +128,10 @@ def main(args):
         item_RT = np.load(args.dataPATH + args.item_RT, allow_pickle=True).item()
         for ku, vu in user_RT.items():
             for k, v in vu.items():
-                v = v.to(args.DEVICE)
+                vu[k] = v[0].to(args.DEVICE)
         for ki, vi in item_RT.items():
             for k, v in vi.items():
-                v = v.to(args.DEVICE)
+                vi[k] = v[0].to(args.DEVICE)
     else:
         # Load Relational Tables (RT) of BERT_avrg for users and items. Type: torch.tensor.
         # map_location is CPU because Dataset with num_workers > 0 should not return CUDA.
