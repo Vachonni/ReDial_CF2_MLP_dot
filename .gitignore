@@ -1,10 +1,13 @@
 /Results
 /.DS_Store
 Data/DataReDialML/embed_*
+Data/DataReDialML/BERT_input*
 Data/DataReDialML/Train100.csv
+Data/DataReDialML/.DS_Store
+Data/DataReDial/BERT_input*
 Data/DataReDial/embed_UserChrono_with_BERT_avrg.pt
 Data/DataReDial/Train100.csv
-/Data/DataReDialML/.DS_Store
+Data/DataReDial/.DS_Store
 /Data/.DS_Store
 Data/PreProcessing/__pycache__/
 __pycache__/
