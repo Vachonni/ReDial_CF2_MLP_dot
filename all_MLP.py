@@ -70,7 +70,8 @@ class TrainBERT(nn.Module):
     
     Averages the last_hidden_layer.
     
-    Passed it through all_MLP model to get a prediction (and logits)
+##    Passed it through all_MLP model to get a prediction (and logits)
+    Do dot product
     """
     
     
@@ -91,11 +92,14 @@ class TrainBERT(nn.Module):
         item_last_hidden_layer = self.BERT(**item)[0]
         item_avrg_last_hidden_layer = item_last_hidden_layer.mean(dim=1)    
         
-        # Pass the both through the MLP
-        return self.MLP(user_avrg_last_hidden_layer, item_avrg_last_hidden_layer)
+        # # Pass the both through the MLP
+        # return self.MLP(user_avrg_last_hidden_layer, item_avrg_last_hidden_layer)
 
-
-
+        # Do dot product of both
+        logits = (user_avrg_last_hidden_layer * item_avrg_last_hidden_layer).sum(dim=1).unsqueeze(1)
+        pred = torch.sigmoid(logits)
+        
+        return pred, logits
 
 
 
