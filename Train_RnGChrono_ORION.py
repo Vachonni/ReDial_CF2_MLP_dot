@@ -141,8 +141,8 @@ def main(args):
     ######## CREATING DATASET 
     
     print('\n******* Creating torch datasets *******')
-    train_dataset = Utils.Dataset_all_MLP(train_data, user_RT, item_RT, args.model_output)
-    valid_dataset = Utils.Dataset_all_MLP(valid_data, user_RT, item_RT, args.model_output)       
+    train_dataset = Utils.Dataset_trainBERT(train_data, user_RT, item_RT, args.model_output)
+    valid_dataset = Utils.Dataset_trainBERT(valid_data, user_RT, item_RT, args.model_output)       
     
     
     ######## CREATE DATALOADER

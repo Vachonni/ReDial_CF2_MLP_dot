@@ -96,7 +96,7 @@ class TrainBERT(nn.Module):
         # return self.MLP(user_avrg_last_hidden_layer, item_avrg_last_hidden_layer)
 
         # Do dot product of both
-        logits = (user_avrg_last_hidden_layer * item_avrg_last_hidden_layer).sum(dim=1).unsqueeze(1)
+        logits = (user_avrg_last_hidden_layer * item_avrg_last_hidden_layer).sum(dim=1)
         pred = torch.sigmoid(logits)
         
         return pred, logits
