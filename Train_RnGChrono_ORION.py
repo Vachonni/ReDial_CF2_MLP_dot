@@ -154,7 +154,7 @@ def main(args):
         kwargs = {'num_workers': args.num_workers, 'pin_memory': False}
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=args.batch,\
                                                shuffle=True, drop_last=True, **kwargs)
-    valid_loader = torch.utils.data.DataLoader(valid_dataset, batch_size=args.batch,\
+    valid_loader = torch.utils.data.DataLoader(valid_dataset, batch_size=2*args.batch,\
                                                shuffle=True, drop_last=True, **kwargs)    
        
     

@@ -170,7 +170,7 @@ class Dataset_all_MLP(data.Dataset):
         
         else:   
             item_id = int(item_id)
-            if not isinstance(rating, float): rating = rating.astype(float)    # <class 'numpy.int64'> in original data needs change
+            if isinstance(rating, float): rating = np.float64(rating)    # To correct data augmentation
             return  self.user_RT[user_id], item_id, self.item_RT[item_id], rating, -1
         
 
@@ -252,7 +252,7 @@ class Dataset_TrainBERT(data.Dataset):
         
         else:   
             item_id = int(item_id)
-            if isinstance(rating, float): rating = np.float64(rating)    # <class 'numpy.int64'> in original data needs change
+            if isinstance(rating, float): rating = np.float64(rating)    # To correct data augmentation
             return  self.user_RT[user_id], item_id, self.item_RT[item_id], rating, -1
         
 
@@ -391,8 +391,16 @@ def EvalReconstruction(valid_loader, item_RT, model, model_output, criterion, \
     qt_of_print = 5
     print_count = 0
     
+    # Esthablish if we are in the training BERT case
+    training_BERT = hasattr(model, 'BERT')    
+    
+    # Parrallelize if multiple GPUs available
+    print(f'We have {torch.cuda.device_count()} GPUs available')
+    if torch.cuda.device_count() > 1:
+        model = torch.nn.DataParallel(model)    
+    
     # Put on right DEVICE
-    if hasattr(model, 'BERT'):
+    if training_BERT:
         for k_item, v_item in item_RT.items():
             for k, v in v_item.items():
                 v_item[k] = v.to(DEVICE)
@@ -406,7 +414,7 @@ def EvalReconstruction(valid_loader, item_RT, model, model_output, criterion, \
         for batch_idx, (user, _, item, targets, masks) in enumerate(valid_loader):
             
             # Put on right DEVICE
-            if hasattr(model, 'BERT'):
+            if training_BERT:
                 user = {k:v.to(DEVICE) for k, v in user.items()}
                 item = {k:v.to(DEVICE) for k, v in item.items()}
             else:
