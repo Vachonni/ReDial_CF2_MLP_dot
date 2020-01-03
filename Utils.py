@@ -516,6 +516,19 @@ def Prediction(pred_data, model, user_RT, item_RT, completion, \
                 
     pred_on_user = None
     l_items_id = []
+    
+    
+    # Put on right DEVICE
+    if hasattr(model, 'BERT'):
+        for k_user, v_user in user_RT.items():
+            for k, v in v_user.items():
+                v_user[k] = v.to(DEVICE)
+        for k_item, v_item in item_RT.items():
+            for k, v in v_item.items():
+                v_item[k] = v.to(DEVICE)
+    else:
+        user_RT = user_RT.to(DEVICE)
+        item_RT = item_RT.to(DEVICE)
         
     
     with torch.no_grad():
@@ -531,9 +544,9 @@ def Prediction(pred_data, model, user_RT, item_RT, completion, \
                 print('Batch {} out of {}'.format(batch_idx, nb_batch))
                 print_count += 1
                                
-            # Put on right DEVICE (what will be used for prediction)
-            user_RT = user_RT.to(DEVICE)
-            item_RT = item_RT.to(DEVICE)
+            # # Put on right DEVICE (what will be used for prediction)
+            # user_RT = user_RT.to(DEVICE)
+            # item_RT = item_RT.to(DEVICE)
             
             
             ### Need to accumualte all movies for the same user (= same qt_movies_mentions)
