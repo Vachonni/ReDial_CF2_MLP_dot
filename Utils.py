@@ -214,8 +214,15 @@ def TrainReconstruction(train_loader, item_RT, model, model_output, criterion, o
     qt_of_print = 5
     print_count = 0  
     
+    # Esthablish if we are in the training BERT case
+    training_BERT = hasattr(model, 'BERT')
+    
+    # Parrallelize if multiple GPUs available
+    if torch.cuda.device_count() > 1:
+        model = torch.nn.DataParallel(model)
+    
     # Put on right DEVICE
-    if hasattr(model, 'BERT'):
+    if training_BERT:
         for k_item, v_item in item_RT.items():
             for k, v in v_item.items():
                 v_item[k] = v.to(DEVICE)
@@ -228,7 +235,7 @@ def TrainReconstruction(train_loader, item_RT, model, model_output, criterion, o
     for batch_idx, (user, _, item, targets, masks) in enumerate(train_loader):
         
         # Put on right DEVICE
-        if hasattr(model, 'BERT'):
+        if training_BERT:
             user = {k:v.to(DEVICE) for k, v in user.items()}
             item = {k:v.to(DEVICE) for k, v in item.items()}
         else:
