@@ -60,7 +60,7 @@ parser.add_argument('--preModel', type=str, metavar='', default='none', \
 # Training
     
 parser.add_argument('--lr', type=float, metavar='', default=0.001, help='Learning rate')
-parser.add_argument('--batch', type=int, metavar='', default=64, help='Batch size')
+parser.add_argument('--batch', type=int, metavar='', default=16, help='Batch size')
 parser.add_argument('--epoch', type=int, metavar='', default=1000, help='Number of epoch')   
 parser.add_argument('--weights', type=float, metavar='', default=1, \
                     help='Weights multiplying the errors on ratings of 0 (underrepresented) \
