@@ -14,11 +14,75 @@ import ast
 import numpy as np
 from torch.utils import data
 import torch
-#import nltk
 import matplotlib.pyplot as plt
 from statistics import mean, stdev
 import scipy.stats as ss
-#import Settings
+
+# Personnal imports
+import Arguments 
+import Settings 
+
+
+
+
+
+
+########################
+#                      # 
+#  DATA AUGMENTATION   #
+#                      # 
+########################  
+
+
+
+def GetRandomItemsAt0(user_row):
+    """
+
+    Parameters
+    ----------
+    user_row : Numpy Array (vector)
+        All inforations about a user.
+            (eg: data_idx,ConvID,qt_movies_mentioned,user_chrono_id,movie_ReDOrId,rating)
+        2nd to last position contains str-list of items that have real ids 
+        Last position contains str-list of real ratings
+
+
+    Returns
+    -------
+    Numpy Array (len(user_row[-1]) + qt  x  len(user_row))
+        Each line has same colums values, except last 2 colums, where:
+            2nd to last is real ids or new item ids
+            Last position contains real ratings or 0
+
+    """
+    
+    # Get real items_ids and associated ratings as numpy arrays (vectors)
+    real_items = np.array(ast.literal_eval(user_row[-2]))
+    real_values = np.array(ast.literal_eval(user_row[-1]))
+    
+    # Get range of movies to choose from (ReDial Only or with ML?)
+    if Arguments.args.dataPATH == '/Data/DataReDialML/':
+        range_size = Settings.nb_movies_ReDialML
+    else:
+        range_size = Settings.nb_movies_ReDial
+        
+    # Get random items ids, different from real_items
+    random_ids = np.random.choice(np.setdiff1d(range(range_size), real_items), \
+                                  Arguments.args.qt_random_ratings)
+    
+    # Concat random ids with real_ones
+    items = np.concatenate((real_items, random_ids))
+    values = np.concatenate((real_values, np.zeros(Arguments.args.qt_random_ratings)))
+    
+    # Expand the user_row to a matrix that will be returned
+    user_mat = np.tile(user_row, (len(real_items)+Arguments.args.qt_random_ratings, 1))
+    
+    # Replace 2 last columns 
+    user_mat[:,-2] = items
+    user_mat[:,-1] = values
+    
+    return user_mat
+
 
 
 
@@ -106,7 +170,8 @@ class Dataset_all_MLP(data.Dataset):
         
         else:   
             item_id = int(item_id)
-            return  self.user_RT[user_id], item_id, self.item_RT[item_id], rating.astype(float), -1
+            if not isinstance(rating, float): rating = rating.astype(float)    # <class 'numpy.int64'> in original data needs change
+            return  self.user_RT[user_id], item_id, self.item_RT[item_id], rating, -1
         
 
 
@@ -187,7 +252,8 @@ class Dataset_TrainBERT(data.Dataset):
         
         else:   
             item_id = int(item_id)
-            return  self.user_RT[user_id], item_id, self.item_RT[item_id], rating.astype(float), -1
+            if not isinstance(rating, float): rating = rating.astype(float)    # <class 'numpy.int64'> in original data needs change
+            return  self.user_RT[user_id], item_id, self.item_RT[item_id], rating, -1
         
 
 

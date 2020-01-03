@@ -10,13 +10,11 @@ All constants for data pre-processing
 @author: nicholas
 """
 
-import numpy as np
-
 
 # Number of movies treated in total (MovieLens + ReDial)
-# Corresponds to last entry in '/Users/nicholas/ReDial/DataRaw/MoviesMergedId_updated181030.csv'
-# or equivalently, the lenght of it
-nb_movies_in_total = 48271
+nb_movies_ReDialML = 48272
+# Number of movies in ReDial only
+nb_movies_ReDial = 7013
 
 
 
@@ -33,13 +31,3 @@ ML_genres = ['animation', 'adventure', 'drama', 'thriller', 'action', 'fantasy',
              'mystery', 'horror', 'sci-fi', 'comedy', 'crime', 'romance', 'war', 
              'documentary', 'children', 'musical', 'western', 'imax', 'film-noir']
 
-
-
-# List of all UiD of movies mentioned in ReDial
-
-# Get the dict of conversions
-# ReDiD2UiD = np.load('./Data/ReDID2uID.npy').item()
-
-#l_ReDUiD = []
-#for value in ReDiD2UiD.values():
-#    l_ReDUiD.append(value)

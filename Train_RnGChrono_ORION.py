@@ -20,6 +20,7 @@ from torch import optim
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import concurrent.futures
 
 # Personnal imports
 import all_MLP
@@ -192,8 +193,29 @@ def main(args):
         
         start_time = time.time()
         
-
         
+        
+        
+        # Augment train_data with random ratings at 0
+        
+        with concurrent.futures.ProcessPoolExecutor() as executor:
+            train_data_generator = executor.map(Utils.GetRandomItemsAt0, \
+                                                train_data, chunksize=100)
+        train_data_augmented = np.vstack(list(train_data_generator))
+        train_dataset = Utils.Dataset_TrainBERT(train_data_augmented, \
+                                                user_RT, item_RT, args.model_output)
+        kwargs = {'num_workers': args.num_workers, 'pin_memory': False}    
+        train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=args.batch,\
+                                                   shuffle=True, drop_last=True, **kwargs)
+        
+        print(f'Augmenting train data with {args.qt_random_ratings} random ratings \
+              took {time.time() - start_time} seconds')
+            
+            
+            
+            
+            
+            
         
         train_loss = Utils.TrainReconstruction(train_loader, item_RT, model, \
                                                args.model_output, criterion, optimizer, \
