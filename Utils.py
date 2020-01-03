@@ -218,6 +218,7 @@ def TrainReconstruction(train_loader, item_RT, model, model_output, criterion, o
     training_BERT = hasattr(model, 'BERT')
     
     # Parrallelize if multiple GPUs available
+    print(f'We have {torch.cuda.device_count()} GPUs available')
     if torch.cuda.device_count() > 1:
         model = torch.nn.DataParallel(model)
     
