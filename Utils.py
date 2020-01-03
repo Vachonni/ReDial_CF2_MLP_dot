@@ -252,7 +252,7 @@ class Dataset_TrainBERT(data.Dataset):
         
         else:   
             item_id = int(item_id)
-            if not isinstance(rating, float): rating = rating.astype(float)    # <class 'numpy.int64'> in original data needs change
+            if isinstance(rating, float): rating = np.float64(rating)    # <class 'numpy.int64'> in original data needs change
             return  self.user_RT[user_id], item_id, self.item_RT[item_id], rating, -1
         
 
