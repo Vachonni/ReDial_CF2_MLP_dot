@@ -87,7 +87,7 @@ print('*      TRAINING      *')
 print('**********************\n')
 #args.dataTrain = 'Train_EQUAL.csv' 
 #args.dataValid  = 'Val_EQUAL.csv' 
-args.completionTrain = 100 
+#args.completionTrain = 100 
 # args.completionPredEpoch = 0 
 args.seed = True 
 
