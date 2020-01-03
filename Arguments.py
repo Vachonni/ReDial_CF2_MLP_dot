@@ -65,7 +65,7 @@ parser.add_argument('--epoch', type=int, metavar='', default=1000, help='Number 
 parser.add_argument('--weights', type=float, metavar='', default=1, \
                     help='Weights multiplying the errors on ratings of 0 (underrepresented) \
                     during training.  0 -> no weights, 5 -> 5 times the weight')
-parser.add_argument('--patience', type=int, metavar='', default=2, \
+parser.add_argument('--patience', type=int, metavar='', default=5, \
                     help='number of epoch to wait without improvement in valid_loss before ending training')
 parser.add_argument('--completionTrain', type=int, metavar='', default=100, \
                     help='% of data used during 1 training epoch ~ "early stopping"')

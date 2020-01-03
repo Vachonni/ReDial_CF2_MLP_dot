@@ -175,6 +175,7 @@ def main(args):
     
     train_losses = []
     valid_losses = []
+    NDCG_by_epoch = []
     RE10_training_plot = []
     NDCG_training_plot = []
 
@@ -235,7 +236,9 @@ def main(args):
                 avrgs = Utils.ChronoPlot(graphs_data[i], graphs_titles[i], \
                                          args.logInfosPATH, subtitle)
                 if graphs_titles[i] == 'RE_10': RE10_training_plot.append(avrgs)
-                if graphs_titles[i] == 'NDCG': NDCG_training_plot.append(avrgs)
+                if graphs_titles[i] == 'NDCG': 
+                    NDCG_training_plot.append(avrgs)
+                    NDCG_this_epoch = avrgs
             
 
         
@@ -249,15 +252,16 @@ def main(args):
         
         train_losses.append(train_loss.item())
         valid_losses.append(eval_loss)
+        NDCG_by_epoch.append(NDCG_this_epoch)
         losses = [train_losses, valid_losses]  
         
         print('\n\nEND EPOCH {:3d} \nTrain Reconstruction Loss on targets: {:.4E}\
-              \nValid Reconstruction Loss on tragets: {:.4E}' \
+              \nValid Reconstruction Loss on targets: {:.4E}' \
               .format(epoch, train_loss, eval_loss))
     
         ######## PATIENCE - Stop if the Model didn't improve in the last 'patience' epochs
         patience = args.patience
-        if len(valid_losses) - valid_losses.index(min(valid_losses)) > patience:
+        if len(NDCG_by_epoch) - NDCG_by_epoch.index(max(NDCG_by_epoch)) > patience:
             print('--------------------------------------------------------------------------------')
             print('-                               STOPPED TRAINING                               -')
             print('-  Recent valid losses:', valid_losses[-patience:])
@@ -265,15 +269,15 @@ def main(args):
             break   # End training
     
         
-        ######## SAVE - First model and model that improves valid loss
-        precedent_losses = valid_losses[:-1]
+        ######## SAVE - First model and model that improves NDCG
+        precedent_NDCG = NDCG_by_epoch[:-1]
         # Cover 1st epoch for min([])'s error
-        if precedent_losses == []: precedent_losses = [0]   
-        if epoch == 0 or eval_loss < min(precedent_losses):
+        if precedent_NDCG == []: precedent_NDCG = [0]   
+        if epoch == 0 or NDCG_this_epoch > max(precedent_NDCG):
             print('\n\n   Saving...')
             state = {
                     'epoch': epoch,
-                    'eval_loss': eval_loss,
+                    'NDCG_this_epoch': NDCG_this_epoch,
                     'state_dict': model.state_dict(),
                     'optimizer': optimizer.state_dict(),
                     'losses': losses,
@@ -300,7 +304,7 @@ def main(args):
         # Saving model corresponding to the last epoch (invariant of patience)
         state = {
                 'epoch': epoch,
-                'eval_loss': eval_loss,
+                'NDCG_this_epoch': NDCG_this_epoch,
                 'state_dict': model.state_dict(),
                 'optimizer': optimizer.state_dict(),
                 'losses': losses,
