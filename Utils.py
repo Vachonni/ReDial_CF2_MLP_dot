@@ -171,6 +171,8 @@ class Dataset_all_MLP(data.Dataset):
         else:   
             item_id = int(item_id)
             if isinstance(rating, float): rating = np.float64(rating)    # To correct data augmentation
+            else: rating = rating.astype(float)    # To correct from int input original data
+            
             return  self.user_RT[user_id], item_id, self.item_RT[item_id], rating, -1
         
 
@@ -253,6 +255,8 @@ class Dataset_TrainBERT(data.Dataset):
         else:   
             item_id = int(item_id)
             if isinstance(rating, float): rating = np.float64(rating)    # To correct data augmentation
+            else: rating = rating.astype(float)    # To correct from int input original data
+           
             return  self.user_RT[user_id], item_id, self.item_RT[item_id], rating, -1
         
 
