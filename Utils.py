@@ -497,7 +497,7 @@ def Prediction(pred_data, model, user_RT, item_RT, completion, \
     
     model.eval()
     
-    # For print pusposes 
+    # For print purposes 
     nb_batch = len(pred_data) * completion / 100
     qt_of_print = 5
     print_count = 0

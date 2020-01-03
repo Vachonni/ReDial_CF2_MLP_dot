@@ -69,9 +69,9 @@ parser.add_argument('--weights', type=float, metavar='', default=1, \
                     during training.  0 -> no weights, 5 -> 5 times the weight')
 parser.add_argument('--patience', type=int, metavar='', default=5, \
                     help='number of epoch to wait without improvement in valid_loss before ending training')
-parser.add_argument('--completionTrain', type=int, metavar='', default=100, \
+parser.add_argument('--completionTrain', type=float, metavar='', default=100, \
                     help='% of data used during 1 training epoch ~ "early stopping"')
-parser.add_argument('--completionPredEpoch', type=int, metavar='', default=100, \
+parser.add_argument('--completionPredEpoch', type=float, metavar='', default=100, \
                     help='% of data used for prediction during training (each epoch)')
 parser.add_argument('--EARLY', default=False, action='store_true', \
                     help="If arg added, Train at 10%, Pred at 1% and PredChrono at 1%")
