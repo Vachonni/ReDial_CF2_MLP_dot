@@ -664,7 +664,7 @@ def GetBertEmbeds(model, RT, DEVICE):
     # Get embeddings for all 
     with torch.no_grad():
         for batch_idx, (idx_rel, dict_rel) in enumerate(RT_dataloader):
-            print(batch_idx)
+
             # Put relations on right DEVICE
             idx_rel = idx_rel.to(DEVICE)
             dict_rel = {k:v.to(DEVICE) for k, v in dict_rel.items()}
@@ -714,7 +714,9 @@ def Prediction(pred_data, model, user_RT, item_RT, completion, \
     
     # If in the train_BERT context, first get the embed values (returned in right DEVICE)
     if hasattr(model, 'BERT'):
+        print("Getting user's embeddings")
         user_RT = GetBertEmbeds(model, user_RT, DEVICE)
+        print("Getting movie's embeddings")
         item_RT = GetBertEmbeds(model, item_RT, DEVICE)
     else: 
         # Put on right DEVICE
