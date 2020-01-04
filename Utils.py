@@ -11,6 +11,7 @@ Classes and functions for ReDial project.
 """
 
 import ast
+import time
 import numpy as np
 from torch.utils import data
 import torch
@@ -714,10 +715,12 @@ def Prediction(pred_data, model, user_RT, item_RT, completion, \
     
     # If in the train_BERT context, first get the embed values (returned in right DEVICE)
     if hasattr(model, 'BERT'):
+        start_time = time.time()
         print("Getting user's embeddings")
         user_RT = GetBertEmbeds(model, user_RT, DEVICE)
         print("Getting movie's embeddings")
         item_RT = GetBertEmbeds(model, item_RT, DEVICE)
+        print(f'It took {time.time() - start_time} to get embeddings')
     else: 
         # Put on right DEVICE
         user_RT = user_RT.to(DEVICE)

@@ -15,6 +15,7 @@ Training Basic Transformer Recommender
 
 import os
 import sys
+import time
 import torch
 from torch import optim
 import numpy as np
@@ -163,8 +164,7 @@ def main(args):
 
     
     
-    import time
-    
+
     
     
     
@@ -209,8 +209,13 @@ def main(args):
         train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=args.batch,\
                                                    shuffle=True, drop_last=True, **kwargs)
         
+            
+            
+            
+        augment_time = time.time()    
+            
         print(f'Augmenting train data with {args.qt_random_ratings} random ratings \
-              took {time.time() - start_time} seconds with {multiprocessing.cpu_count()} CPUs.')
+              took {augment_time - start_time} seconds with {multiprocessing.cpu_count()} CPUs.')
             
             
             
@@ -226,9 +231,10 @@ def main(args):
         
         
 
+        train_time = time.time()
         
-        
-        print('With {}, it took {} seconds'.format(args.num_workers, time.time() - start_time))   
+        print(f'With {args.num_workers} workers,\
+              it took {train_time - augment_time} seconds to train and eval')   
         
         
         
@@ -264,7 +270,9 @@ def main(args):
                     NDCG_this_epoch = avrgs
             
 
+        pred_time = time.time()
         
+        print(f'It took {pred_time - train_time} seconds to make predictions')     
 
     
     
