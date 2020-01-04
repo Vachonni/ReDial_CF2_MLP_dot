@@ -21,6 +21,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import concurrent.futures
+import multiprocessing
 
 # Personnal imports
 import all_MLP
@@ -209,7 +210,7 @@ def main(args):
                                                    shuffle=True, drop_last=True, **kwargs)
         
         print(f'Augmenting train data with {args.qt_random_ratings} random ratings \
-              took {time.time() - start_time} seconds')
+              took {time.time() - start_time} seconds with {multiprocessing.cpu_count()} CPUs.')
             
             
             
