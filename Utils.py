@@ -346,7 +346,7 @@ def TrainReconstruction(train_loader, item_RT, model, model_output, criterion, o
             break
         
         # Print update
-        if True:  #batch_idx > nb_batch / qt_of_print * print_count:
+        if batch_idx > nb_batch / qt_of_print * print_count:
             print('Batch {:4d} out of {:4.1f}.    Reconstruction Loss on targets: {:.4E}, no weights: {:.4E}' \
                   .format(batch_idx, nb_batch, train_loss/(batch_idx+1), train_loss_no_weight/(batch_idx+1)))  
             print_count += 1    

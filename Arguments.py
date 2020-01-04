@@ -39,7 +39,7 @@ parser.add_argument('--user_RT', type=str, metavar='', default='BERT_input_UserC
                     help='File name where one index is one user input')
 parser.add_argument('--item_RT', type=str, metavar='', default='BERT_input_MovieTitlesGenres_dict.npy', \
                     help='File name where one index is one item input')
-parser.add_argument('--qt_random_ratings', type=int, metavar='', default=20, \
+parser.add_argument('--qt_random_ratings', type=int, metavar='', default=6, \
                     help='Quantity of random ratings added in training data')    
 
 
