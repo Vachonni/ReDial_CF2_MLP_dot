@@ -647,12 +647,12 @@ def GetBertEmbeds(model, RT, DEVICE):
     With actual model, use its BERT part to get the embeddings of all users and items
     """
     
-    embed_RT = torch.zeros(len(RT), 768)
+    embed_RT = torch.zeros(len(RT), 768).to(DEVICE)
     
     # Get BERT of of complete model and parrallelize if multiple GPUs available
     print(f'We have {torch.cuda.device_count()} GPUs available')
     if torch.cuda.device_count() > 1:
-        model = torch.nn.DataParallel(model.BERT)
+        model = torch.nn.DataParallel(model.BERT).to(DEVICE)
     
     # Create Dataset for RT
     RT_dataset = Dataset_Pred(RT)
@@ -666,6 +666,7 @@ def GetBertEmbeds(model, RT, DEVICE):
         for batch_idx, (idx_rel, dict_rel) in enumerate(RT_dataloader):
     
             # Put relations on right DEVICE
+            idx_rel = idx_rel.to(DEVICE)
             dict_rel = {k:v.to(DEVICE) for k, v in dict_rel.items()}
                 
             embed_rel = model(**dict_rel)[0].mean(dim=1)
