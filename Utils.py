@@ -664,7 +664,7 @@ def GetBertEmbeds(model, RT, DEVICE):
     # Get embeddings for all 
     with torch.no_grad():
         for batch_idx, (idx_rel, dict_rel) in enumerate(RT_dataloader):
-    
+            print(batch_idx)
             # Put relations on right DEVICE
             idx_rel = idx_rel.to(DEVICE)
             dict_rel = {k:v.to(DEVICE) for k, v in dict_rel.items()}
