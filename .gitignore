@@ -7,6 +7,7 @@ Data/DataReDialML/.DS_Store
 Data/DataReDial/BERT_input*
 Data/DataReDial/embed_UserChrono_with_BERT_avrg.pt
 Data/DataReDial/Train100.csv
+Data/DataReDial/Train500.csv
 Data/DataReDial/.DS_Store
 /Data/.DS_Store
 Data/PreProcessing/__pycache__/
