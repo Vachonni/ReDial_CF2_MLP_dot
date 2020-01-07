@@ -5,7 +5,7 @@ Data/DataReDialML/BERT_input*
 Data/DataReDialML/Train100.csv
 Data/DataReDialML/.DS_Store
 Data/DataReDial/BERT_input*
-Data/DataReDial/embed_UserChrono_with_BERT_avrg.pt
+Data/DataReDial/embed_UserChrono*
 Data/DataReDial/Train100.csv
 Data/DataReDial/Train500.csv
 Data/DataReDial/.DS_Store
