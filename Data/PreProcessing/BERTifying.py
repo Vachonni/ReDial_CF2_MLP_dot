@@ -73,10 +73,16 @@ def Text_in_BERT(text, tokenizer=tokenizer, max_length=512):
 
 
 
-def BERT_avrg(last_hidden_layer):
+def BERT_avrg(last_hidden_layer, attention_mask):
     """
-    From BERT last hidden layer to average of it.
+    From BERT last hidden layer to average of it,  
+    
+    ** NOW ONLY WITH EXISTING TOKENS
     """
+    
+    # 1st .squeeze() to get out of batch 2nd to get the indices
+    indices_to_use = attention_mask.squeeze().nonzero().squeeze()
+    last_hidden_layer = last_hidden_layer[:,indices_to_use,:]
     
     return last_hidden_layer.mean(dim=1)
     
@@ -90,7 +96,7 @@ def Text_to_BERT_avrg(text, model=model, tokenizer=tokenizer, max_length=512):
     
     input_to_bert = Text_in_BERT(text, tokenizer, max_length)
     last_hidden_layer = model(**input_to_bert)[0]
-    avrg_last_hidden_layer = BERT_avrg(last_hidden_layer)
+    avrg_last_hidden_layer = BERT_avrg(last_hidden_layer, input_to_bert['attention_mask'])
     
     return avrg_last_hidden_layer
     

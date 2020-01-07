@@ -19,11 +19,11 @@ from BERTifying import Text_to_BERT_avrg
 print('now Bertify is loaded')
 
 if torch.cuda.is_available():
-    df_user = pd.read_csv('/home/vachonni/scratch/ReDial_CF2_MLP_dot/Data/user_chrono_RT.csv')
-    df_item = pd.read_csv('/home/vachonni/scratch/ReDial_CF2_MLP_dot/Data/movie_genres_RT.csv')
+    df_user = pd.read_csv('/home/vachonni/scratch/ReDial_CF2_MLP_dot/Data/PreProcessing/user_chrono_RT.csv')
+    df_item = pd.read_csv('/home/vachonni/scratch/ReDial_CF2_MLP_dot/Data/PreProcessing/movie_genres_RT.csv')
 else:    
-    df_user = pd.read_csv('/Users/nicholas/ReDial_CF2_MLP_dot/Data/user_chrono_RT.csv')
-    df_item = pd.read_csv('/Users/nicholas/ReDial_CF2_MLP_dot/Data/movie_genres_RT.csv')
+    df_user = pd.read_csv('/Users/nicholas/ReDial_CF2_MLP_dot/Data/PreProcessing/user_chrono_RT.csv')
+    df_item = pd.read_csv('/Users/nicholas/ReDial_CF2_MLP_dot/Data/PreProcessing/movie_genres_RT.csv')
 
 
 #%%
@@ -32,7 +32,7 @@ else:
 # Treat users
 print('USERS')
 
-BERT_avrg = torch.zeros(48272, 768)
+BERT_avrg = torch.zeros(len(df_user.index), 768)
 with torch.no_grad():
     
     for i, text in enumerate(df_user['text']):
@@ -40,7 +40,7 @@ with torch.no_grad():
         BERT_avrg[i] = Text_to_BERT_avrg(text)
         
 
-torch.save(BERT_avrg, 'user_BERT_avrg.pt')
+torch.save(BERT_avrg, 'embed_UserChrono_with_BERT_avrg.pt')
 
 
 #%%
@@ -48,7 +48,7 @@ torch.save(BERT_avrg, 'user_BERT_avrg.pt')
 # Treat items
 print('ITEMS')
 
-BERT_avrg = torch.zeros(48272, 768)
+BERT_avrg = torch.zeros(len(df_item.index), 768)
 with torch.no_grad():
     
     for i, (title, genres) in enumerate(zip(df_item['title'], df_item['genres'])):
@@ -64,4 +64,4 @@ with torch.no_grad():
         BERT_avrg[i] = Text_to_BERT_avrg(title + '. ' + genres)
 
 
-torch.save(BERT_avrg, 'item_BERT_avrg.pt')  
+torch.save(BERT_avrg, 'embed_MovieTitlesGenres_with_BERT_avrg.pt')  
