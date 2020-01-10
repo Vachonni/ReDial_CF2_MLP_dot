@@ -125,6 +125,7 @@ def main(args):
     print('\n******* Loading RT *******', args.dataPATH + args.item_RT)
     # LOAD RT - According to the model
     if args.model == 'TrainBERTDotProduct' or args.model == 'TrainBERTMLP':
+        # Load Relational Tables (RT) of BERT ready inputs for users and items. Type: dict of torch.tensor.
         user_RT = np.load(args.dataPATH + args.user_RT, allow_pickle=True).item()
         item_RT = np.load(args.dataPATH + args.item_RT, allow_pickle=True).item()
     else:
@@ -224,8 +225,9 @@ def main(args):
         train_loss = Utils.TrainReconstruction(train_loader, item_RT, model, \
                                                args.model_output, criterion, optimizer, \
                                                args.weights, args.completionTrain, args.DEVICE)
-        eval_loss = Utils.EvalReconstruction(valid_loader, item_RT, model, args.model_output,
-                                             criterion, args.weights, 1, args.DEVICE)
+        eval_loss = Utils.EvalReconstruction(valid_loader, item_RT, model, \
+                                             args.model_output, criterion, \
+                                             args.weights, args.CompletionEval, args.DEVICE)
         
         
 

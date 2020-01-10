@@ -71,6 +71,8 @@ parser.add_argument('--patience', type=int, metavar='', default=5, \
                     help='number of epoch to wait without improvement in valid_loss before ending training')
 parser.add_argument('--completionTrain', type=float, metavar='', default=100, \
                     help='% of data used during 1 training epoch ~ "early stopping"')
+parser.add_argument('--completionEval', type=float, metavar='', default=100, \
+                    help='% of data used during 1 eval epoch ~ "early stopping"')    
 parser.add_argument('--completionPredEpoch', type=float, metavar='', default=100, \
                     help='% of data used for prediction during training (each epoch)')
 parser.add_argument('--EARLY', default=False, action='store_true', \

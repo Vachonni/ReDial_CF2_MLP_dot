@@ -98,7 +98,6 @@ def GetRandomItemsAt0(user_row):
 
 
 
-
 class Dataset_Train(data.Dataset):
     """    
     Dataset to use when *_RT are tensors of BERT embeddings (**OR** dict of BERT_input format).
@@ -189,7 +188,6 @@ class Dataset_Train(data.Dataset):
             
             return  self.usier_RT[user_id], item_id, self.item_RT[item_id], rating, -1
         
-
 
 
 class Dataset_Pred(data.Dataset):
@@ -574,7 +572,8 @@ def EvalReconstruction(valid_loader, item_RT, model, model_output, criterion, \
 
 def GetBertEmbeds(model, RT, DEVICE):
     """
-    With actual model, use its BERT part to get the embeddings of all users and items
+    When we are training BERT, use the actual model's BERT part
+    to get the embeddings of all users and items.
     """
     
     embed_RT = torch.zeros(len(RT), 768).to(DEVICE)
@@ -630,6 +629,9 @@ def Prediction(pred_data, model, user_RT, item_RT, completion, \
     qt_of_print = 5
     print_count = 0
     
+    # Esthablish if we are in the training BERT case
+    training_BERT = hasattr(model, 'BERT')    
+    
     Avrg_Ranks = {}
     MRR = {}
     RR = {}
@@ -643,7 +645,7 @@ def Prediction(pred_data, model, user_RT, item_RT, completion, \
     
     
     # If in the train_BERT context, first get the embed values (returned in right DEVICE)
-    if hasattr(model, 'BERT'):
+    if training_BERT:
         start_time = time.time()
         print("Getting user's embeddings")
         user_RT = GetBertEmbeds(model, user_RT, DEVICE)
@@ -669,11 +671,7 @@ def Prediction(pred_data, model, user_RT, item_RT, completion, \
                 print('Batch {} out of {}'.format(batch_idx, nb_batch))
                 print_count += 1
                                
-            # # Put on right DEVICE (what will be used for prediction)
-            # user_RT = user_RT.to(DEVICE)
-            # item_RT = item_RT.to(DEVICE)
-            
-            
+                        
             ### Need to accumualte all movies for the same user (= same qt_movies_mentions)
             # If first time, set pred_on_user to the first one
             if pred_on_user == None: 
@@ -687,20 +685,13 @@ def Prediction(pred_data, model, user_RT, item_RT, completion, \
                 user_embed = user_RT[pred_on_user]
                 # Adapt shape for model: embedding_size -> qt_items x embedding_size 
                 user_embed_broad = user_embed.expand(len(item_RT), -1)
-                # Make predictions on all movies 
-                
-                
-                
-                
-                """ 
-                Rapidly changed for dot product for train_BERT.
-                NEEDS TO BE ADAPTED FOR ALL CASES
-                """
-     #           pred = model(user_embed_broad, item_RT)[0]   # model returns (pred, logits)
-                pred = torch.sigmoid( (user_embed_broad * item_RT).sum(dim=1) )
-                
-                
-                
+                # Make predictions on all movies embedding 
+                # If training BERT, get merge part of the model
+                if training_BERT:
+                    pred = model.merge(user_embed_broad, item_RT)[0]   # model returns (pred, logits)
+                # If not, model is MLP, used it.
+                else:   
+                    pred = model(user_embed_broad, item_RT)[0]
                 
                 
                 
