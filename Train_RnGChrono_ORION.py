@@ -142,8 +142,8 @@ def main(args):
     ######## CREATING DATASET 
     
     print('\n******* Creating torch datasets *******')
-    train_dataset = Utils.Dataset_TrainBERT(train_data, user_RT, item_RT, args.model_output)
-    valid_dataset = Utils.Dataset_TrainBERT(valid_data, user_RT, item_RT, args.model_output)       
+    train_dataset = Utils.Dataset_Train(train_data, user_RT, item_RT, args.model_output)
+    valid_dataset = Utils.Dataset_Train(valid_data, user_RT, item_RT, args.model_output)       
     
     
     ######## CREATE DATALOADER
@@ -201,8 +201,8 @@ def main(args):
             train_data_generator = executor.map(Utils.GetRandomItemsAt0, \
                                                 train_data, chunksize=100)
         train_data_augmented = np.vstack(list(train_data_generator))
-        train_dataset = Utils.Dataset_TrainBERT(train_data_augmented, \
-                                                user_RT, item_RT, args.model_output)
+        train_dataset = Utils.Dataset_Train(train_data_augmented, \
+                                            user_RT, item_RT, args.model_output)
         kwargs = {'num_workers': args.num_workers, 'pin_memory': False}    
         train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=args.batch,\
                                                    shuffle=True, drop_last=True, **kwargs)

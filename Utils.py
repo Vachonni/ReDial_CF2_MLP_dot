@@ -99,10 +99,10 @@ def GetRandomItemsAt0(user_row):
 
 
 
-class Dataset_all_MLP(data.Dataset):
-    """
-    Dataset to use when *_RT are tensors of embeddings as the returns are.
-         
+class Dataset_Train(data.Dataset):
+    """    
+    Dataset to use when *_RT are tensors of BERT embeddings (**OR** dict of BERT_input format).
+        
     
     INPUT: 
         data: A Numpy Array shape (qt_data, 6), where each column is:
@@ -110,93 +110,22 @@ class Dataset_all_MLP(data.Dataset):
              Chrono data's from ReDial
         user_RT: torch tensor (in cuda) of shape (qt_user, embedding_size). 
                  Kind of a Retational Table.
-                 Each line is the embedding representation of corresponding user_id     
-        item_RT: torch tensor (in cuda) of shape (qt_item, embedding_size). 
-                 Kind of a Retational Table.
-                 Each line is the embedding representation of corresponding item_id
-        model_output: Softmax or sigmoid. How the loss will be evaluated.
-
-    RETURNS (for one data point): 
-        Always a 5-tuple (with some -1 when variable not necessary, depends of model_output)
-            user's embedding
-            item_id
-            item's embedding
-            rating (or list of ratings) corresponding user and item
-            masks on ratings when list of ratings (for Softmax)
-    """
-    
-    
-    def __init__(self, data, user_RT, item_RT, model_output):
-  
-        self.data = data
-        self.user_RT = user_RT
-        self.item_RT = item_RT
-        self.model_output = model_output
-        # Quantity of users 
-        # (Not always unique users. In chrono, users repeat for varying qt of movies mentionned)
-        self.qt_user = len(data)
-        self.qt_item = len(item_RT)
-        
-
-        
-    def __len__(self):
-        "Total number of samples."
-        
-        return len(self.data)
-
-
-
-    def __getitem__(self, index):
-        "Generate one sample of data."    
-        
-        # Get items in 'index' position 
-        data_idx, ConvID, qt_movies_mentionned, user_id, item_id, rating = self.data[index]        
-        
-        if self.model_output == 'Softmax':
-            
-            # Convert str to list
-            l_item_id = ast.literal_eval(item_id)
-            l_ratings = ast.literal_eval(rating)
-            
-            # Turn the list of item id's and list of ratings to full tensors (size len of items)
-            full_ratings = torch.zeros(self.qt_item)
-            # masks are 1 if a raing is available, 0 if not
-            full_masks = torch.zeros(self.qt_item)
-            for i, item in enumerate(l_item_id):
-                full_ratings[item] = l_ratings[i]
-                full_masks[item] = 1
-            
-            return  self.user_RT[user_id], -1, -1, full_ratings, full_masks
-        
-        
-        else:   
-            item_id = int(item_id)
-            if isinstance(rating, float): rating = np.float64(rating)    # To correct data augmentation
-            else: rating = rating.astype(float)    # To correct from int input original data
-            
-            return  self.user_RT[user_id], item_id, self.item_RT[item_id], rating, -1
-        
-
-
-
-
-class Dataset_TrainBERT(data.Dataset):
-    """    
-    Dataset to use when *_RT are dict of BERT_input.
-        
-    
-    INPUT: 
-        data: A Numpy Array shape (qt_data, 6), where each column is:
-             [data_idx, ConvID, qt_movies_mentioned, user_id, item_id, rating]
-             Chrono data's from ReDial
+                 Each line is the embedding representation of corresponding user_id)  
+        (**OR**
         user_RT: A dict of BERT_input (len = qt_user). 
                  Kind of a Retational Table.
                  Each item is a dict containing 4 tensors (inputs, masks, positional, token_types) 
-                 corresponding to user's key    
+                 corresponding to user's key 
+        )
+        item_RT: torch tensor (in cuda) of shape (qt_item, embedding_size). 
+                 Kind of a Retational Table.
+                 Each line is the embedding representation of corresponding item_id)
+        (**OR**
         item_RT: A dict of BERT_input (len = qt_item). 
                  Kind of a Retational Table.
                  Each item is a dict containing 4 tensors (inputs, masks, positional, token_types) 
                  corresponding to item's key
+        )
         model_output: Softmax or sigmoid. How the loss will be evaluated.
 
     
@@ -257,8 +186,8 @@ class Dataset_TrainBERT(data.Dataset):
             item_id = int(item_id)
             if isinstance(rating, float): rating = np.float64(rating)    # To correct data augmentation
             else: rating = rating.astype(float)    # To correct from int input original data
-           
-            return  self.user_RT[user_id], item_id, self.item_RT[item_id], rating, -1
+            
+            return  self.usier_RT[user_id], item_id, self.item_RT[item_id], rating, -1
         
 
 
