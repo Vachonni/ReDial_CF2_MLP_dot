@@ -11,6 +11,7 @@ List of argumnents usable with parser
 """
 
 import argparse
+import torch
 
 
 parser = argparse.ArgumentParser(description='Train an MLP for CF2')
@@ -39,7 +40,7 @@ parser.add_argument('--user_RT', type=str, metavar='', default='BERT_input_UserC
                     help='File name where one index is one user input')
 parser.add_argument('--item_RT', type=str, metavar='', default='BERT_input_MovieTitlesGenres_dict.npy', \
                     help='File name where one index is one item input')
-parser.add_argument('--qt_random_ratings', type=int, metavar='', default=6, \
+parser.add_argument('--qt_random_ratings', type=int, metavar='', default=20, \
                     help='Quantity of random ratings added in training data')    
 
 
@@ -138,12 +139,35 @@ args = parser.parse_args()
 # ASSERTIONS
 
 
-# if args.loss_fct == 'BCE':
-#     assert args.last_layer_activation != 'none','Need last layer activation with BCE'
-# if args.loss_fct == 'BCEWLL':
-#     assert args.last_layer_activation == 'none',"Last layer activation must be 'none' with BCEWLL"
-    
-    
+
+# MODEL - DATA MATCH
+
+# If model trains BERT, data needs to be in BERT input ready format
+if args.model == 'TrainBERTDotProduct' or args.model == 'TrainBERTMLP':
+    if not isinstance(args.user_RT, dict) or not isinstance(args.item_RT, dict):
+        print("\n\n\n     ****************************")
+        print("          ***   WARNING  ***")
+        print("\n     Changing RT to make them BERT ready inputs ")
+        print("     Using    BERT_input_MovieTitlesGenres_dict.npy    for items")
+        print("\n     ****************************\n\n\n")
+        args.user_RT = 'BERT_input_UserChrono_dict.npy'
+        args.item_RT = 'BERT_input_MovieTitlesGenres_dict.npy'
+# If not, it should be torch tensors containing BERT embeddings
+else:
+    if not isinstance(args.user_RT, torch.Tensor) or not isinstance(args.item_RT, torch.Tensor):
+       print("\n\n\n     ****************************")
+       print("          ***   WARNING  ***")
+       print("\n     Changing RT to make them torch.Tensor with embeddings ")
+       print("     Using    embed_MovieTitlesGenres_with_BERT_avrg.pt    for items")
+       print("     Setting qt_random_ratings at 100")
+       print("\n     ****************************\n\n\n")
+       args.user_RT = 'embed_UserChrono_with_BERT_avrg.pt'
+       args.item_RT = 'embed_MovieTitlesGenres_with_BERT_avrg.pt'  
+       args.qt_random_ratings = 100
+
+
+
+
 
 # Pourcentage
 assert 0 <= args.completionTrain <=100,'completionTrain should be in [0,100]'
