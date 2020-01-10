@@ -46,7 +46,7 @@ parser.add_argument('--qt_random_ratings', type=int, metavar='', default=6, \
 
 # Model
 
-parser.add_argument('--model', type=str, metavar='', default='TrainBERTDotProduct', 
+parser.add_argument('--model', type=str, metavar='', default='TrainBERTMLP', 
                     choices=['TrainBERTDotProduct', 'TrainBERTMLP', 'MLP'], \
                     help='Which model to use')    
 parser.add_argument('--model_output', type=str, metavar='', default='sigmoid', 
