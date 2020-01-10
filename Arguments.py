@@ -144,7 +144,7 @@ args = parser.parse_args()
 
 # If model trains BERT, data needs to be in BERT input ready format
 if args.model == 'TrainBERTDotProduct' or args.model == 'TrainBERTMLP':
-    if not isinstance(args.user_RT, dict) or not isinstance(args.item_RT, dict):
+    if args.user_RT[-3:] != 'npy' or args.item_RT[-3:] != 'npy':
         print("\n\n\n     ****************************")
         print("          ***   WARNING  ***")
         print("\n     Changing RT to make them BERT ready inputs ")
@@ -154,7 +154,7 @@ if args.model == 'TrainBERTDotProduct' or args.model == 'TrainBERTMLP':
         args.item_RT = 'BERT_input_MovieTitlesGenres_dict.npy'
 # If not, it should be torch tensors containing BERT embeddings
 else:
-    if not isinstance(args.user_RT, torch.Tensor) or not isinstance(args.item_RT, torch.Tensor):
+    if args.user_RT[-3:] != '.pt' or args.item_RT[-3:] != '.pt':
        print("\n\n\n     ****************************")
        print("          ***   WARNING  ***")
        print("\n     Changing RT to make them torch.Tensor with embeddings ")
