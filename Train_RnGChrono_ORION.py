@@ -227,7 +227,7 @@ def main(args):
                                                args.weights, args.completionTrain, args.DEVICE)
         eval_loss = Utils.EvalReconstruction(valid_loader, item_RT, model, \
                                              args.model_output, criterion, \
-                                             args.weights, args.CompletionEval, args.DEVICE)
+                                             args.weights, args.completionEval, args.DEVICE)
         
         
 
