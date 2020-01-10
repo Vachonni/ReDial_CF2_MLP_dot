@@ -27,7 +27,7 @@ def DotProduct(tensor1, tensor2):
 
 
 
-class all_MLP(nn.Module):
+class MLP(nn.Module):
     """
     Input:
         user: A tensor of shape (batch, x)        (e.g: BERT average representation (batch, 768))
@@ -39,7 +39,7 @@ class all_MLP(nn.Module):
 
 
     def __init__(self, input_size=2*768, hidden_size=512, output_size=1):
-        super(all_MLP, self).__init__()
+        super(MLP, self).__init__()
         
         self.model = nn.Sequential(
           nn.Linear(input_size ,hidden_size),
@@ -75,7 +75,7 @@ class TrainBERT(nn.Module):
     
     Averages the last_hidden_layer.
     
-    Passed it through all_MLP model or DotProduct (depending on model)
+    Passed it through MLP model or DotProduct (depending on model)
     to get a prediction (and logits)
     """
     
@@ -86,7 +86,7 @@ class TrainBERT(nn.Module):
         if model == 'TrainBERTDotProduct':
             self.merge = DotProduct
         elif model == 'TrainBERTMLP':
-            self.merge = all_MLP(input_size, hidden_size, output_size)
+            self.merge = MLP(input_size, hidden_size, output_size)
         
         self.BERT = BertModel.from_pretrained('bert-base-uncased')
         

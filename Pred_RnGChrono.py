@@ -75,7 +75,7 @@ def main(args):
     
     
     # Create basic model
-    model = all_MLP.all_MLP()
+    model = all_MLP.MLP()
     model = model.to(args.DEVICE)
     
     print('\n******* Loading model *******')         

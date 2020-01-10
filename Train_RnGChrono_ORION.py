@@ -84,7 +84,7 @@ def main(args):
         criterion = torch.nn.BCEWithLogitsLoss() 
         
     else:
-        model = all_MLP.all_MLP()
+        model = all_MLP.MLP()
         model = model.to(args.DEVICE)       
         
         if args.model_output == 'Softmax':
