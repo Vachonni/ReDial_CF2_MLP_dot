@@ -21,7 +21,7 @@ import pandas as pd
 import numpy as np
 
 # Personnal imports
-import all_MLP
+import Models
 import Utils
 import Arguments 
 
@@ -75,7 +75,7 @@ def main(args):
     
     
     # Create basic model
-    model = all_MLP.MLP()
+    model = Models.MLP()
     model = model.to(args.DEVICE)
     
     print('\n******* Loading model *******')         

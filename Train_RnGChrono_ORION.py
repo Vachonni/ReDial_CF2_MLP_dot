@@ -25,7 +25,7 @@ import concurrent.futures
 import multiprocessing
 
 # Personnal imports
-import all_MLP
+import Models
 import Utils 
 import Arguments 
 
@@ -79,12 +79,12 @@ def main(args):
     # Create model
             
     if args.model == 'TrainBERTDotProduct' or args.model == 'TrainBERTMLP':
-        model = all_MLP.TrainBERT(args.model)
+        model = Models.TrainBERT(args.model)
         model = model.to(args.DEVICE) 
         criterion = torch.nn.BCEWithLogitsLoss() 
         
     else:
-        model = all_MLP.MLP()
+        model = Models.MLP()
         model = model.to(args.DEVICE)       
         
         if args.model_output == 'Softmax':
