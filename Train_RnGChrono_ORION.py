@@ -80,18 +80,16 @@ def main(args):
             
     if args.model == 'TrainBERTDotProduct' or args.model == 'TrainBERTMLP':
         model = Models.TrainBERT(args.model)
-        model = model.to(args.DEVICE) 
-        criterion = torch.nn.BCEWithLogitsLoss() 
-        
+        criterion = torch.nn.BCEWithLogitsLoss()    
+   
     else:
         model = Models.MLP()
-        model = model.to(args.DEVICE)       
-        
         if args.model_output == 'Softmax':
             criterion = torch.nn.BCELoss() 
         elif args.model_output == 'sigmoid':
             criterion = torch.nn.BCEWithLogitsLoss()     
-            
+             
+    model = model.to(args.DEVICE)        
         
     optimizer = optim.Adam(model.parameters(), lr = args.lr)
     

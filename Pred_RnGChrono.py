@@ -74,12 +74,16 @@ def main(args):
     ########################
     
     
-    # Create basic model
-    model = Models.MLP()
-    model = model.to(args.DEVICE)
+    # Create basic model and load learned parameters
+    print('\n******* Loading model *******') 
     
-    print('\n******* Loading model *******')         
-    
+    if args.model == 'TrainBERTDotProduct' or args.model == 'TrainBERTMLP':
+        model = Models.TrainBERT(args.model) 
+    else:
+        model = Models.MLP()
+  
+    model = model.to(args.DEVICE)       
+            
     checkpoint = torch.load(args.model_path, map_location=args.DEVICE)
     
     model.load_state_dict(checkpoint['state_dict'])
