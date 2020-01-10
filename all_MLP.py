@@ -4,22 +4,11 @@
 Created on Tue Dec  3 14:52:13 2019
 
 
+Models used for CF2
 
-                              ===   MLP_dot   ===
-
-
-Input:
-    user: A tensor of shape (batch, x)        (e.g: BERT average representation (batch, 768))
-    item: A tensor of shape (batch, x)        (e.g: BERT average representation (batch, 768))
-Output:
-    A tensor of shape (batch, 1) representing the predicted ratings of each user-item pair (+ the logits)
-    
-    
 
 @author: nicholas
 """
-
-
 
 
 import torch
@@ -28,9 +17,24 @@ from transformers import BertModel
     
 
 
+def DotProduct(tensor1, tensor2):
+    
+    logits = (tensor1 * tensor2).sum(dim=1)
+    pred = torch.sigmoid(logits)
+    
+    return pred, logits
+
+
+
+
 class all_MLP(nn.Module):
     """
-    See top of file for description.
+    Input:
+        user: A tensor of shape (batch, x)        (e.g: BERT average representation (batch, 768))
+        item: A tensor of shape (batch, x)        (e.g: BERT average representation (batch, 768))
+    Output:
+        A tensor of shape (batch, 1) representing the predicted ratings of each user-item pair (+ the logits)
+        
     """
 
 
@@ -62,6 +66,7 @@ class all_MLP(nn.Module):
 
 
 
+
 class TrainBERT(nn.Module):
     """ 
     A Model that takes in 2 BERT_input: user and item.
@@ -70,50 +75,48 @@ class TrainBERT(nn.Module):
     
     Averages the last_hidden_layer.
     
-##    Passed it through all_MLP model to get a prediction (and logits)
-    Do dot product
+    Passed it through all_MLP model or DotProduct (depending on model)
+    to get a prediction (and logits)
     """
     
     
-    def __init__(self, input_size=2*768, hidden_size=512, output_size=1):
+    def __init__(self, model, input_size=2*768, hidden_size=512, output_size=1):
         super(TrainBERT, self).__init__()
         
-        self.MLP = all_MLP(input_size, hidden_size, output_size)
+        if model == 'TrainBERTDotProduct':
+            self.merge = DotProduct
+        elif model == 'TrainBERTMLP':
+            self.merge = all_MLP(input_size, hidden_size, output_size)
+        
         self.BERT = BertModel.from_pretrained('bert-base-uncased')
         
         
     def forward(self, user, item):
         
-        # # Get user's BERT_avrg value
-        # user_last_hidden_layer = self.BERT(**user)[0]
-        # user_avrg_last_hidden_layer = user_last_hidden_layer.mean(dim=1)
-
-        # # Get item's BERT_avrg value
-        # item_last_hidden_layer = self.BERT(**item)[0]
-        # item_avrg_last_hidden_layer = item_last_hidden_layer.mean(dim=1)    
-        
-        
-        
-        """ Trying with Pooler """
-        
         # Get user's BERT_avrg value
-        user_avrg_last_hidden_layer = self.BERT(**user)[1]
+        user_last_hidden_layer = self.BERT(**user)[0]
+        user_avrg_last_hidden_layer = user_last_hidden_layer.mean(dim=1)
 
         # Get item's BERT_avrg value
-        item_avrg_last_hidden_layer = self.BERT(**item)[1]
+        item_last_hidden_layer = self.BERT(**item)[0]
+        item_avrg_last_hidden_layer = item_last_hidden_layer.mean(dim=1)    
+        
+        
+        
+        # """ Trying with Pooler """
+        
+        # # Get user's BERT_avrg value
+        # user_avrg_last_hidden_layer = self.BERT(**user)[1]
+
+        # # Get item's BERT_avrg value
+        # item_avrg_last_hidden_layer = self.BERT(**item)[1]
       
         
-        """  """
+        # """  """
         
         
-        # # Pass the both through the MLP
-        # return self.MLP(user_avrg_last_hidden_layer, item_avrg_last_hidden_layer)
-
-        # Do dot product of both
-        logits = (user_avrg_last_hidden_layer * item_avrg_last_hidden_layer).sum(dim=1)
-        pred = torch.sigmoid(logits)
-        
-        return pred, logits
+        # Return pred and logits, according to matching factor
+        return self.merge(user_avrg_last_hidden_layer, item_avrg_last_hidden_layer)
 
 
 

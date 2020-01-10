@@ -105,7 +105,7 @@ def main(args):
     
     print('\n******* Loading RT *******', args.dataPATH + args.item_RT)
     # LOAD RT - According to the model
-    if args.model == 'TrainBERT':
+    if args.model == 'TrainBERTDotProduct' or args.model == 'TrainBERTMLP':
         user_RT = np.load(args.dataPATH + args.user_RT, allow_pickle=True).item()
         item_RT = np.load(args.dataPATH + args.item_RT, allow_pickle=True).item()
     else:
