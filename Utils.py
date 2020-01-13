@@ -73,7 +73,7 @@ def GetRandomItemsAt0(user_row):
     
     # Concat random ids with real_ones
     items = np.concatenate((real_items, random_ids))
-    values = np.concatenate((real_values, np.zeros(Arguments.args.qt_random_ratings)+0.5))
+    values = np.concatenate((real_values, np.zeros(Arguments.args.qt_random_ratings)))
     
     # Expand the user_row to a matrix that will be returned
     user_mat = np.tile(user_row, (len(real_items)+Arguments.args.qt_random_ratings, 1))
