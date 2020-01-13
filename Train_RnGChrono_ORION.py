@@ -93,7 +93,8 @@ def main(args):
         
     optimizer = optim.Adam(model.parameters(), lr = args.lr)
     
-    
+    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='max', \
+                                                     patience=3, verbose=True)
     
     
 
@@ -276,7 +277,8 @@ def main(args):
 
     
     
-    
+
+        scheduler.step(NDCG_this_epoch)
     
     
                 
