@@ -296,6 +296,7 @@ def TrainReconstruction(train_loader, item_RT, model, model_output, criterion, o
         if model_output == 'sigmoid':
             # Add weights on targets rated 0 (w_0) because outnumbered by targets 1
             w_0 = (targets - 1) * -1 * (weights_factor - 1)
+   #         w_1 = targets * weights_factor
             w = torch.ones(len(targets)).to(DEVICE) + w_0
             criterion.weight = w
     
@@ -826,13 +827,23 @@ def Ranks(all_values, indices_to_rank, ranking_method, topx = 0):
     # If topx not mentionned (no top), it's for all the values
     if topx == 0: topx = len(all_values)
     
+    # Insure the values we need to rank are mostly different. 
+    #    We accept case where 1 is repeated because it dataset has repeats 
+    #    and possible confusion with remakes e.g. Poltergist and Poltergist (2015)
     if ranking_method == 'min':
-        qt_uniq = len(all_values.unique())
-       # plt.hist(all_values, 100, [0.0,1.0])
-       # plt.show
-        assert qt_uniq > len(all_values) * 0.98, \
-               "{} of predictions are equal, which is more than 2%. \
-               USE --ranking_method 'ordinal'".format(1 - (qt_uniq/len(all_values)))
+        values_to_rank = all_values[indices_to_rank]
+        qt_uniq = len(values_to_rank.unique())
+      #  plt.hist(values_to_rank, 100, [0.0,1.0])
+      #  plt.show
+        if qt_uniq < len(values_to_rank) - 1:
+            print("\n\n\n     ****************************")
+            print("          ***   WARNING  ***")
+            print(f"\n     {(1 - (qt_uniq/len(values_to_rank)))*100:.1f}% of predictions are equal")
+            print(f"     --> Indices to rank {indices_to_rank}")
+            print(f"     --> Values to rank are {values_to_rank}")
+            print("     Changing ranking method to    'ordinal'")
+            print("\n     ****************************\n\n\n")
+            ranking_method = 'ordinal'
     
     ranks = ss.rankdata((-1*all_values).cpu(), method=ranking_method)[indices_to_rank]
         
