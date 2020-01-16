@@ -67,7 +67,7 @@ parser.add_argument('--batch', type=int, metavar='', default=16, help='Batch siz
 parser.add_argument('--epoch', type=int, metavar='', default=1000, help='Number of epoch')   
 parser.add_argument('--weights', type=float, metavar='', default=1, \
                     help='Weights multiplying the errors on ratings of 0 (underrepresented) \
-                    during training.  0 -> no weights, 5 -> 5 times the weight')
+                    during training.  1 -> no weights, 5 -> 5 times the weight')
 parser.add_argument('--patience', type=int, metavar='', default=5, \
                     help='number of epoch to wait without improvement in valid_loss before ending training')
 parser.add_argument('--completionTrain', type=float, metavar='', default=100, \
