@@ -42,15 +42,13 @@ class MLP(nn.Module):
         super(MLP, self).__init__()
         
         self.model = nn.Sequential(
-          nn.Dropout(0.1),  
           nn.Linear(input_size ,hidden_size),
           nn.ReLU(),
-          nn.Dropout(0.1),
           nn.Linear(hidden_size ,output_size),
         )
         
-        nn.init.xavier_uniform_(self.model[1].weight)
-        nn.init.xavier_uniform_(self.model[4].weight)
+        nn.init.xavier_uniform_(self.model[0].weight)
+        nn.init.xavier_uniform_(self.model[2].weight)
        
         
     def forward(self, user, item):
