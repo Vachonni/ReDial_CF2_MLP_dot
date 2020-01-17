@@ -28,7 +28,7 @@ Cython==0.29.2
 deap==1.2.2
 decorator==4.3.0
 docutils==0.15.2
-ecdsa==0.13
+ecdsa==0.13.3
 entrypoints==0.2.3
 fast-bert==1.5.3
 fastai==1.0.58
