@@ -84,7 +84,7 @@ parser.add_argument('--EARLY', default=False, action='store_true', \
 
 # ...for Pred file
     
-parser.add_argument('--ranking_method', type=str, metavar='', default='min', \
+parser.add_argument('--ranking_method', type=str, metavar='', default='average', \
                     help='How even ranks are assigned. Use "ordinal" if get an assert error \
                     of too many predictions equal. Can also be "average"')
 parser.add_argument('--PredOnly', default=False, action='store_true', \
