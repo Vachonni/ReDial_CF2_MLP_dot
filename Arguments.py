@@ -55,8 +55,8 @@ parser.add_argument('--model_output', type=str, metavar='', default='sigmoid',
                     help='How loss will be evaluated. \
                     With Softmax, masked BCE on all movies. \
                     With sigmoid, error on each. Should be used with 100 ramdom samples.')
-parser.add_argument('--preModel', type=str, metavar='', default='none', \
-                    help='Path to a pre-trained model to start with.')
+parser.add_argument('--preModelTrain', type=str, metavar='', default='none', \
+                    help='Path to a pre-trained model to start training with.')
     
     
 
@@ -89,7 +89,7 @@ parser.add_argument('--ranking_method', type=str, metavar='', default='average',
                     of too many predictions equal. Can also be "average"')
 parser.add_argument('--PredOnly', default=False, action='store_true', \
                     help='If arg added,run.py will only do prediction, no training.')
-parser.add_argument('--model_path', type=str, metavar='', default='none', \
+parser.add_argument('--preModelPred', type=str, metavar='', default='none', \
                     help='Path to model used for prediction. If none, determined in run.py')
 parser.add_argument('--completionPredFinal', type=int, metavar='', default=100, \
                     help='% of data used for final prediction')

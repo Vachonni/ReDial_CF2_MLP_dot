@@ -107,8 +107,8 @@ print('*  FINAL PREDICTION  *')
 print('**********************\n')
 # Set args for prediction of one model, 
 args.seed = True
-if args.model_path == 'none':
-    args.model_path = args.logModelsPATH + 'model.pth'   
+if args.preModelPred == 'none':
+    args.preModelPred = args.logModelsPATH + 'model.pth'   
 if args.DEBUG and args.completionPredFinal!= 0:
     args.completionPredFinal = 5
 

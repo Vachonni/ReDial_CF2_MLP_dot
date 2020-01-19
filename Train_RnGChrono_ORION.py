@@ -93,10 +93,21 @@ def main(args):
         
     optimizer = optim.Adam(model.parameters(), lr = args.lr)
     
+    
+    # Load existing model
+    
+    if args.preModelTrain != 'none':
+    
+        checkpoint = torch.load(args.preModelPred, map_location=args.DEVICE)
+        
+        model.load_state_dict(checkpoint['state_dict'])    
+        optimizer.load_state_dict(checkpoint['optimizer'])
+
+    # Include a scheduler
+
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='max', \
                                                      patience=3, verbose=True)
-    
-    
+
 
     ########################
     #                      # 
@@ -174,18 +185,28 @@ def main(args):
     #                      # 
     ########################  
     
+    # Initialization
     
-    train_losses = []
-    valid_losses = []
-    NDCG_by_epoch = []
-    RE10_training_plot = []
-    NDCG_training_plot = []
+    if args.preModelTrain != 'none':
+        epoch_start = checkpoint['epoch']
+        NDCG_by_epoch = checkpoint['NDCG_by_epoch']
+        train_losses = checkpoint['losses'][0]
+        valid_losses = checkpoint['losses'][1]
+        RE10_training_plot = checkpoint['RE10_training_plot']
+        NDCG_training_plot = checkpoint['NDCG_training_plot']
+    else:
+        epoch_start = 0
+        NDCG_by_epoch = []
+        train_losses = []
+        valid_losses = []
+        RE10_training_plot = []
+        NDCG_training_plot = []
 
         
     if args.DEBUG: args.epoch = 1
     
     
-    for epoch in range(args.epoch):
+    for epoch in range(epoch_start, args.epoch):
     
         print('\n\n\n\n     ==> Epoch:', epoch, '\n')
         
@@ -309,11 +330,13 @@ def main(args):
         if epoch == 0 or NDCG_this_epoch > max(precedent_NDCG):
             print('\n\n   Saving...')
             state = {
-                    'epoch': epoch,
-                    'NDCG_this_epoch': NDCG_this_epoch,
                     'state_dict': model.state_dict(),
                     'optimizer': optimizer.state_dict(),
+                    'epoch': epoch,
+                    'NDCG_by_epoch': NDCG_by_epoch,
                     'losses': losses,
+                    'RE10_training_plot': RE10_training_plot,
+                    'NDCG_training_plot': NDCG_training_plot
                     }
             if not os.path.isdir(args.logModelsPATH): os.makedirs(args.logModelsPATH, exist_ok=True)
             # Save at Models directory + model.pth
@@ -336,11 +359,13 @@ def main(args):
             
         # Saving model corresponding to the last epoch (invariant of patience)
         state = {
-                'epoch': epoch,
-                'NDCG_this_epoch': NDCG_this_epoch,
                 'state_dict': model.state_dict(),
                 'optimizer': optimizer.state_dict(),
+                'epoch': epoch,
+                'NDCG_by_epoch': NDCG_by_epoch,
                 'losses': losses,
+                'RE10_training_plot': RE10_training_plot,
+                'NDCG_training_plot': NDCG_training_plot
                 }
         # Save at Models directory + model_last_epoch.pth
         torch.save(state, args.logModelsPATH + 'model_last_epoch.pth')

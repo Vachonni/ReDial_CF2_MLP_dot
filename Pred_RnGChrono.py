@@ -84,7 +84,7 @@ def main(args):
   
     model = model.to(args.DEVICE)       
             
-    checkpoint = torch.load(args.model_path, map_location=args.DEVICE)
+    checkpoint = torch.load(args.preModelPred, map_location=args.DEVICE)
     
     model.load_state_dict(checkpoint['state_dict'])
 
