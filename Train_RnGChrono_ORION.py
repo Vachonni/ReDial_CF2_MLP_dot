@@ -93,7 +93,9 @@ def main(args):
         
     optimizer = optim.Adam(model.parameters(), lr = args.lr)
     
-    
+    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='max', \
+                                                     patience=3, verbose=True)
+        
     # Load existing model
     
     if args.preModelTrain != 'none':
@@ -102,11 +104,9 @@ def main(args):
         
         model.load_state_dict(checkpoint['state_dict'])    
         optimizer.load_state_dict(checkpoint['optimizer'])
+        scheduler.load_state_dict(checkpoint['scheduler'])
 
-    # Include a scheduler
-
-    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='max', \
-                                                     patience=3, verbose=True)
+    
 
 
     ########################
@@ -332,6 +332,7 @@ def main(args):
             state = {
                     'state_dict': model.state_dict(),
                     'optimizer': optimizer.state_dict(),
+                    'scheduler': scheduler.state_dict(),
                     'epoch': epoch,
                     'NDCG_by_epoch': NDCG_by_epoch,
                     'losses': losses,
@@ -361,6 +362,7 @@ def main(args):
         state = {
                 'state_dict': model.state_dict(),
                 'optimizer': optimizer.state_dict(),
+                'scheduler': scheduler.state_dict(),
                 'epoch': epoch,
                 'NDCG_by_epoch': NDCG_by_epoch,
                 'losses': losses,
