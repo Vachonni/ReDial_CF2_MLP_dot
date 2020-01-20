@@ -93,9 +93,11 @@ def main(args):
         
     optimizer = optim.Adam(model.parameters(), lr = args.lr)
     
-    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='max', \
-                                                     patience=3, verbose=True)
-        
+  #  scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='max', \
+  #                                                   patience=3, verbose=True)
+    scheduler = torch.optim.lr_scheduler.CyclicLR(optimizer, base_lr=0.00001, max_lr=0.1, 
+                                                  cycle_momentum=False)
+    
     # Load existing model
     
     if args.preModelTrain != 'none':
@@ -245,7 +247,7 @@ def main(args):
             
         
         train_loss = Utils.TrainReconstruction(train_loader, item_RT, model, \
-                                               args.model_output, criterion, optimizer, \
+                                               args.model_output, criterion, optimizer, scheduler, \
                                                args.weights, args.completionTrain, args.DEVICE)
         eval_loss = Utils.EvalReconstruction(valid_loader, item_RT, model, \
                                              args.model_output, criterion, \
@@ -299,7 +301,7 @@ def main(args):
     
     
 
-        scheduler.step(NDCG_this_epoch)
+    #    scheduler.step(NDCG_this_epoch)
     
     
                 

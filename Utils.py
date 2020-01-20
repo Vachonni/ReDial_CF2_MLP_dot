@@ -225,7 +225,7 @@ class Dataset_Pred(data.Dataset):
 
 
 def TrainReconstruction(train_loader, item_RT, model, model_output, criterion, optimizer, \
-                        weights_factor, completion, DEVICE):
+                        scheduler, weights_factor, completion, DEVICE):
     
     model.train()
     train_loss = 0
@@ -317,6 +317,8 @@ def TrainReconstruction(train_loader, item_RT, model, model_output, criterion, o
 
         loss.backward()
         optimizer.step()
+        
+        scheduler.step()
         
         train_loss += loss.detach()
         
