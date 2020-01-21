@@ -51,9 +51,14 @@ for name, module in generator_of_models_modules:
 #%%
 
 # Load data. BERT inputs format of user Chrono
-    
-data_user = np.load('../DataReDial/BERT_input_UserChrono_dict.npy', \
+
+if DEVICE == 'cpu':    
+    data_user = np.load('/Users/nicholas/ReDial_CF2_MLP_dot/Data/DataReDial/BERT_input_UserChrono_dict.npy', \
                     allow_pickle=True).item()
+else:
+    data_user = np.load('/home/vachonni/scratch/ReDial_CF2_MLP_dot/Data/DataReDial/BERT_input_UserChrono_dict.npy', \
+                    allow_pickle=True).item()     
+
 
 #%%
     
