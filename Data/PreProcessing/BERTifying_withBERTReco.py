@@ -81,8 +81,9 @@ embed_UserChrono_BERTReco_FineTuned = torch.zeros(len(data_user), 768)
 
 for k, v in data_user.items():
     
-    v = batch(v)
-    embed_UserChrono_BERTReco_FineTuned[k] = dict_of_models_modules['bert'](**v)[1]
+    with torch.no_grad():
+        v = batch(v)
+        embed_UserChrono_BERTReco_FineTuned[k] = dict_of_models_modules['bert'](**v)[1]
     
     # for GPU memory issues
     if DEVICE == 'cuda':
