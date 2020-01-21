@@ -82,7 +82,8 @@ embed_UserChrono_BERTReco_FineTuned = torch.zeros(len(data_user), 768)
 for k, v in data_user.items():
     v = batch(v)
     embed_UserChrono_BERTReco_FineTuned[k] = dict_of_models_modules['bert'](**v)[1]
-    if k % 1000 == 0: print(k) 
+    del(v)
+    if k % 100 == 0: print(k) 
     
     
 #%%    
