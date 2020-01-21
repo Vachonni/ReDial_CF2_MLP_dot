@@ -25,9 +25,12 @@ from transformers import BertForSequenceClassification
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 print('DEVICE = ', DEVICE )
 
+# Load on local or Compute Canada
+if DEVICE == 'cpu':
+    model = BertForSequenceClassification.from_pretrained('/Users/nicholas/ReDial_A19/Results/ChronoTextSRGenres_W20/model_out')
+else:
+    model = BertForSequenceClassification.from_pretrained('/home/vachonni/scratch/ReDial_A19/Results/ChronoTextSRGenres_W20/model_out')
 
-
-model = BertForSequenceClassification.from_pretrained('/Users/nicholas/ReDial_A19/Results/ChronoTextSRGenres_W20/model_out')
 model.to(DEVICE)
 model.eval()
 print('model loaded')
@@ -49,7 +52,7 @@ for name, module in generator_of_models_modules:
 
 # Load data. BERT inputs format of user Chrono
     
-data_user = np.load('/Users/nicholas/ReDial_CF2_MLP_dot/Data/DataReDial/BERT_input_UserChrono_dict.npy', \
+data_user = np.load('../DataReDial/BERT_input_UserChrono_dict.npy', \
                     allow_pickle=True).item()
 
 #%%
