@@ -85,8 +85,9 @@ for k, v in data_user.items():
     embed_UserChrono_BERTReco_FineTuned[k] = dict_of_models_modules['bert'](**v)[1]
     
     # for GPU memory issues
-    del(v)
-    torch.cuda.empty_cache()
+    if DEVICE == 'cuda':
+        del(v)
+        torch.cuda.empty_cache()
     
     if k % 100 == 0: print(k) 
     
