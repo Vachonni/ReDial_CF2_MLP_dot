@@ -66,9 +66,10 @@ def batch(d):
     """
     But dict of tensor in 1D to (1,-1) dimension 
     for BERT input of batch size 1 equivalent
+    Also put on right DEVICE
     """
     for k,v in d.items():
-        d[k] = d[k].view(1,-1)
+        d[k] = d[k].view(1,-1).to(DEVICE)
         
     return d    
     
