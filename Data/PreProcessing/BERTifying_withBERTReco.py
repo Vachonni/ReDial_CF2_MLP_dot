@@ -62,14 +62,14 @@ else:
 
 #%%
     
-def batch(d):
+def batch(d, device):
     """
     But dict of tensor in 1D to (1,-1) dimension 
     for BERT input of batch size 1 equivalent
     Also put on right DEVICE
     """
     for k,v in d.items():
-        d[k] = d[k].view(1,-1).to(DEVICE)
+        d[k] = d[k].view(1,-1).to(device)
         
     return d    
     
@@ -80,8 +80,10 @@ def batch(d):
 embed_UserChrono_BERTReco_FineTuned = torch.zeros(len(data_user), 768)
 
 for k, v in data_user.items():
-    v = batch(v)
+    v = batch(v, DEVICE)
     embed_UserChrono_BERTReco_FineTuned[k] = dict_of_models_modules['bert'](**v)[1].to('cpu')
+    # Put back on cpu for memory issues
+    v = batch(v,'cpu')
     if k % 100 == 0: print(k) 
     
     
