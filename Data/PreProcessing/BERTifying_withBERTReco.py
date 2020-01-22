@@ -8,7 +8,7 @@ Turning BERT inputs into BERT pooler representations...
 
 
         ...FINE TUNED with BertForSequenceClassification used for Recommendation
-                                                                (Softmax on 48272)
+                                                                (Softmax on 7013)
 
 
 @author: nicholas
@@ -27,9 +27,9 @@ print('DEVICE = ', DEVICE )
 
 # Load on local or Compute Canada
 if DEVICE == 'cpu':
-    model = BertForSequenceClassification.from_pretrained('/Users/nicholas/ReDial_A19/Results/ChronoTextSRGenres_W20/model_out')
+    model = BertForSequenceClassification.from_pretrained('/Users/nicholas/ReDial_A19/Results/ChronoTextSRGenres_W20_ReDOrId/model_out')
 else:
-    model = BertForSequenceClassification.from_pretrained('/home/vachonni/scratch/ReDial_A19/Results/ChronoTextSRGenres_W20/model_out')
+    model = BertForSequenceClassification.from_pretrained('/home/vachonni/scratch/ReDial_A19/Results/ChronoTextSRGenres_W20_ReDOrId/model_out')
 
 model.to(DEVICE)
 model.eval()
