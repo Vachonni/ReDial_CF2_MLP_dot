@@ -97,7 +97,7 @@ for k, v in data_user.items():
     
 # Save 
 
-torch.save(embed_UserChrono_BERTReco_FineTuned, 'embed_UserChrono_BERTReco_FineTuned.pt')
+torch.save(embed_UserChrono_BERTReco_FineTuned, 'embed_UserChrono_with_BERTRecoFineTuned.pt')
 
 
 
