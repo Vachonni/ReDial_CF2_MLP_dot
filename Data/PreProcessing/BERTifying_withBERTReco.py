@@ -25,11 +25,11 @@ from transformers import BertForSequenceClassification
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 print('DEVICE = ', DEVICE )
 
-# Load on local or Compute Canada
+# Load model on local or Compute Canada
 if DEVICE == 'cpu':
     model = BertForSequenceClassification.from_pretrained('/Users/nicholas/ReDial_A19/Results/ChronoTextSRGenres_W20_ReDOrId/model_out')
 else:
-    model = BertForSequenceClassification.from_pretrained('/home/vachonni/scratch/ReDial_A19/Results/ChronoTextSRGenres_W20_ReDOrId/model_out')
+    model = BertForSequenceClassification.from_pretrained('/home/vachonni/scratch/ReDial_A19/Results/Item_ABSTRACT/model_out')
 
 model.to(DEVICE)
 model.eval()
@@ -56,7 +56,7 @@ if DEVICE == 'cpu':
     data_user = np.load('/Users/nicholas/ReDial_CF2_MLP_dot/Data/DataReDial/BERT_input_UserChrono_dict.npy', \
                     allow_pickle=True).item()
 else:
-    data_user = np.load('/home/vachonni/scratch/ReDial_CF2_MLP_dot/Data/DataReDial/BERT_input_UserChrono_dict.npy', \
+    data_user = np.load('/home/vachonni/scratch/ReDial_CF2_MLP_dot/Data/DataReDial/BERT_input_MovieAbstract_dict.npy', \
                     allow_pickle=True).item()     
 
 
@@ -97,7 +97,7 @@ for k, v in data_user.items():
     
 # Save 
 
-torch.save(embed_UserChrono_BERTReco_FineTuned, 'embed_UserChrono_with_BERTRecoFineTuned.pt')
+torch.save(embed_UserChrono_BERTReco_FineTuned, 'embed_ItemAbstract_with_BERTRecoFineTuned.pt')
 
 
 
