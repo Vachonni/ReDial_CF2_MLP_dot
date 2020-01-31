@@ -45,9 +45,11 @@ class MLP(nn.Module):
         super(MLP, self).__init__()
         
         self.model = nn.Sequential(
-          nn.Linear(input_size ,hidden_size),
+          nn.Linear(input_size, 2048),
           nn.ReLU(),
-          nn.Linear(hidden_size ,output_size),
+          nn.Linear(2048, hidden_size),
+          nn.ReLU(),
+          nn.Linear(hidden_size, output_size),
         )
         
         nn.init.xavier_uniform_(self.model[0].weight)
