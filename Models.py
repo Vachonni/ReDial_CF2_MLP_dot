@@ -41,14 +41,14 @@ class MLP(nn.Module):
 
 
     def __init__(self, input_size=2*768+Settings.nb_movies_ReDial, \
-                 hidden_size=512, output_size=1):
+                 hidden_size=64, output_size=1):
         super(MLP, self).__init__()
         
         self.model = nn.Sequential(
-          nn.Linear(input_size, 2048),
+          nn.Linear(input_size, 128),
           nn.ReLU(),
           nn.Dropout(0.1),
-          nn.Linear(2048, hidden_size),
+          nn.Linear(128, hidden_size),
           nn.ReLU(),
           nn.Dropout(0.1),
           nn.Linear(hidden_size, output_size),
