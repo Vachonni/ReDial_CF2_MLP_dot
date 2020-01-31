@@ -47,14 +47,17 @@ class MLP(nn.Module):
         self.model = nn.Sequential(
           nn.Linear(input_size, 2048),
           nn.ReLU(),
+          nn.Dropout(0.1),
           nn.Linear(2048, hidden_size),
           nn.ReLU(),
+          nn.Dropout(0.1),
           nn.Linear(hidden_size, output_size),
         )
         
         nn.init.xavier_uniform_(self.model[0].weight)
-        nn.init.xavier_uniform_(self.model[2].weight)
-       
+        nn.init.xavier_uniform_(self.model[3].weight)
+        nn.init.xavier_uniform_(self.model[6].weight)
+        
         
     def forward(self, user, item, itemID):
                 
