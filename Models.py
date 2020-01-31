@@ -15,6 +15,8 @@ import torch
 import torch.nn as nn
 from transformers import BertModel
     
+import Settings
+
 
 
 def DotProduct(tensor1, tensor2):
@@ -38,7 +40,8 @@ class MLP(nn.Module):
     """
 
 
-    def __init__(self, input_size=2*768, hidden_size=512, output_size=1):
+    def __init__(self, input_size=2*768+Settings.nb_movies_ReDial, \
+                 hidden_size=512, output_size=1):
         super(MLP, self).__init__()
         
         self.model = nn.Sequential(
@@ -51,10 +54,10 @@ class MLP(nn.Module):
         nn.init.xavier_uniform_(self.model[2].weight)
        
         
-    def forward(self, user, item):
-        
+    def forward(self, user, item, itemID):
+                
         # Concatenate user and item
-        user_item = torch.cat((user, item), dim = -1)
+        user_item = torch.cat((user, item, itemID), dim = -1)
         
         # Make a prediction
         logits = self.model(user_item).squeeze()

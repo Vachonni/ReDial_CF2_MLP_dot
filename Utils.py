@@ -255,7 +255,7 @@ def TrainReconstruction(train_loader, item_RT, model, model_output, criterion, o
     
     print('\nTRAINING')
      
-    for batch_idx, (user, _, item, targets, masks) in enumerate(train_loader):
+    for batch_idx, (user, itemID, item, targets, masks) in enumerate(train_loader):
         
         # Put on right DEVICE
         if training_BERT:
@@ -290,7 +290,11 @@ def TrainReconstruction(train_loader, item_RT, model, model_output, criterion, o
 
         elif model_output == 'sigmoid':
             # Proceed one at a time
-            _, logits = model(user, item)
+            # Turn itemID(s) in one hot vector(s)
+            itemID_onehot = torch.zeros(len(itemID), Settings.nb_movies_ReDial)
+            itemID_onehot.scatter_(1, torch.tensor(itemID).unsqueeze(1), 1)
+            itemID_onehot.to(DEVICE)
+            _, logits = model(user, item, itemID_onehot)
         
         # Consider wieghts
         if model_output == 'sigmoid':
@@ -368,7 +372,7 @@ def EvalReconstruction(valid_loader, item_RT, model, model_output, criterion, \
     print('\nEVALUATION')
     
     with torch.no_grad():
-        for batch_idx, (user, _, item, targets, masks) in enumerate(valid_loader):
+        for batch_idx, (user, itemID, item, targets, masks) in enumerate(valid_loader):
             
             # Put on right DEVICE
             if training_BERT:
@@ -401,7 +405,11 @@ def EvalReconstruction(valid_loader, item_RT, model, model_output, criterion, \
                 
             elif model_output == 'sigmoid':
                 # Proceed one at a time
-                _, logits = model(user, item)
+                # Turn itemID(s) in one hot vector(s)
+                itemID_onehot = torch.zeros(len(itemID), Settings.nb_movies_ReDial)
+                itemID_onehot.scatter_(1, torch.tensor(itemID).unsqueeze(1), 1)
+                itemID_onehot.to(DEVICE)
+                _, logits = model(user, item, itemID_onehot)
             
             # Consider wieghts
             if model_output == 'sigmoid':
@@ -692,7 +700,8 @@ def Prediction(pred_data, model, user_RT, item_RT, completion, \
                     pred = model.merge(user_embed_broad, item_RT)[0]   # model returns (pred, logits)
                 # If not, model is MLP, used it.
                 else:   
-                    pred = model(user_embed_broad, item_RT)[0]
+                    pred = model(user_embed_broad, item_RT, \
+                                 torch.eye(Settings.nb_movies_ReDial).to(DEVICE))[0]
                 
                 
                 
