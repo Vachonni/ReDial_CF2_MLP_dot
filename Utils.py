@@ -292,7 +292,7 @@ def TrainReconstruction(train_loader, item_RT, model, model_output, criterion, o
             # Proceed one at a time
             # Turn itemID(s) in one hot vector(s)
             itemID_onehot = torch.zeros(len(itemID), Settings.nb_movies_ReDial)
-            itemID_onehot.scatter_(1, torch.tensor(itemID).unsqueeze(1), 1)
+            itemID_onehot.scatter_(1, itemID.unsqueeze(1), 1)
             itemID_onehot.to(DEVICE)
             _, logits = model(user, item, itemID_onehot)
         
@@ -407,7 +407,7 @@ def EvalReconstruction(valid_loader, item_RT, model, model_output, criterion, \
                 # Proceed one at a time
                 # Turn itemID(s) in one hot vector(s)
                 itemID_onehot = torch.zeros(len(itemID), Settings.nb_movies_ReDial)
-                itemID_onehot.scatter_(1, torch.tensor(itemID).unsqueeze(1), 1)
+                itemID_onehot.scatter_(1, itemID.unsqueeze(1), 1)
                 itemID_onehot.to(DEVICE)
                 _, logits = model(user, item, itemID_onehot)
             

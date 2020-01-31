@@ -196,8 +196,8 @@ def main(args):
         
         
         
-        
-        # Augment train_data with random ratings at 0
+        # AUGMENT DATA
+        # Augment train_data with random ratings at 0. From LIST to INT
         
         with concurrent.futures.ProcessPoolExecutor() as executor:
             train_data_generator = executor.map(Utils.GetRandomItemsAt0, \
