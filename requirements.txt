@@ -100,7 +100,7 @@ python-dateutil==2.8.1
 pytorch-lamb==1.0.0
 pytorch-transformers==1.2.0
 pytz==2019.3
-PyYAML==3.13
+PyYAML==5.4
 pyzmq==17.1.2
 regex==2018.1.10
 requests==2.22.0
