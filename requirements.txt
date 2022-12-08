@@ -17,7 +17,7 @@ blist==1.3.6
 boto3==1.9.242
 botocore==1.12.242
 Bottleneck==1.2.1
-certifi==2019.11.28
+certifi==2022.12.7
 cffi==1.11.5
 chardet==3.0.4
 Click==7.0
